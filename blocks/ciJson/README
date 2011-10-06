@@ -1,0 +1,24 @@
+ciJson is a JSON parsing and creating utility for Cinder.
+It wraps JsonCpp. The block introduces some convenience 
+methods while fully supporting JsonCpp's native syntax. 
+This is cross platform except for the "saveUrl" method, 
+which uses Windows' Internet API.
+
+Sample code and project details here:
+http://bantherewind.com/cijson
+
+More about JsonCpp:
+http://jsoncpp.sourceforge.net/
+
+WISH LIST
+
+- Sample project (VC10 + XCode)
+- Single "load" and "save" methods which can take
+  a filepath or URL, for Mac or Windows
+
+-----------------------------------------
+
+http://www.bantherewind.com
+http://www.libcinder.org
+
+bantherewind@gmail.com
