@@ -1,0 +1,8 @@
+{
+   "DiffuseTexture" : "blah",
+   "DiffuseColor" : [1.0, 1.0, 1.0],
+   "ParticleScale" : 1,
+   "EmitScale" : 10,
+   "Rate" : 200.0,
+   "InitialSpeed" : 1.0
+}

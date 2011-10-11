@@ -1,0 +1,8 @@
+{
+   "DiffuseTexture" : "Test2.png",
+   "DiffuseColor" : [1.0, 1.0, 1.0],
+   "ParticleScale" : 1,
+   "EmitScale" : 15,
+   "Rate" : 200.0,
+   "InitialSpeed" : 1.0
+}

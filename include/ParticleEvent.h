@@ -1,43 +1,73 @@
 //
-//  SpaceThing.h
-//  Test
+//  ParticleEvent.h
 //
-//  Created by Tom Carden on 10/4/11.
 //  Copyright 2011 Bloom Studio, Inc. All rights reserved.
 //
 
 #pragma once
-#include "BloomNode.h"
-#include "cinder/Vector.h"
-#include "cinder/gl/gl.h"
-#include "cinder/ImageIo.h"
-#include "cinder/gl/Texture.h"
+#include "EffectEvent.h"
+
+#include "cinder/Rand.h"
+#include <vector>
 
 using namespace ci;
-using namespace ci::app;
+using namespace std;
 
-class SpaceThing : public BloomNode
-{
+class ParticleEvent : public EffectEvent {
+
 public:
+    ParticleEvent();
+
+    ~ParticleEvent();
     
-    SpaceThing(float planetRadius, float orbitRadius, float orbitAngle, float orbitVelocity): 
-        mPlanetRadius(planetRadius),
-        mOrbitRadius(orbitRadius),
-        mOrbitAngle(orbitAngle),
-        mOrbitVelocity(orbitVelocity)
-    {}
+    void registerAttributes() 
+    {
+        // editable attributes (Name, Type, Member)
+        registerAttribute("DiffuseTexture", "Texture");
+        registerAttribute("DiffuseColor",   "Color");
+        registerAttribute("ParticleScale",  "Float");
+        registerAttribute("EmitScale",      "Float");
+        registerAttribute("Rate",           "Float");
+        registerAttribute("InitialSpeed",   "Float");
+        registerAttribute("RotationAngle",  "Float");
+    }
     
-    ~SpaceThing() {}
-    
-    void update();
+    void setup();
+    void update(const ci::CameraPersp &camera);
     void draw();
     
 private:
+    void processAttributes();
     
-    float mPlanetRadius;
-    float mOrbitRadius;
-    float mOrbitAngle;
-    float mOrbitVelocity;
+    // user-defined
+    // TODO these and others will need variance eventually (new type)
+    float mRate;
+    float mEmitScale;
+    float mParticleScale;
+    float mRotationAngle;
+    float mInitialSpeed;
+    Color mDiffuseColor;
+    gl::Texture mDiffuseTexture;
     
-    gl::Texture testImage;
+    //---------------------------------
+    struct Particle {
+        float scale;
+        float rotation;
+        float lifetime;
+        
+        Vec3f position;
+        Color color;
+    };
+    
+    struct VertexData {
+        ci::Vec3f vertex;
+        ci::Vec2f texture;
+        ci::Vec4f color;
+    };
+    
+	int mTotalVertices;
+    int mPrevTotalVertices;
+    
+    std::vector<Particle> mParticles;
+	VertexData *mVerts;
 };

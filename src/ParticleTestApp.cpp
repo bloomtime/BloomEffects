@@ -1,11 +1,12 @@
 #include "cinder/app/AppCocoaTouch.h"
 #include "cinder/app/Renderer.h"
 #include "cinder/Surface.h"
+#include "cinder/ImageIo.h"
 #include "cinder/gl/Texture.h"
 #include "cinder/Camera.h"
 #include "ciJson.h"
 
-#include "ParticleEvent.h"
+#include "Effect.h"
 #include <boost/algorithm/string.hpp>
 
 using namespace std;
@@ -25,7 +26,11 @@ class ParticleTestApp : public AppCocoaTouch {
 	CameraPersp	mCam;
     
     json::Value mData;
-    ParticleEvent* mTestEvent;
+    
+    Effect* mTestEffect;
+    //ParticleEvent* mTestEvent;
+    
+    CameraPersp mCamera;
     
   protected:
   
@@ -34,30 +39,12 @@ class ParticleTestApp : public AppCocoaTouch {
 
 void ParticleTestApp::setup()
 {
-    //mData = loadResource("test1.json");
-    DataSourceRef dataSource = loadResource("test1.json");
+	mCamera.setPerspective( 60.0f, getWindowAspectRatio(), 0.001f, 2000.0f );
+	mCamera.lookAt( Vec3f(0.0f, 0.0f, -50.f), Vec3f::zero());  //TODO rough
     
-    Buffer buf = dataSource->getBuffer();
-	size_t dataSize = buf.getDataSize();
-	shared_ptr<char> bufString( new char[dataSize+1], checked_array_deleter<char>() );
-	memcpy( bufString.get(), buf.getData(), buf.getDataSize() );
-	bufString.get()[dataSize] = 0;
-    
-    string fileString;
-    fileString.append(bufString.get());
-
-    mData = json::deserialize(fileString);
-
-    if (mData != NULL) {
-        float scale = mData["Scale"].asFloat();
-        
-        console() << "yay: " << mData["Scale"].asFloat() << " - boo"<< std::endl;
-        
-        mTestEvent = new ParticleEvent(scale, Vec3f(getWindowCenter(), 0.0f));
-    }
-    else {
-        console() << "ERROR: Invalid Data."<< std::endl;
-    }
+    mTestEffect = new Effect("test.effect.json");
+    mTestEffect->setCamera(mCamera);
+    mTestEffect->setup();
 }
 
 void ParticleTestApp::resize( ResizeEvent event )
@@ -68,18 +55,25 @@ void ParticleTestApp::resize( ResizeEvent event )
 
 void ParticleTestApp::update()
 {
-    if (mTestEvent)
-        mTestEvent->update();
+    if (mTestEffect)
+        mTestEffect->deepUpdate();
+        
+    //if (mTestEvent)
+    //    mTestEvent->update(mCamera);
 }
 
 void ParticleTestApp::draw()
 {
     gl::clear( Color( 0.0f, 0.0f, 0.0f ) );
-    gl::setMatricesWindow( getWindowSize() );
-
+    //gl::setMatricesWindow( getWindowSize() );
+    gl::setMatrices( mCamera );
     
-    if (mTestEvent)
-        mTestEvent->draw();
+    //gl::color( Color::white() );
+    //gl::drawSolidCircle( Vec2f::zero(), 3 );
+        
+    if (mTestEffect)
+        mTestEffect->draw();
+        
 }
 
 CINDER_APP_COCOA_TOUCH( ParticleTestApp, RendererGl )

@@ -14,8 +14,16 @@
 		28FD15000DC6FC520079059D /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28FD14FF0DC6FC520079059D /* OpenGLES.framework */; };
 		28FD15080DC6FC5B0079059D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28FD15070DC6FC5B0079059D /* QuartzCore.framework */; };
 		43CD9799123D6504003B628E /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 43CD9798123D6504003B628E /* Icon.png */; };
-		AD7DAD8C143D2ED5009F0A59 /* test1.json in Resources */ = {isa = PBXBuildFile; fileRef = AD7DAD8B143D2ED5009F0A59 /* test1.json */; };
 		AD7DAD95143E28ED009F0A59 /* ParticleEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD7DAD94143E28ED009F0A59 /* ParticleEvent.cpp */; };
+		AD8B2317143FA9AE00DA23EE /* EffectEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD8B2316143FA9AE00DA23EE /* EffectEvent.cpp */; };
+		AD9231C41443FE9F00D89666 /* Test1.png in Resources */ = {isa = PBXBuildFile; fileRef = AD9231C31443FE9F00D89666 /* Test1.png */; };
+		AD9231C71443FEA800D89666 /* Test2.png in Resources */ = {isa = PBXBuildFile; fileRef = AD9231C61443FEA800D89666 /* Test2.png */; };
+		ADA517AD143E8555003BA388 /* test.effect.json in Resources */ = {isa = PBXBuildFile; fileRef = ADA517AC143E8555003BA388 /* test.effect.json */; };
+		ADA517AF143E8576003BA388 /* test1.particle.json in Resources */ = {isa = PBXBuildFile; fileRef = ADA517AE143E8576003BA388 /* test1.particle.json */; };
+		ADA517B1143E857C003BA388 /* test2.particle.json in Resources */ = {isa = PBXBuildFile; fileRef = ADA517B0143E857C003BA388 /* test2.particle.json */; };
+		ADA517B4143F7B57003BA388 /* Effect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADA517B3143F7B57003BA388 /* Effect.cpp */; };
+		ADA5184D143F89EF003BA388 /* BloomNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADA51817143F89EF003BA388 /* BloomNode.cpp */; };
+		ADA5184E143F89EF003BA388 /* BloomScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADA51818143F89EF003BA388 /* BloomScene.cpp */; };
 		ADB17174143D06220075945C /* README in Resources */ = {isa = PBXBuildFile; fileRef = ADB1716A143D06220075945C /* README */; };
 		ADB17175143D06220075945C /* ciJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADB1716C143D06220075945C /* ciJson.cpp */; };
 		ADB17176143D06220075945C /* json_internalarray.inl in Resources */ = {isa = PBXBuildFile; fileRef = ADB1716E143D06220075945C /* json_internalarray.inl */; };
@@ -42,9 +50,21 @@
 		32CA4F630368D1EE00C91783 /* ParticleTest_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleTest_Prefix.pch; sourceTree = "<group>"; };
 		43CD9798123D6504003B628E /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = ../resources/Icon.png; sourceTree = SOURCE_ROOT; };
 		8D1107310486CEB800E47090 /* ParticleTest-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "ParticleTest-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
-		AD7DAD8B143D2ED5009F0A59 /* test1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = test1.json; path = ../resources/test1.json; sourceTree = "<group>"; };
-		AD7DAD94143E28ED009F0A59 /* ParticleEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleEvent.cpp; sourceTree = "<group>"; };
-		AD7DAD96143E28F5009F0A59 /* ParticleEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleEvent.h; sourceTree = "<group>"; };
+		AD7DAD94143E28ED009F0A59 /* ParticleEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParticleEvent.cpp; path = ../src/ParticleEvent.cpp; sourceTree = "<group>"; };
+		AD7DAD96143E28F5009F0A59 /* ParticleEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParticleEvent.h; path = ../include/ParticleEvent.h; sourceTree = "<group>"; };
+		AD8B2315143FA9A300DA23EE /* EffectEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EffectEvent.h; path = ../include/EffectEvent.h; sourceTree = "<group>"; };
+		AD8B2316143FA9AE00DA23EE /* EffectEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EffectEvent.cpp; path = ../src/EffectEvent.cpp; sourceTree = "<group>"; };
+		AD9231C31443FE9F00D89666 /* Test1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Test1.png; path = ../resources/Test1.png; sourceTree = "<group>"; };
+		AD9231C61443FEA800D89666 /* Test2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Test2.png; path = ../resources/Test2.png; sourceTree = "<group>"; };
+		ADA517AC143E8555003BA388 /* test.effect.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = test.effect.json; path = ../resources/test.effect.json; sourceTree = "<group>"; };
+		ADA517AE143E8576003BA388 /* test1.particle.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = test1.particle.json; path = ../resources/test1.particle.json; sourceTree = "<group>"; };
+		ADA517B0143E857C003BA388 /* test2.particle.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = test2.particle.json; path = ../resources/test2.particle.json; sourceTree = "<group>"; };
+		ADA517B2143F7B48003BA388 /* Effect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Effect.h; path = ../include/Effect.h; sourceTree = "<group>"; };
+		ADA517B3143F7B57003BA388 /* Effect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Effect.cpp; path = ../src/Effect.cpp; sourceTree = "<group>"; };
+		ADA517E4143F89EF003BA388 /* BloomNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BloomNode.h; sourceTree = "<group>"; };
+		ADA517E5143F89EF003BA388 /* BloomScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BloomScene.h; sourceTree = "<group>"; };
+		ADA51817143F89EF003BA388 /* BloomNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BloomNode.cpp; sourceTree = "<group>"; };
+		ADA51818143F89EF003BA388 /* BloomScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BloomScene.cpp; sourceTree = "<group>"; };
 		ADB17160143D06220075945C /* ciJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ciJson.h; sourceTree = "<group>"; };
 		ADB17162143D06220075945C /* autolink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = autolink.h; sourceTree = "<group>"; };
 		ADB17163143D06220075945C /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
@@ -93,6 +113,8 @@
 		00CFDFA7113848F40091E310 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				AD8B2316143FA9AE00DA23EE /* EffectEvent.cpp */,
+				ADA517B3143F7B57003BA388 /* Effect.cpp */,
 				AD7DAD94143E28ED009F0A59 /* ParticleEvent.cpp */,
 				00CFDFDF11384CC60091E310 /* ParticleTestApp.cpp */,
 			);
@@ -102,6 +124,8 @@
 		00CFDFB81138492F0091E310 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				AD8B2315143FA9A300DA23EE /* EffectEvent.h */,
+				ADA517B2143F7B48003BA388 /* Effect.h */,
 				AD7DAD96143E28F5009F0A59 /* ParticleEvent.h */,
 			);
 			name = Headers;
@@ -140,7 +164,11 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				AD7DAD8B143D2ED5009F0A59 /* test1.json */,
+				AD9231C61443FEA800D89666 /* Test2.png */,
+				AD9231C31443FE9F00D89666 /* Test1.png */,
+				ADA517B0143E857C003BA388 /* test2.particle.json */,
+				ADA517AE143E8576003BA388 /* test1.particle.json */,
+				ADA517AC143E8555003BA388 /* test.effect.json */,
 				43CD9798123D6504003B628E /* Icon.png */,
 				8D1107310486CEB800E47090 /* ParticleTest-Info.plist */,
 			);
@@ -164,9 +192,38 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		ADA517BC143F89EF003BA388 /* BloomScene */ = {
+			isa = PBXGroup;
+			children = (
+				ADA517E3143F89EF003BA388 /* include */,
+				ADA51816143F89EF003BA388 /* src */,
+			);
+			name = BloomScene;
+			path = ../blocks/BloomScene;
+			sourceTree = "<group>";
+		};
+		ADA517E3143F89EF003BA388 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				ADA517E4143F89EF003BA388 /* BloomNode.h */,
+				ADA517E5143F89EF003BA388 /* BloomScene.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		ADA51816143F89EF003BA388 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				ADA51817143F89EF003BA388 /* BloomNode.cpp */,
+				ADA51818143F89EF003BA388 /* BloomScene.cpp */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
 		ADB17159143D05B70075945C /* Blocks */ = {
 			isa = PBXGroup;
 			children = (
+				ADA517BC143F89EF003BA388 /* BloomScene */,
 				ADB1715E143D06220075945C /* ciJson */,
 			);
 			name = Blocks;
@@ -283,7 +340,11 @@
 				ADB17176143D06220075945C /* json_internalarray.inl in Resources */,
 				ADB17177143D06220075945C /* json_internalmap.inl in Resources */,
 				ADB1717A143D06220075945C /* json_valueiterator.inl in Resources */,
-				AD7DAD8C143D2ED5009F0A59 /* test1.json in Resources */,
+				ADA517AD143E8555003BA388 /* test.effect.json in Resources */,
+				ADA517AF143E8576003BA388 /* test1.particle.json in Resources */,
+				ADA517B1143E857C003BA388 /* test2.particle.json in Resources */,
+				AD9231C41443FE9F00D89666 /* Test1.png in Resources */,
+				AD9231C71443FEA800D89666 /* Test2.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -300,6 +361,10 @@
 				ADB17179143D06220075945C /* json_value.cpp in Sources */,
 				ADB1717B143D06220075945C /* json_writer.cpp in Sources */,
 				AD7DAD95143E28ED009F0A59 /* ParticleEvent.cpp in Sources */,
+				ADA517B4143F7B57003BA388 /* Effect.cpp in Sources */,
+				ADA5184D143F89EF003BA388 /* BloomNode.cpp in Sources */,
+				ADA5184E143F89EF003BA388 /* BloomScene.cpp in Sources */,
+				AD8B2317143FA9AE00DA23EE /* EffectEvent.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
