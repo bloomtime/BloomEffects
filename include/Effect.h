@@ -34,6 +34,7 @@ enum ChildEvent {
     PARTICLE_EVENT
 };
 
+// add new child events here
 const boost::unordered_map<string, ChildEvent> CHILD_EVENTS = boost::assign::map_list_of
     ("ParticleEvent", PARTICLE_EVENT);
 
@@ -56,6 +57,7 @@ public:
     void deepUpdate();
     void draw();
     
+    void initializeData();
     void setCamera(ci::CameraPersp &camera);
     void setTransform( const ci::Matrix44f &transform ) { mTransform = transform; /* copy OK */ }
     ci::Matrix44f getTransform() const { return mTransform; /* copy OK */ }
@@ -66,15 +68,13 @@ private:
     
     ci::Matrix44f mTransform;
     
-    // TODO need to move this to manager later
+    // TODO need to move this to effectsmanager later
     ci::CameraPersp* mCamera;
     bool mIsVisible;
     
-    //TODO TEMP TESTING
+    //TODO TEMP TESTING-parsing should be moved elsewhere
     json::Value mData;
     
-    //TODO need to convert to BloomNoderefs instead
+    //TODO maybe need to convert to BloomNoderefs instead
     std::vector<EffectEvent *> mEvents;
-    //typedef boost::unordered_map<string, EffectEvent*> ChildMap;
-    //ChildMap mChildEvents;
 };

@@ -35,6 +35,7 @@ public:
     void setup();
     void update(const ci::CameraPersp &camera);
     void draw();
+    void deepDraw();
     
 private:
     void processAttributes();

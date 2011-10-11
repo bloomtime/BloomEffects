@@ -56,6 +56,7 @@
 		AD8B2316143FA9AE00DA23EE /* EffectEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EffectEvent.cpp; path = ../src/EffectEvent.cpp; sourceTree = "<group>"; };
 		AD9231C31443FE9F00D89666 /* Test1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Test1.png; path = ../resources/Test1.png; sourceTree = "<group>"; };
 		AD9231C61443FEA800D89666 /* Test2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Test2.png; path = ../resources/Test2.png; sourceTree = "<group>"; };
+		AD9231D41444D1A300D89666 /* EffectManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EffectManager.h; path = ../include/EffectManager.h; sourceTree = "<group>"; };
 		ADA517AC143E8555003BA388 /* test.effect.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = test.effect.json; path = ../resources/test.effect.json; sourceTree = "<group>"; };
 		ADA517AE143E8576003BA388 /* test1.particle.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = test1.particle.json; path = ../resources/test1.particle.json; sourceTree = "<group>"; };
 		ADA517B0143E857C003BA388 /* test2.particle.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = test2.particle.json; path = ../resources/test2.particle.json; sourceTree = "<group>"; };
@@ -124,6 +125,7 @@
 		00CFDFB81138492F0091E310 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				AD9231D41444D1A300D89666 /* EffectManager.h */,
 				AD8B2315143FA9A300DA23EE /* EffectEvent.h */,
 				ADA517B2143F7B48003BA388 /* Effect.h */,
 				AD7DAD96143E28F5009F0A59 /* ParticleEvent.h */,

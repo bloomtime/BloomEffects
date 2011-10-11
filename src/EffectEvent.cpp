@@ -15,8 +15,8 @@ EffectEvent::~EffectEvent()
 void EffectEvent::registerAttribute(string attrName, string attrType)
 {
     EffectAttribute newAttr;
-    newAttr.name = attrName;
-    newAttr.type = attrType;
+    newAttr.mName = attrName;
+    newAttr.mType = attrType;
     
     mAttributes[attrName] = newAttr;
 }

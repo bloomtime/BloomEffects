@@ -14,7 +14,22 @@ Effect::Effect(string effectPath)
 {
     mIsVisible = true;
     mData = getData(effectPath);
+}
 
+json::Value Effect::getData(string effectPath)
+{
+    DataSourceRef dataSource = loadResource(effectPath);
+    Buffer buf = dataSource->getBuffer();
+	size_t dataSize = buf.getDataSize();
+	shared_ptr<char> bufString( new char[dataSize+1], checked_array_deleter<char>() );
+	memcpy( bufString.get(), buf.getData(), buf.getDataSize() );
+	bufString.get()[dataSize] = 0;
+    
+    return json::deserialize(bufString.get());
+}
+
+void Effect::initializeData()
+{
     if (mData != NULL) {
         vector<json::Value> events = json::readValues(mData, "Events");
         
@@ -83,19 +98,6 @@ Effect::Effect(string effectPath)
     else {
         console() << "ERROR: Invalid Data."<< std::endl;
     }
-
-}
-
-json::Value Effect::getData(string effectPath)
-{
-    DataSourceRef dataSource = loadResource(effectPath);
-    Buffer buf = dataSource->getBuffer();
-	size_t dataSize = buf.getDataSize();
-	shared_ptr<char> bufString( new char[dataSize+1], checked_array_deleter<char>() );
-	memcpy( bufString.get(), buf.getData(), buf.getDataSize() );
-	bufString.get()[dataSize] = 0;
-    
-    return json::deserialize(bufString.get());
 }
 
 void Effect::parseAttr(const json::Value data, EffectAttribute &attr, EffectEvent *currentEvent)
@@ -104,34 +106,34 @@ void Effect::parseAttr(const json::Value data, EffectAttribute &attr, EffectEven
     
     boost::any currentValue;
     
-    if (attr.type == "Color")
+    if (attr.mType == "Color")
     {
-        vector<json::Value> values = json::readValues(data, attr.name);
+        vector<json::Value> values = json::readValues(data, attr.mName);
         currentValue = Color(values[0].asFloat(), values[1].asFloat(), values[2].asFloat());
     }
-    else if (attr.type == "Texture")
+    else if (attr.mType == "Texture")
     {
-        currentValue = data[attr.name].asString();
+        currentValue = data[attr.mName].asString();
     }
-    else if (attr.type == "Float")
+    else if (attr.mType == "Float")
     {
-        currentValue = data[attr.name].asFloat();
+        currentValue = data[attr.mName].asFloat();
     }
-    else if (attr.type == "Vector3")
+    else if (attr.mType == "Vector3")
     {
-        vector<json::Value> values = json::readValues(data, attr.name);
+        vector<json::Value> values = json::readValues(data, attr.mName);
         currentValue = Vec3f(values[0].asFloat(), values[1].asFloat(), values[2].asFloat());
     }
-    else if (attr.type == "Bool")
+    else if (attr.mType == "Bool")
     {
-        currentValue = data[attr.name].asBool();
+        currentValue = data[attr.mName].asBool();
     }
     else
     {
         console() << "ERROR:  Unrecognized Attr Type"<< std::endl;
     }
     
-    currentEvent->mAttributes[attr.name].value = currentValue;
+    currentEvent->setAttribute(attr.mName, currentValue);
 }
 
 Effect::~Effect()
@@ -144,16 +146,12 @@ Effect::~Effect()
     }
     
     mEvents.clear();
-    
-    //BOOST_FOREACH(ChildMap::value_type i, mChildEvents) {
-    //    delete i.second;
-    //}
-    
-    //mChildEvents.clear();
 }
 
 void Effect::setup()
 {
+    initializeData();
+    
 	for( vector<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
     {
         if ((*it)->isEnabled())
@@ -161,7 +159,6 @@ void Effect::setup()
     }
     
     /*
-    //TODO need to convert to BloomNoderefs instead
     std::vector<EffectEventRef> effectChildren;
     std::copy(effectChildren.begin(), effectChildren.end(), std::back_inserter(mChildren));
     
@@ -192,8 +189,7 @@ void Effect::deepUpdate()
                 (*it)->update(*mCamera);
         }
         
-        /* TODO convert to bloomnoderefs
-        // TODO: don't know if this makes sense here.  Might be better to just have a separate vector of EffectEventRefs that updates whenever children are added.  Hmmm...
+        /*
         std::vector<EffectEventRef> effectChildren;
         std::copy(effectChildren.begin(), effectChildren.end(), std::back_inserter(mChildren));
         

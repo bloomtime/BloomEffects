@@ -28,19 +28,22 @@ class ParticleTestApp : public AppCocoaTouch {
     json::Value mData;
     
     Effect* mTestEffect;
-    //ParticleEvent* mTestEvent;
     
+    // TODO:  This will be the effect manager eventually, which inherits from BloomSceneRef
+    BloomSceneRef mBloomSceneRef;
     CameraPersp mCamera;
     
   protected:
-  
     //void LoadFile( DataSourceRef dataSource 
 };
 
 void ParticleTestApp::setup()
 {
 	mCamera.setPerspective( 60.0f, getWindowAspectRatio(), 0.001f, 2000.0f );
+    mCamera.setWorldUp( Vec3f(0.0f, 1.0f, 0.0f) );
 	mCamera.lookAt( Vec3f(0.0f, 0.0f, -50.f), Vec3f::zero());  //TODO rough
+    
+    //mBloomSceneRef = BloomScene::create( this );
     
     mTestEffect = new Effect("test.effect.json");
     mTestEffect->setCamera(mCamera);
@@ -49,17 +52,14 @@ void ParticleTestApp::setup()
 
 void ParticleTestApp::resize( ResizeEvent event )
 {
-	mCam.lookAt( Vec3f( 3, 2, -3 ), Vec3f::zero() );
-	mCam.setPerspective( 60, event.getAspectRatio(), 1, 1000 );
+	//mCam.lookAt( Vec3f( 3, 2, -3 ), Vec3f::zero() );
+	//mCam.setPerspective( 60, event.getAspectRatio(), 1, 1000 );
 }
 
 void ParticleTestApp::update()
 {
     if (mTestEffect)
         mTestEffect->deepUpdate();
-        
-    //if (mTestEvent)
-    //    mTestEvent->update(mCamera);
 }
 
 void ParticleTestApp::draw()
@@ -67,9 +67,6 @@ void ParticleTestApp::draw()
     gl::clear( Color( 0.0f, 0.0f, 0.0f ) );
     //gl::setMatricesWindow( getWindowSize() );
     gl::setMatrices( mCamera );
-    
-    //gl::color( Color::white() );
-    //gl::drawSolidCircle( Vec2f::zero(), 3 );
         
     if (mTestEffect)
         mTestEffect->draw();

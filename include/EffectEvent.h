@@ -41,12 +41,33 @@ typedef boost::function<void (string x)> TextureAttrFunction;
 typedef boost::function<void (float x, float y, float z)> Vec3AttrFunction;
 */
 
-struct EffectAttribute
+class EffectAttribute
 {
-    string name;
-    string type;
-    boost::any value;
-    //SetAttrFunction setAttrFunc;
+public:
+    string mName;
+    string mType;
+    boost::any mValue;
+    
+    gl::Texture getTexture() 
+    { 
+        return gl::Texture( loadImage( loadResource( boost::any_cast<string>(mValue) ) ) );
+    }
+    float getFloat()
+    {
+        return boost::any_cast<float>(mValue);
+    }
+    Color getColor()
+    {
+        return boost::any_cast<Color>(mValue);
+    }
+    Vec3f getVector3()
+    {
+        return boost::any_cast<Vec3f>(mValue);
+    }
+    int getInt()
+    {
+        return boost::any_cast<int>(mValue);
+    }
 };
 
 typedef boost::unordered_map<string, EffectAttribute> EffectAttrMap;
@@ -73,8 +94,9 @@ public:
     ci::Matrix44f getTransform() const { return mTransform; /* copy OK */ }
     
     void registerAttribute(string attrName, string attrType);
-    
+        
     EffectAttrMap getAttributes() { return mAttributes; }
+    void setAttribute(string name, boost::any value) { mAttributes[name].mValue = value; }
     void setEnabled(bool enabled) { mEnabled = enabled; }
     void setEmitterPosition(Vec3f position) { mEmitterPosition = position; }
     bool isEnabled() { return mEnabled; }
@@ -84,27 +106,6 @@ public:
 protected:
 
     virtual void processAttributes() {};
-    
-    gl::Texture getTexture(boost::any currentValue) 
-    { 
-        return gl::Texture( loadImage( loadResource( boost::any_cast<string>(currentValue) ) ) );
-    }
-    float getFloat(boost::any currentValue)
-    {
-        return boost::any_cast<float>(currentValue);
-    }
-    Color getColor(boost::any currentValue)
-    {
-        return boost::any_cast<Color>(currentValue);
-    }
-    Vec3f getVector3(boost::any currentValue)
-    {
-        return boost::any_cast<Vec3f>(currentValue);
-    }
-    int getInt(boost::any currentValue)
-    {
-        return boost::any_cast<int>(currentValue);
-    }
     
     // TODOs:
     // mAttachment (parent or joint attachments)

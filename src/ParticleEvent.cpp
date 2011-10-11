@@ -39,13 +39,13 @@ ParticleEvent::~ParticleEvent()
 void ParticleEvent::processAttributes()
 {
     // if can associate these member vars with the attr name that would be sweet
-    mDiffuseTexture = getTexture(mAttributes.at("DiffuseTexture").value);
-    mDiffuseColor = getColor(mAttributes.at("DiffuseColor").value);
-    mParticleScale = getFloat(mAttributes.at("ParticleScale").value);
-    mEmitScale = getFloat(mAttributes.at("EmitScale").value);
-    mRate = getFloat(mAttributes.at("Rate").value);
-    mInitialSpeed = getFloat(mAttributes.at("InitialSpeed").value);
-    mRotationAngle = getFloat(mAttributes.at("RotationAngle").value);
+    mDiffuseTexture =mAttributes.at("DiffuseTexture").getTexture();
+    mDiffuseColor = mAttributes.at("DiffuseColor").getColor();
+    mParticleScale = mAttributes.at("ParticleScale").getFloat();
+    mEmitScale = mAttributes.at("EmitScale").getFloat();
+    mRate = mAttributes.at("Rate").getFloat();
+    mInitialSpeed = mAttributes.at("InitialSpeed").getFloat();
+    mRotationAngle = mAttributes.at("RotationAngle").getFloat();
 }
 
 void ParticleEvent::setup()
@@ -101,10 +101,10 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         Vec3f right			= bbRight * scale;
         Vec3f up			= bbUp * scale;
         
-        Vec3f p1			= pos - right - up;
-        Vec3f p2			= pos + right - up;
-        Vec3f p3			= pos - right + up;
-        Vec3f p4			= pos + right + up;
+        Vec3f p1			= pos - right + up;
+        Vec3f p2			= pos + right + up;
+        Vec3f p3			= pos - right - up;
+        Vec3f p4			= pos + right - up;
         
         mVerts[vIndex].vertex  = p1;
         mVerts[vIndex].texture = Vec2f(0.0f,0.0f);
@@ -168,4 +168,8 @@ void ParticleEvent::draw()
     //gl::disableAdditiveBlending();
 
     // and then any children will be draw after this
+}
+
+void ParticleEvent::deepDraw()
+{
 }
