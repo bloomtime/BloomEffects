@@ -19,6 +19,7 @@
 #include "cinder/ImageIo.h"
 #include "cinder/gl/Texture.h"
 #include "cinder/app/App.h"
+#include "cinder/BSpline.h"
 #include <boost/unordered_map.hpp>
 #include <boost/assign/list_of.hpp>
 
@@ -27,6 +28,13 @@ using namespace ci::app;
 using namespace std;
 using namespace ci;
 using namespace std;
+
+typedef vector<Vec2f> floatCurvePoints;
+
+//TEMP - needs to be bspline
+typedef BSpline2f floatCurve;
+
+const float CURVE_TENSION = .5f;  //experiment
 
 class EffectAttribute
 {
@@ -62,6 +70,45 @@ public:
     string getString()
     {
         return boost::any_cast<string>(mValue);
+    }
+    floatCurve getCurve()
+    {
+        floatCurve newCurve;
+        /*
+        floatCurvePoints curvePoints = boost::any_cast<floatCurvePoints>(mValue);
+        vector<ci::Vec2f> curveInput;
+        
+        if (curvePoints.size() == 1)
+            curvePoints.push_back(curvePoints[0]);
+        
+        Vec2f pFirst = curvePoints[0] + curvePoints[0] - curvePoints[1];
+        curvePoints.insert (curvePoints.begin(), pFirst);
+        
+        float last = curvePoints.size() - 2;
+        Vec2f pLast = curvePoints[last] + curvePoints[last] - curvePoints[last-1];
+        curvePoints.push_back(pLast);
+
+        for (int i=0; i < curvePoints.size()-1; i++)
+        {
+            Vec2f currentPoint = curvePoints[i];
+            
+            if (i == 0)
+            {
+                curveInput.push_back(currentPoint);
+                continue;
+            }
+            
+            console() << curvePoints[i+3][0] << ","<< curvePoints[i+3][1] << "|" << std::endl;
+            
+            // TODO need to handle end point
+            Vec2f b1 = curvePoints[i-1] + (curvePoints[i] - curvePoints[i-1]) * CURVE_TENSION;
+            Vec2f b2 = curvePoints[i+2] - (curvePoints[i+1] - curvePoints[i]) * CURVE_TENSION;
+            
+            curveInput.push_back(curvePoints[i]);
+        }
+        */
+        
+        return newCurve;
     }
 };
 

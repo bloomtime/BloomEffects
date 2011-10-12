@@ -26,7 +26,8 @@ ParticleEvent::ParticleEvent():
     mBlendMode("Alpha"),
     mParticleLifetime(Vec2f(0.0f,0.0f)),
     mPreviousElapsed(0.0f),
-    mCurrentRate(0.0f)
+    mCurrentRate(0.0f),
+    mCurrentAlpha(1.0f)
 { 
     mFileExtension = PATH_EXTENSION;
     registerAttributes(); 
@@ -54,6 +55,8 @@ void ParticleEvent::processAttributes()
     mLifetime = mAttributes.at("Lifetime").getFloat();
     mParticleLifetime = mAttributes.at("ParticleLifetime").getVector2();
     mEmitMode = EMIT_MODES.at(mAttributes.at("EmitMode").getString());
+    mAlphaCurve = mAttributes.at("Alpha").getCurve();
+    
     //mRotationAngle = mAttributes.at("RotationAngle").getFloat();
 }
 
@@ -138,6 +141,12 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         {
             it = mParticles.erase( it );
         }
+        
+        float interval = (*it).lifetime / (*it).maxLifetime;
+        float time = interval - floor(interval);
+        
+        //TODO here need to grab the value from the curve using time
+        mCurrentAlpha = 1.0f;
     }
     
     if (mIsStopping && mParticles.size() == 0)
@@ -165,7 +174,7 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         Vec3f pos = (*it).position;
         Color c = (*it).color;
         float scale = (*it).scale;
-		Vec4f col = Vec4f(c.r, c.g, c.b, 1.0);
+		Vec4f col = Vec4f(c.r, c.g, c.b, mCurrentAlpha);
     
         Vec3f right			= bbRight * scale;
         Vec3f up			= bbUp * scale;

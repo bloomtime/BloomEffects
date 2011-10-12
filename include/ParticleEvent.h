@@ -55,6 +55,7 @@ public:
         registerAttribute("Lifetime",         "Float");
         registerAttribute("ParticleLifetime", "Vector2");
         registerAttribute("EmitMode",         "String");
+        registerAttribute("Alpha",            "Curve");
     }
     
     void setup();
@@ -76,6 +77,9 @@ private:
     int mEmitMode;
     Vec2f mParticleLifetime;  // value, variance
     string mBlendMode;
+    
+    floatCurve mAlphaCurve;
+    float mCurrentAlpha;
     
     // for continuous emit mode
     float mPreviousElapsed;

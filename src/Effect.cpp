@@ -139,6 +139,21 @@ void Effect::parseAttr(const json::Value data, EffectAttribute &attr, EffectEven
     {
         currentValue = data[attr.mName].asString();
     }
+    else if (attr.mType == "Curve")
+    {
+        floatCurvePoints currentCurve;
+        
+        vector<json::Value> pointValues = json::readValues(data, attr.mName);
+        
+        for (vector<json::Value>::const_iterator it = pointValues.begin(); it != pointValues.end(); ++it)
+        {
+            vector<json::Value> pValues = json::readValues((*it), "point");
+            Vec2f currentPoint = Vec2f(pValues[0].asFloat(), pValues[1].asFloat());
+            currentCurve.push_back(currentPoint);
+        }
+        
+        currentValue = currentCurve;
+    }
     else
     {
         console() << "ERROR:  Unrecognized Attr Type" << std::endl;
