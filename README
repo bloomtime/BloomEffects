@@ -1,0 +1,4 @@
+jsoncpp came from http://jsoncpp.sourceforge.net/
+and required scons-local to build http://sourceforge.net/projects/scons/files/scons-local/1.2.0/
+
+TODO: how to build for ios devices (not just simulator)?
