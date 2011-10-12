@@ -25,17 +25,12 @@
 		ADA5184D143F89EF003BA388 /* BloomNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADA51817143F89EF003BA388 /* BloomNode.cpp */; };
 		ADA5184E143F89EF003BA388 /* BloomScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADA51818143F89EF003BA388 /* BloomScene.cpp */; };
 		ADB17175143D06220075945C /* ciJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADB1716C143D06220075945C /* ciJson.cpp */; };
-		ADB17176143D06220075945C /* json_internalarray.inl in Resources */ = {isa = PBXBuildFile; fileRef = ADB1716E143D06220075945C /* json_internalarray.inl */; };
-		ADB17177143D06220075945C /* json_internalmap.inl in Resources */ = {isa = PBXBuildFile; fileRef = ADB1716F143D06220075945C /* json_internalmap.inl */; };
-		ADB17178143D06220075945C /* json_reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADB17170143D06220075945C /* json_reader.cpp */; };
-		ADB17179143D06220075945C /* json_value.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADB17171143D06220075945C /* json_value.cpp */; };
-		ADB1717A143D06220075945C /* json_valueiterator.inl in Resources */ = {isa = PBXBuildFile; fileRef = ADB17172143D06220075945C /* json_valueiterator.inl */; };
-		ADB1717B143D06220075945C /* json_writer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADB17173143D06220075945C /* json_writer.cpp */; };
 		C725DFFE121DAC7F00FA186B /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C727C02B121B400300192073 /* CoreMedia.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		C725E001121DAC8F00FA186B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C725E000121DAC8F00FA186B /* AVFoundation.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		C727C02E121B400300192073 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C727C02D121B400300192073 /* CoreVideo.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		C7FB19D6124BC0D70045AFD2 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7FB19D5124BC0D70045AFD2 /* AudioToolbox.framework */; };
 		C7FB19D6124BC0D70045AFD3 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7FB19D5124BC0D70045AFD3 /* CoreText.framework */; };
+		E2F56488144652CA0009E4A8 /* jsoncpp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E2F56487144652CA0009E4A8 /* jsoncpp.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -67,17 +62,12 @@
 		ADA51818143F89EF003BA388 /* BloomScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BloomScene.cpp; sourceTree = "<group>"; };
 		ADB17160143D06220075945C /* ciJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ciJson.h; sourceTree = "<group>"; };
 		ADB1716C143D06220075945C /* ciJson.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ciJson.cpp; sourceTree = "<group>"; };
-		ADB1716E143D06220075945C /* json_internalarray.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = json_internalarray.inl; sourceTree = "<group>"; };
-		ADB1716F143D06220075945C /* json_internalmap.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = json_internalmap.inl; sourceTree = "<group>"; };
-		ADB17170143D06220075945C /* json_reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json_reader.cpp; sourceTree = "<group>"; };
-		ADB17171143D06220075945C /* json_value.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json_value.cpp; sourceTree = "<group>"; };
-		ADB17172143D06220075945C /* json_valueiterator.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = json_valueiterator.inl; sourceTree = "<group>"; };
-		ADB17173143D06220075945C /* json_writer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json_writer.cpp; sourceTree = "<group>"; };
 		C725E000121DAC8F00FA186B /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		C727C02B121B400300192073 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		C727C02D121B400300192073 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		C7FB19D5124BC0D70045AFD2 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		C7FB19D5124BC0D70045AFD3 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
+		E2F56487144652CA0009E4A8 /* jsoncpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsoncpp.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,23 +232,10 @@
 		ADB1716B143D06220075945C /* src */ = {
 			isa = PBXGroup;
 			children = (
+				E2F56487144652CA0009E4A8 /* jsoncpp.cpp */,
 				ADB1716C143D06220075945C /* ciJson.cpp */,
-				ADB1716D143D06220075945C /* json */,
 			);
 			path = src;
-			sourceTree = "<group>";
-		};
-		ADB1716D143D06220075945C /* json */ = {
-			isa = PBXGroup;
-			children = (
-				ADB1716E143D06220075945C /* json_internalarray.inl */,
-				ADB1716F143D06220075945C /* json_internalmap.inl */,
-				ADB17170143D06220075945C /* json_reader.cpp */,
-				ADB17171143D06220075945C /* json_value.cpp */,
-				ADB17172143D06220075945C /* json_valueiterator.inl */,
-				ADB17173143D06220075945C /* json_writer.cpp */,
-			);
-			path = json;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -311,9 +288,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				43CD9799123D6504003B628E /* Icon.png in Resources */,
-				ADB17176143D06220075945C /* json_internalarray.inl in Resources */,
-				ADB17177143D06220075945C /* json_internalmap.inl in Resources */,
-				ADB1717A143D06220075945C /* json_valueiterator.inl in Resources */,
 				ADA517AD143E8555003BA388 /* test.effect.json in Resources */,
 				ADA517AF143E8576003BA388 /* test1.particle.json in Resources */,
 				ADA517B1143E857C003BA388 /* test2.particle.json in Resources */,
@@ -331,14 +305,12 @@
 			files = (
 				00CFDFE011384CC60091E310 /* ParticleTestApp.cpp in Sources */,
 				ADB17175143D06220075945C /* ciJson.cpp in Sources */,
-				ADB17178143D06220075945C /* json_reader.cpp in Sources */,
-				ADB17179143D06220075945C /* json_value.cpp in Sources */,
-				ADB1717B143D06220075945C /* json_writer.cpp in Sources */,
 				AD7DAD95143E28ED009F0A59 /* ParticleEvent.cpp in Sources */,
 				ADA517B4143F7B57003BA388 /* Effect.cpp in Sources */,
 				ADA5184D143F89EF003BA388 /* BloomNode.cpp in Sources */,
 				ADA5184E143F89EF003BA388 /* BloomScene.cpp in Sources */,
 				AD8B2317143FA9AE00DA23EE /* EffectEvent.cpp in Sources */,
+				E2F56488144652CA0009E4A8 /* jsoncpp.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,7 +334,7 @@
 				"GCC_THUMB_SUPPORT[arch=armv7]" = "";
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				INFOPLIST_FILE = "ParticleTest-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				"OTHER_LDFLAGS[sdk=iphoneos*][arch=*]" = (
 					"\"$(CINDER_PATH)/lib/libcinder-iphone_d.a\"",
 					"-lz",
@@ -372,6 +344,7 @@
 					"-lz",
 				);
 				PRODUCT_NAME = ParticleTest;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -390,7 +363,7 @@
 				"GCC_THUMB_SUPPORT[arch=armv7]" = "";
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				INFOPLIST_FILE = "ParticleTest-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				"OTHER_LDFLAGS[sdk=iphoneos*][arch=*]" = (
 					"\"$(CINDER_PATH)/lib/libcinder-iphone.a\"",
 					"-lz",
@@ -400,6 +373,7 @@
 					"-lz",
 				);
 				PRODUCT_NAME = ParticleTest;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
