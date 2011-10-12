@@ -13,8 +13,26 @@
 Effect::Effect(string effectPath)
 {
     mIsVisible = true;
+    mIsStarted = false;
+    mIsStopped = false;
+    
     mData = getData(effectPath);
+}
 
+json::Value Effect::getData(string effectPath)
+{
+    DataSourceRef dataSource = loadResource(effectPath);
+    Buffer buf = dataSource->getBuffer();
+	size_t dataSize = buf.getDataSize();
+	shared_ptr<char> bufString( new char[dataSize+1], checked_array_deleter<char>() );
+	memcpy( bufString.get(), buf.getData(), buf.getDataSize() );
+	bufString.get()[dataSize] = 0;
+    
+    return json::deserialize(bufString.get());
+}
+
+void Effect::initializeData()
+{
     if (mData != NULL) {
         vector<json::Value> events = json::readValues(mData, "Events");
         
@@ -66,14 +84,13 @@ Effect::Effect(string effectPath)
             
                 // Parse global parameters
                 currentEvent->setEnabled(currentBlock["Enabled"].asBool());
-            
-                float startTime = currentBlock["StartTime"].asFloat();
+                currentEvent->setStartTime(currentBlock["StartTime"].asFloat());
             
                 vector<json::Value> posValues = json::readValues(currentBlock, "Position");
                 currentEvent->setEmitterPosition(Vec3f(posValues[0].asFloat(), posValues[1].asFloat(), posValues[2].asFloat()));       
             
                 vector<json::Value> orientValues = json::readValues(currentBlock, "Orientation");
-                Vec3f orientation = Vec3f(orientValues[0].asFloat(), orientValues[1].asFloat(), orientValues[2].asFloat());
+                currentEvent->setEmitterOrientation(Vec3f(orientValues[0].asFloat(), orientValues[1].asFloat(), orientValues[2].asFloat()));
             
                 //addChild( EffectEventRef(currentEvent) );
                 mEvents.push_back(currentEvent);
@@ -83,19 +100,6 @@ Effect::Effect(string effectPath)
     else {
         console() << "ERROR: Invalid Data."<< std::endl;
     }
-
-}
-
-json::Value Effect::getData(string effectPath)
-{
-    DataSourceRef dataSource = loadResource(effectPath);
-    Buffer buf = dataSource->getBuffer();
-	size_t dataSize = buf.getDataSize();
-	shared_ptr<char> bufString( new char[dataSize+1], checked_array_deleter<char>() );
-	memcpy( bufString.get(), buf.getData(), buf.getDataSize() );
-	bufString.get()[dataSize] = 0;
-    
-    return json::deserialize(bufString.get());
 }
 
 void Effect::parseAttr(const json::Value data, EffectAttribute &attr, EffectEvent *currentEvent)
@@ -104,64 +108,91 @@ void Effect::parseAttr(const json::Value data, EffectAttribute &attr, EffectEven
     
     boost::any currentValue;
     
-    if (attr.type == "Color")
+    if (attr.mType == "Color")
     {
-        vector<json::Value> values = json::readValues(data, attr.name);
+        vector<json::Value> values = json::readValues(data, attr.mName);
         currentValue = Color(values[0].asFloat(), values[1].asFloat(), values[2].asFloat());
     }
-    else if (attr.type == "Texture")
+    else if (attr.mType == "Texture")
     {
-        currentValue = data[attr.name].asString();
+        currentValue = data[attr.mName].asString();
     }
-    else if (attr.type == "Float")
+    else if (attr.mType == "Float")
     {
-        currentValue = data[attr.name].asFloat();
+        currentValue = data[attr.mName].asFloat();
     }
-    else if (attr.type == "Vector3")
+    else if (attr.mType == "Vector3")
     {
-        vector<json::Value> values = json::readValues(data, attr.name);
+        vector<json::Value> values = json::readValues(data, attr.mName);
         currentValue = Vec3f(values[0].asFloat(), values[1].asFloat(), values[2].asFloat());
     }
-    else if (attr.type == "Bool")
+    else if (attr.mType == "Vector2")
     {
-        currentValue = data[attr.name].asBool();
+        vector<json::Value> values = json::readValues(data, attr.mName);
+        currentValue = Vec2f(values[0].asFloat(), values[1].asFloat());
+    }
+    else if (attr.mType == "Bool")
+    {
+        currentValue = data[attr.mName].asBool();
+    }
+    else if (attr.mType == "String")
+    {
+        currentValue = data[attr.mName].asString();
     }
     else
     {
-        console() << "ERROR:  Unrecognized Attr Type"<< std::endl;
+        console() << "ERROR:  Unrecognized Attr Type" << std::endl;
     }
     
-    currentEvent->mAttributes[attr.name].value = currentValue;
+    currentEvent->setAttribute(attr.mName, currentValue);
 }
 
 Effect::~Effect()
 {
     delete mCamera; 
     
-	for( vector<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+	for( list<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
     {
         delete (*it);
     }
     
     mEvents.clear();
-    
-    //BOOST_FOREACH(ChildMap::value_type i, mChildEvents) {
-    //    delete i.second;
-    //}
-    
-    //mChildEvents.clear();
+}
+
+void Effect::start()
+{
+    mIsStarted = true;
+    mStartedTime = getElapsedSeconds();
+}
+
+void Effect::stop(bool hardStop)
+{
+    for( list<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+    {
+        if ((*it)->isEnabled())
+            (*it)->stop(hardStop);
+    }
+}
+
+float Effect::getEffectElapsedSeconds()
+{
+    if (mStartedTime == -1.0f)
+        return 0.0f;
+        
+    return getElapsedSeconds () - mStartedTime;
 }
 
 void Effect::setup()
 {
-	for( vector<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+    initializeData();
+    
+	for( list<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
     {
         if ((*it)->isEnabled())
             (*it)->setup();
     }
     
     /*
-    //TODO need to convert to BloomNoderefs instead
     std::vector<EffectEventRef> effectChildren;
     std::copy(effectChildren.begin(), effectChildren.end(), std::back_inserter(mChildren));
     
@@ -178,22 +209,38 @@ void Effect::setup()
 
 void Effect::update()
 {
+    for( list<EffectEvent *>::iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+    {
+        if ((*it)->isStopped())
+        {
+            delete (*it);  
+            it = mEvents.erase( it );
+        }
+    }          
+    
+    if (mIsStarted && mEvents.size() == 0)
+        mIsStopped = true;
 }
 
 void Effect::deepUpdate()
 {
-    if (mIsVisible) {
+    if (mIsVisible && mIsStarted) {
         // update self
         update();
         
-        for( vector<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+        for( list<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
         {
-            if ((*it)->isEnabled())
+            if (((*it)->isStarted() == false) && ((*it)->isStopping() == false) && (getEffectElapsedSeconds() >= (*it)->getStartTime()))
+            {
+                (*it)->start();
+            }
+            
+            
+            if ((*it)->isEnabled() && (*it)->isStarted())
                 (*it)->update(*mCamera);
         }
         
-        /* TODO convert to bloomnoderefs
-        // TODO: don't know if this makes sense here.  Might be better to just have a separate vector of EffectEventRefs that updates whenever children are added.  Hmmm...
+        /*
         std::vector<EffectEventRef> effectChildren;
         std::copy(effectChildren.begin(), effectChildren.end(), std::back_inserter(mChildren));
         
@@ -209,7 +256,7 @@ void Effect::deepUpdate()
 
 void Effect::draw()
 {    
-    for( vector<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+    for( list<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
     {
         if ((*it)->isEnabled())
             (*it)->draw();

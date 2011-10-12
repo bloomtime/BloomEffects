@@ -34,6 +34,7 @@ enum ChildEvent {
     PARTICLE_EVENT
 };
 
+// add new child events here
 const boost::unordered_map<string, ChildEvent> CHILD_EVENTS = boost::assign::map_list_of
     ("ParticleEvent", PARTICLE_EVENT);
 
@@ -41,7 +42,10 @@ class Effect : public BloomNode {
 
 public:
     Effect():
-        mIsVisible(true)
+        mIsVisible(true),
+        mIsStarted(false),
+        mIsStopped(false),
+        mStartedTime(-1.0f)
     {}
     
     //TODO TEMP TESTING
@@ -56,9 +60,17 @@ public:
     void deepUpdate();
     void draw();
     
+    void start();
+    void stop(bool hardStop=false);  
+    float getEffectElapsedSeconds();
+    
+    void initializeData();
     void setCamera(ci::CameraPersp &camera);
     void setTransform( const ci::Matrix44f &transform ) { mTransform = transform; /* copy OK */ }
     ci::Matrix44f getTransform() const { return mTransform; /* copy OK */ }
+    
+    bool isStarted() { return mIsStarted; }
+    bool isStopped() { return mIsStopped; }
     
 private:
     json::Value getData(string effectPath);
@@ -66,15 +78,16 @@ private:
     
     ci::Matrix44f mTransform;
     
-    // TODO need to move this to manager later
+    // TODO need to move this to effectsmanager later
     ci::CameraPersp* mCamera;
     bool mIsVisible;
+    bool mIsStarted;
+    bool mIsStopped;
+    float mStartedTime;
     
-    //TODO TEMP TESTING
+    //TODO TEMP TESTING-parsing should be moved elsewhere
     json::Value mData;
     
-    //TODO need to convert to BloomNoderefs instead
-    std::vector<EffectEvent *> mEvents;
-    //typedef boost::unordered_map<string, EffectEvent*> ChildMap;
-    //ChildMap mChildEvents;
+    //TODO maybe need to convert to BloomNoderefs instead
+    std::list<EffectEvent *> mEvents;
 };

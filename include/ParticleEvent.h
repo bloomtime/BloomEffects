@@ -9,10 +9,31 @@
 
 #include "cinder/Rand.h"
 #include <vector>
+#include <list>
 
 using namespace ci;
 using namespace std;
 
+enum EmitModes {
+    EMIT_BURST,
+    EMIT_CONTINUOUS
+};
+
+// add new Emit Modes here
+const boost::unordered_map<string, EmitModes> EMIT_MODES = boost::assign::map_list_of
+    ("Burst", EMIT_BURST)
+    ("Continuous", EMIT_CONTINUOUS);
+
+enum BlendModes {
+    BLEND_ALPHA,
+    BLEND_ADDITIVE
+};
+
+// add new Blend Modes here
+const boost::unordered_map<string, BlendModes> BLEND_MODES = boost::assign::map_list_of
+    ("Alpha", BLEND_ALPHA)
+    ("Additive", BLEND_ADDITIVE);
+    
 class ParticleEvent : public EffectEvent {
 
 public:
@@ -23,21 +44,27 @@ public:
     void registerAttributes() 
     {
         // editable attributes (Name, Type, Member)
-        registerAttribute("DiffuseTexture", "Texture");
-        registerAttribute("DiffuseColor",   "Color");
-        registerAttribute("ParticleScale",  "Float");
-        registerAttribute("EmitScale",      "Float");
-        registerAttribute("Rate",           "Float");
-        registerAttribute("InitialSpeed",   "Float");
-        registerAttribute("RotationAngle",  "Float");
+        registerAttribute("DiffuseTexture",   "Texture");
+        registerAttribute("DiffuseColor",     "Color");
+        registerAttribute("ParticleScale",    "Float");
+        registerAttribute("EmitScale",        "Float");
+        registerAttribute("Rate",             "Float");
+        registerAttribute("InitialSpeed",     "Float");
+        registerAttribute("RotationAngle",    "Float");
+        registerAttribute("BlendMode",        "String");
+        registerAttribute("Lifetime",         "Float");
+        registerAttribute("ParticleLifetime", "Vector2");
+        registerAttribute("EmitMode",         "String");
     }
     
     void setup();
     void update(const ci::CameraPersp &camera);
     void draw();
+    void deepDraw(){}
     
 private:
     void processAttributes();
+    void addNewParticle();
     
     // user-defined
     // TODO these and others will need variance eventually (new type)
@@ -46,6 +73,14 @@ private:
     float mParticleScale;
     float mRotationAngle;
     float mInitialSpeed;
+    int mEmitMode;
+    Vec2f mParticleLifetime;  // value, variance
+    string mBlendMode;
+    
+    // for continuous emit mode
+    float mPreviousElapsed;
+    float mCurrentRate;  
+    
     Color mDiffuseColor;
     gl::Texture mDiffuseTexture;
     
@@ -53,7 +88,9 @@ private:
     struct Particle {
         float scale;
         float rotation;
+        float startTime;
         float lifetime;
+        float maxLifetime;
         
         Vec3f position;
         Color color;
@@ -68,6 +105,6 @@ private:
 	int mTotalVertices;
     int mPrevTotalVertices;
     
-    std::vector<Particle> mParticles;
+    std::list<Particle> mParticles;
 	VertexData *mVerts;
 };
