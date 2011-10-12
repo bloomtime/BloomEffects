@@ -48,6 +48,8 @@ void ParticleTestApp::setup()
     mTestEffect = new Effect("test.effect.json");
     mTestEffect->setCamera(mCamera);
     mTestEffect->setup();
+    
+    mTestEffect->start();
 }
 
 void ParticleTestApp::resize( ResizeEvent event )
@@ -59,7 +61,15 @@ void ParticleTestApp::resize( ResizeEvent event )
 void ParticleTestApp::update()
 {
     if (mTestEffect)
-        mTestEffect->deepUpdate();
+    { 
+        if (!mTestEffect->isStopped())
+            mTestEffect->deepUpdate();
+            
+        // why doesn't deleting work?  maybe it is handled by the app?
+        //else
+        //    delete mTestEffect;
+    }
+
 }
 
 void ParticleTestApp::draw()
@@ -68,7 +78,7 @@ void ParticleTestApp::draw()
     //gl::setMatricesWindow( getWindowSize() );
     gl::setMatrices( mCamera );
         
-    if (mTestEffect)
+    if (mTestEffect && !mTestEffect->isStopped())
         mTestEffect->draw();
         
 }

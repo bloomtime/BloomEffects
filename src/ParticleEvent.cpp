@@ -9,6 +9,8 @@
 
 //TODO DEBUG only
 #include "cinder/app/App.h"
+#include "cinder/Rand.h"
+
 using namespace ci;
 using namespace ci::app;
 
@@ -20,9 +22,13 @@ ParticleEvent::ParticleEvent():
     mParticleScale(1.0f),
     mDiffuseColor(Color( 1.0f, 1.0f, 1.0f )),
     mTotalVertices(0),
-    mPrevTotalVertices(0)
+    mPrevTotalVertices(0),
+    mBlendMode("Alpha"),
+    mParticleLifetime(Vec2f(0.0f,0.0f)),
+    mPreviousElapsed(0.0f),
+    mCurrentRate(0.0f)
 { 
-    mExtension = PATH_EXTENSION;
+    mFileExtension = PATH_EXTENSION;
     registerAttributes(); 
 }
     
@@ -45,7 +51,23 @@ void ParticleEvent::processAttributes()
     mEmitScale = mAttributes.at("EmitScale").getFloat();
     mRate = mAttributes.at("Rate").getFloat();
     mInitialSpeed = mAttributes.at("InitialSpeed").getFloat();
-    mRotationAngle = mAttributes.at("RotationAngle").getFloat();
+    mLifetime = mAttributes.at("Lifetime").getFloat();
+    mParticleLifetime = mAttributes.at("ParticleLifetime").getVector2();
+    mEmitMode = EMIT_MODES.at(mAttributes.at("EmitMode").getString());
+    //mRotationAngle = mAttributes.at("RotationAngle").getFloat();
+}
+
+void ParticleEvent::addNewParticle()
+{
+    Particle newParticle;
+    newParticle.scale = mParticleScale;
+    newParticle.rotation = 0.0f;
+    newParticle.lifetime = 0.0f;
+    newParticle.startTime = -1.0f;
+    newParticle.maxLifetime = mParticleLifetime[0] + Rand::randFloat(-mParticleLifetime[1], mParticleLifetime[1]) ;
+    newParticle.position = mEmitterPosition + Rand::randVec3f() * mEmitScale;
+    newParticle.color = mDiffuseColor;
+    mParticles.push_back(newParticle);
 }
 
 void ParticleEvent::setup()
@@ -56,25 +78,72 @@ void ParticleEvent::setup()
     mPrevTotalVertices = -1;
     
     mParticles.clear();
+    mPreviousElapsed = 0.0f;
+    mCurrentRate = 0.0f;
     
-    // only works for burst mode right now
-    for (int i=0; i<mRate; i++)
+    if (mEmitMode == EMIT_BURST)
     {
-        Particle newParticle;
-        newParticle.scale = mParticleScale;
-        newParticle.rotation = 0.0f;
-        newParticle.lifetime = 1.0f;
-        newParticle.position = mEmitterPosition + Rand::randVec3f() * mEmitScale;
-        newParticle.color = mDiffuseColor;
-        mParticles.push_back(newParticle);
+        for (int i=0; i<mRate; i++)
+        {
+            addNewParticle();
+        }
     }
 }
 
-
 void ParticleEvent::update(const ci::CameraPersp &camera)
 {
+    float elapsed = getElapsedSeconds();
+    
+    if (getEventElapsedSeconds() >= mLifetime && !mIsStopping)
+    {
+        stop(mHardStop);
+    }
+    
+    if (!mIsStarted || (mIsStopping && mHardStop))
+        return;
+    
+    if (mEmitMode == EMIT_CONTINUOUS && !mIsStopping)
+    {
+        float currentElapsed = elapsed - mPreviousElapsed;
+        float actualRate = mCurrentRate + mRate * currentElapsed;
+        float rateRounded = floor(actualRate);
+        
+        // carry over any remainder "rate" to the next frame
+        mCurrentRate = actualRate - rateRounded;
+        
+        for (int i=0; i<rateRounded; i++)
+        {
+            addNewParticle();
+        }
+        
+        mPreviousElapsed = elapsed;
+    }
+    
     Vec3f bbRight, bbUp;
     camera.getBillboardVectors( &bbRight, &bbUp );   
+    
+	for( list<Particle>::iterator it = mParticles.begin(); it != mParticles.end(); ++it )
+    {
+		if ((*it).startTime == -1.0f)
+        {
+            (*it).startTime = elapsed;
+            (*it).lifetime = 0.0f;
+        }
+        else
+        {
+            (*it).lifetime = elapsed - (*it).startTime;
+        }
+        
+        if ((*it).lifetime > (*it).maxLifetime)
+        {
+            it = mParticles.erase( it );
+        }
+    }
+    
+    if (mIsStopping && mParticles.size() == 0)
+    {
+        mIsStopped = true;
+    }
     
 	mTotalVertices = mParticles.size() * 6;
 	
@@ -91,8 +160,8 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         
 	int vIndex = 0;
 	
-	for( vector<Particle>::const_iterator it = mParticles.begin(); it != mParticles.end(); ++it ){
-		
+	for( list<Particle>::const_iterator it = mParticles.begin(); it != mParticles.end(); ++it )
+    {
         Vec3f pos = (*it).position;
         Color c = (*it).color;
         float scale = (*it).scale;
@@ -141,6 +210,9 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
 
 void ParticleEvent::draw()
 {    
+    if (!mIsStarted || (mIsStopping && mHardStop))
+        return;
+        
     // console() << "drawing" << std::endl;
     //glBlendFunc(GL_SRC_ALPHA, GL_SRC_ONE_MINUS_ALPHA);
     //glEnable(GL_BLEND);
@@ -168,8 +240,4 @@ void ParticleEvent::draw()
     //gl::disableAdditiveBlending();
 
     // and then any children will be draw after this
-}
-
-void ParticleEvent::deepDraw()
-{
 }

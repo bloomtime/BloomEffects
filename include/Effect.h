@@ -42,7 +42,10 @@ class Effect : public BloomNode {
 
 public:
     Effect():
-        mIsVisible(true)
+        mIsVisible(true),
+        mIsStarted(false),
+        mIsStopped(false),
+        mStartedTime(-1.0f)
     {}
     
     //TODO TEMP TESTING
@@ -57,10 +60,17 @@ public:
     void deepUpdate();
     void draw();
     
+    void start();
+    void stop(bool hardStop=false);  
+    float getEffectElapsedSeconds();
+    
     void initializeData();
     void setCamera(ci::CameraPersp &camera);
     void setTransform( const ci::Matrix44f &transform ) { mTransform = transform; /* copy OK */ }
     ci::Matrix44f getTransform() const { return mTransform; /* copy OK */ }
+    
+    bool isStarted() { return mIsStarted; }
+    bool isStopped() { return mIsStopped; }
     
 private:
     json::Value getData(string effectPath);
@@ -71,10 +81,13 @@ private:
     // TODO need to move this to effectsmanager later
     ci::CameraPersp* mCamera;
     bool mIsVisible;
+    bool mIsStarted;
+    bool mIsStopped;
+    float mStartedTime;
     
     //TODO TEMP TESTING-parsing should be moved elsewhere
     json::Value mData;
     
     //TODO maybe need to convert to BloomNoderefs instead
-    std::vector<EffectEvent *> mEvents;
+    std::list<EffectEvent *> mEvents;
 };

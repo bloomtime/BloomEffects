@@ -28,19 +28,6 @@ using namespace std;
 using namespace ci;
 using namespace std;
 
-class EffectEvent;
-
-//typedef boost::any (EffectEvent::*SetAttrFunction)(boost::any);
-
-/*
-typedef boost::function<void (int x)> IntAttrFunction;
-typedef boost::function<void (float x)> FloatAttrFunction;
-typedef boost::function<void (bool x)> BoolAttrFunction;
-typedef boost::function<void (float x, float y, float z)> ColorAttrFunction;
-typedef boost::function<void (string x)> TextureAttrFunction;
-typedef boost::function<void (float x, float y, float z)> Vec3AttrFunction;
-*/
-
 class EffectAttribute
 {
 public:
@@ -68,6 +55,14 @@ public:
     {
         return boost::any_cast<int>(mValue);
     }
+    Vec2f getVector2()
+    {
+        return boost::any_cast<Vec2f>(mValue);
+    }
+    string getString()
+    {
+        return boost::any_cast<string>(mValue);
+    }
 };
 
 typedef boost::unordered_map<string, EffectAttribute> EffectAttrMap;
@@ -77,14 +72,21 @@ class EffectEvent : public BloomNode {
 public:
     EffectEvent() :
         mEnabled(true),
-        mExtension(""),
-        mEmitterPosition(Vec3f( 0.0f, 0.0f, 0.0f ))
+        mFileExtension(""),
+        mIsStarted(false),
+        mIsStopping(false),
+        mIsStopped(false),
+        mHardStop(false),
+        mStartTime(-1.0f),
+        mLifetime(0.0f),
+        mEmitterPosition(Vec3f( 0.0f, 0.0f, 0.0f )),
+        mEmitterOrientation(Vec3f( 0.0f, 0.0f, 0.0f))
         {}
         
     ~EffectEvent();
     
     virtual void registerAttributes() {}
-    string getPathExtension() { return mExtension; }
+    string getPathExtension() { return mFileExtension; }
     
     virtual void setup() {}
     virtual void update(const ci::CameraPersp &camera) {}
@@ -98,8 +100,20 @@ public:
     EffectAttrMap getAttributes() { return mAttributes; }
     void setAttribute(string name, boost::any value) { mAttributes[name].mValue = value; }
     void setEnabled(bool enabled) { mEnabled = enabled; }
+    void setStartTime(float startTime) { mStartTime = startTime; }
+    float getStartTime() { return mStartTime; }
     void setEmitterPosition(Vec3f position) { mEmitterPosition = position; }
+    void setEmitterOrientation(Vec3f orientation) { mEmitterOrientation = orientation; }
     bool isEnabled() { return mEnabled; }
+    
+    // TODO make one function and one state variable
+    bool isStarted() { return mIsStarted; }
+    bool isStopped() { return mIsStopped; }
+    bool isStopping() { return mIsStopping; }
+    
+    void start();
+    void stop(bool hardStop=false);
+    float getEventElapsedSeconds();
     
     EffectAttrMap mAttributes;
     
@@ -112,10 +126,20 @@ protected:
     // bool mInheritTransform
     
     ci::Matrix44f mTransform;
+    float mLifetime;
+    float mStartTime;
+    bool mHardStop;
     
+    //TODO make these all one variable (enum?)
+    bool mIsStarted;
+    bool mIsStopping;
+    bool mIsStopped;
+            
     bool mEnabled;
     Vec3f mEmitterPosition;
-    string mExtension;
+    Vec3f mEmitterOrientation;
+    
+    string mFileExtension;
 };
 
 typedef std::shared_ptr<EffectEvent> EffectEventRef;

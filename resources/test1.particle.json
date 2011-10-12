@@ -4,5 +4,8 @@
    "ParticleScale" : 1.3,
    "EmitScale" : 8,
    "Rate" : 50.0,
-   "InitialSpeed" : 1.0
+   "InitialSpeed" : 1.0,
+   "Lifetime" : 10.0,
+   "ParticleLifetime" : [2.0, 1.0],
+   "EmitMode" : "Continuous"
 }
