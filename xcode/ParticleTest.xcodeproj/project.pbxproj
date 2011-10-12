@@ -24,7 +24,6 @@
 		ADA517B4143F7B57003BA388 /* Effect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADA517B3143F7B57003BA388 /* Effect.cpp */; };
 		ADA5184D143F89EF003BA388 /* BloomNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADA51817143F89EF003BA388 /* BloomNode.cpp */; };
 		ADA5184E143F89EF003BA388 /* BloomScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADA51818143F89EF003BA388 /* BloomScene.cpp */; };
-		ADB17174143D06220075945C /* README in Resources */ = {isa = PBXBuildFile; fileRef = ADB1716A143D06220075945C /* README */; };
 		ADB17175143D06220075945C /* ciJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADB1716C143D06220075945C /* ciJson.cpp */; };
 		ADB17176143D06220075945C /* json_internalarray.inl in Resources */ = {isa = PBXBuildFile; fileRef = ADB1716E143D06220075945C /* json_internalarray.inl */; };
 		ADB17177143D06220075945C /* json_internalmap.inl in Resources */ = {isa = PBXBuildFile; fileRef = ADB1716F143D06220075945C /* json_internalmap.inl */; };
@@ -67,15 +66,6 @@
 		ADA51817143F89EF003BA388 /* BloomNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BloomNode.cpp; sourceTree = "<group>"; };
 		ADA51818143F89EF003BA388 /* BloomScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BloomScene.cpp; sourceTree = "<group>"; };
 		ADB17160143D06220075945C /* ciJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ciJson.h; sourceTree = "<group>"; };
-		ADB17162143D06220075945C /* autolink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = autolink.h; sourceTree = "<group>"; };
-		ADB17163143D06220075945C /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
-		ADB17164143D06220075945C /* features.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = features.h; sourceTree = "<group>"; };
-		ADB17165143D06220075945C /* forwards.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = forwards.h; sourceTree = "<group>"; };
-		ADB17166143D06220075945C /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json.h; sourceTree = "<group>"; };
-		ADB17167143D06220075945C /* reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reader.h; sourceTree = "<group>"; };
-		ADB17168143D06220075945C /* value.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = value.h; sourceTree = "<group>"; };
-		ADB17169143D06220075945C /* writer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = writer.h; sourceTree = "<group>"; };
-		ADB1716A143D06220075945C /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		ADB1716C143D06220075945C /* ciJson.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ciJson.cpp; sourceTree = "<group>"; };
 		ADB1716E143D06220075945C /* json_internalarray.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = json_internalarray.inl; sourceTree = "<group>"; };
 		ADB1716F143D06220075945C /* json_internalmap.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = json_internalmap.inl; sourceTree = "<group>"; };
@@ -235,7 +225,6 @@
 			isa = PBXGroup;
 			children = (
 				ADB1715F143D06220075945C /* include */,
-				ADB1716A143D06220075945C /* README */,
 				ADB1716B143D06220075945C /* src */,
 			);
 			name = ciJson;
@@ -246,24 +235,8 @@
 			isa = PBXGroup;
 			children = (
 				ADB17160143D06220075945C /* ciJson.h */,
-				ADB17161143D06220075945C /* json */,
 			);
 			path = include;
-			sourceTree = "<group>";
-		};
-		ADB17161143D06220075945C /* json */ = {
-			isa = PBXGroup;
-			children = (
-				ADB17162143D06220075945C /* autolink.h */,
-				ADB17163143D06220075945C /* config.h */,
-				ADB17164143D06220075945C /* features.h */,
-				ADB17165143D06220075945C /* forwards.h */,
-				ADB17166143D06220075945C /* json.h */,
-				ADB17167143D06220075945C /* reader.h */,
-				ADB17168143D06220075945C /* value.h */,
-				ADB17169143D06220075945C /* writer.h */,
-			);
-			path = json;
 			sourceTree = "<group>";
 		};
 		ADB1716B143D06220075945C /* src */ = {
@@ -338,7 +311,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				43CD9799123D6504003B628E /* Icon.png in Resources */,
-				ADB17174143D06220075945C /* README in Resources */,
 				ADB17176143D06220075945C /* json_internalarray.inl in Resources */,
 				ADB17177143D06220075945C /* json_internalmap.inl in Resources */,
 				ADB1717A143D06220075945C /* json_valueiterator.inl in Resources */,
@@ -389,16 +361,8 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				"GCC_THUMB_SUPPORT[arch=armv7]" = "";
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				HEADER_SEARCH_PATHS = (
-					"\"$(JSONCPP_PATH)/src/lib_json\"",
-					../blocks/ciJson/include,
-					"\"$(CINDER_PATH)/boost\"",
-					../include,
-					"\"$(JSONCPP_PATH)/include",
-				);
 				INFOPLIST_FILE = "ParticleTest-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
-				JSONCPP_PATH = "../../../jsoncpp/0.6.0-rc2";
 				"OTHER_LDFLAGS[sdk=iphoneos*][arch=*]" = (
 					"\"$(CINDER_PATH)/lib/libcinder-iphone_d.a\"",
 					"-lz",
@@ -425,16 +389,8 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				"GCC_THUMB_SUPPORT[arch=armv7]" = "";
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				HEADER_SEARCH_PATHS = (
-					"\"$(JSONCPP_PATH)/src/lib_json\"",
-					../blocks/ciJson/include,
-					"\"$(CINDER_PATH)/boost\"",
-					../include,
-					"\"$(JSONCPP_PATH)/include",
-				);
 				INFOPLIST_FILE = "ParticleTest-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
-				JSONCPP_PATH = "../../../jsoncpp/0.6.0-rc2";
 				"OTHER_LDFLAGS[sdk=iphoneos*][arch=*]" = (
 					"\"$(CINDER_PATH)/lib/libcinder-iphone.a\"",
 					"-lz",
@@ -457,12 +413,14 @@
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
+				HEADER_SEARCH_PATHS = (
+					../blocks/ciJson/include,
+					"\"$(CINDER_PATH)/boost\"",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
-				JSONCPP_PATH = "../../../jsoncpp-src-0.5.0";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
-				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\"";
+				USER_HEADER_SEARCH_PATHS = "include \"$(CINDER_PATH)/include\"";
 			};
 			name = Debug;
 		};
@@ -475,12 +433,14 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
+				HEADER_SEARCH_PATHS = (
+					../blocks/ciJson/include,
+					"\"$(CINDER_PATH)/boost\"",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
-				JSONCPP_PATH = "../../../jsoncpp-src-0.5.0";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
-				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\"";
+				USER_HEADER_SEARCH_PATHS = "include \"$(CINDER_PATH)/include\"";
 			};
 			name = Release;
 		};
