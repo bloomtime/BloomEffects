@@ -4,7 +4,7 @@
 #include "cinder/ImageIo.h"
 #include "cinder/gl/Texture.h"
 #include "cinder/Camera.h"
-#include "ciJson.h"
+//#include "json/json.h"
 
 #include "Effect.h"
 #include <boost/algorithm/string.hpp>
@@ -25,7 +25,7 @@ class ParticleTestApp : public AppCocoaTouch {
 	gl::Texture mTex;
 	CameraPersp	mCam;
     
-    json::Value mData;
+    Json::Value mData;
     
     Effect* mTestEffect;
     

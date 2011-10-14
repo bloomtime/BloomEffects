@@ -14,16 +14,17 @@ EffectEvent::~EffectEvent()
 
 void EffectEvent::start()
 {
-    mIsStarted = true; 
-    mIsStopping = false;
-    mIsStopped = false;
+    mEventState = EVENT_STARTED;
     mStartTime = getElapsedSeconds();
 }
 
 void EffectEvent::stop(bool hardStop)
 {
-    mIsStopping = true;
+    mEventState = EVENT_STOPPING;
     mHardStop = hardStop;
+    
+    if (hardStop)
+        mEventState = EVENT_STOPPED;
 }
 
 float EffectEvent::getEventElapsedSeconds()

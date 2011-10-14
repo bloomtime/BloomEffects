@@ -15,9 +15,11 @@
 #include "cinder/Cinder.h"
 #include "cinder/Vector.h"
 #include <vector>
+#include <list>
 
 //TODO for now Effect is going to handle the file parsing and data grabbing.  Will need to separate this out when I figure out how the custom attributes for different EffectEvents are handled    
-#include "ciJson.h"
+//#include "ciJson.h"
+#include "json/json.h"
 #include "cinder/ImageIo.h"
 #include "cinder/gl/Texture.h"
 #include "cinder/app/App.h"
@@ -71,22 +73,24 @@ public:
     
     bool isStarted() { return mIsStarted; }
     bool isStopped() { return mIsStopped; }
-    
+
 private:
-    json::Value getData(string effectPath);
-    void parseAttr(const json::Value data, EffectAttribute &attr, EffectEvent *currentEvent);
+    vector<Json::Value> readVector(Json::Value object, string key);
+    Json::Value getData(string effectPath);
+    void parseAttr(const Json::Value data, EffectAttribute &attr, EffectEvent *currentEvent);
     
     ci::Matrix44f mTransform;
     
     // TODO need to move this to effectsmanager later
     ci::CameraPersp* mCamera;
     bool mIsVisible;
-    bool mIsStarted;
-    bool mIsStopped;
     float mStartedTime;
     
+    bool mIsStarted;
+    bool mIsStopped;
+    
     //TODO TEMP TESTING-parsing should be moved elsewhere
-    json::Value mData;
+    Json::Value mData;
     
     //TODO maybe need to convert to BloomNoderefs instead
     std::list<EffectEvent *> mEvents;

@@ -14,25 +14,27 @@
 using namespace ci;
 using namespace std;
 
-enum EmitModes {
+enum EmitMode {
     EMIT_BURST,
     EMIT_CONTINUOUS
 };
 
 // add new Emit Modes here
-const boost::unordered_map<string, EmitModes> EMIT_MODES = boost::assign::map_list_of
+const boost::unordered_map<string, EmitMode> EMIT_MODES = boost::assign::map_list_of
     ("Burst", EMIT_BURST)
     ("Continuous", EMIT_CONTINUOUS);
 
-enum BlendModes {
+enum BlendMode {
     BLEND_ALPHA,
-    BLEND_ADDITIVE
+    BLEND_ADDITIVE,
+    BLEND_OPAQUE
 };
 
 // add new Blend Modes here
-const boost::unordered_map<string, BlendModes> BLEND_MODES = boost::assign::map_list_of
-    ("Alpha", BLEND_ALPHA)
-    ("Additive", BLEND_ADDITIVE);
+const boost::unordered_map<string, BlendMode> BLEND_MODES = boost::assign::map_list_of
+    ("AlphaBlend", BLEND_ALPHA)
+    ("AdditiveBlend", BLEND_ADDITIVE)
+    ("OpaqueBlend", BLEND_OPAQUE);
     
 class ParticleEvent : public EffectEvent {
 
@@ -46,7 +48,7 @@ public:
         // editable attributes (Name, Type, Member)
         registerAttribute("DiffuseTexture",   "Texture");
         registerAttribute("DiffuseColor",     "Color");
-        registerAttribute("ParticleScale",    "Float");
+        registerAttribute("ParticleScale",    "Curve");
         registerAttribute("EmitScale",        "Float");
         registerAttribute("Rate",             "Float");
         registerAttribute("InitialSpeed",     "Float");
@@ -67,20 +69,22 @@ private:
     void processAttributes();
     void addNewParticle();
     
+    void enableBlendMode();
+    void disableBlendMode();
+    
     // user-defined
     // TODO these and others will need variance eventually (new type)
     float mRate;
     float mEmitScale;
-    float mParticleScale;
     float mRotationAngle;
     float mInitialSpeed;
-    int mEmitMode;
+    EmitMode mEmitMode;
     Vec2f mParticleLifetime;  // value, variance
-    string mBlendMode;
+    BlendMode mBlendMode;
     
     floatCurve mAlphaCurve;
-    float mCurrentAlpha;
-    
+    floatCurve mParticleScaleCurve;
+        
     // for continuous emit mode
     float mPreviousElapsed;
     float mCurrentRate;  
@@ -95,6 +99,7 @@ private:
         float startTime;
         float lifetime;
         float maxLifetime;
+        float alpha;
         
         Vec3f position;
         Color color;

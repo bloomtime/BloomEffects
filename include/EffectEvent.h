@@ -6,110 +6,30 @@
 
 #pragma once
 #include "BloomNode.h"
+#include "EffectAttribute.h"
 
 #include "cinder/Cinder.h"
 #include "cinder/Camera.h"
 #include "cinder/gl/Texture.h"
 #include <boost/unordered_map.hpp>
-#include <boost/any.hpp>
-#include <boost/function.hpp>
 #include <string>
 
-#include "ciJson.h"
 #include "cinder/ImageIo.h"
 #include "cinder/gl/Texture.h"
 #include "cinder/app/App.h"
-#include "cinder/BSpline.h"
 #include <boost/unordered_map.hpp>
-#include <boost/assign/list_of.hpp>
 
 using namespace ci;
 using namespace ci::app;
 using namespace std;
-using namespace ci;
-using namespace std;
 
-typedef vector<Vec2f> floatCurvePoints;
-
-//TEMP - needs to be bspline
-typedef BSpline2f floatCurve;
-
-const float CURVE_TENSION = .5f;  //experiment
-
-class EffectAttribute
+enum EventState 
 {
-public:
-    string mName;
-    string mType;
-    boost::any mValue;
-    
-    gl::Texture getTexture() 
-    { 
-        return gl::Texture( loadImage( loadResource( boost::any_cast<string>(mValue) ) ) );
-    }
-    float getFloat()
-    {
-        return boost::any_cast<float>(mValue);
-    }
-    Color getColor()
-    {
-        return boost::any_cast<Color>(mValue);
-    }
-    Vec3f getVector3()
-    {
-        return boost::any_cast<Vec3f>(mValue);
-    }
-    int getInt()
-    {
-        return boost::any_cast<int>(mValue);
-    }
-    Vec2f getVector2()
-    {
-        return boost::any_cast<Vec2f>(mValue);
-    }
-    string getString()
-    {
-        return boost::any_cast<string>(mValue);
-    }
-    floatCurve getCurve()
-    {
-        floatCurve newCurve;
-        /*
-        floatCurvePoints curvePoints = boost::any_cast<floatCurvePoints>(mValue);
-        vector<ci::Vec2f> curveInput;
-        
-        if (curvePoints.size() == 1)
-            curvePoints.push_back(curvePoints[0]);
-        
-        Vec2f pFirst = curvePoints[0] + curvePoints[0] - curvePoints[1];
-        curvePoints.insert (curvePoints.begin(), pFirst);
-        
-        float last = curvePoints.size() - 2;
-        Vec2f pLast = curvePoints[last] + curvePoints[last] - curvePoints[last-1];
-        curvePoints.push_back(pLast);
-
-        for (int i=0; i < curvePoints.size()-1; i++)
-        {
-            Vec2f currentPoint = curvePoints[i];
-            
-            if (i == 0)
-            {
-                curveInput.push_back(currentPoint);
-                continue;
-            }
-            
-            console() << curvePoints[i+3][0] << ","<< curvePoints[i+3][1] << "|" << std::endl;
-            
-            // TODO need to handle end point
-            Vec2f b1 = curvePoints[i-1] + (curvePoints[i] - curvePoints[i-1]) * CURVE_TENSION;
-            Vec2f b2 = curvePoints[i+2] - (curvePoints[i+1] - curvePoints[i]) * CURVE_TENSION;
-            
-            curveInput.push_back(curvePoints[i]);
-        }
-        */
-        
-        return newCurve;
-    }
+    EVENT_INITIALIZED,
+    EVENT_STARTED,
+    EVENT_RUNNING,
+    EVENT_STOPPING,
+    EVENT_STOPPED
 };
 
 typedef boost::unordered_map<string, EffectAttribute> EffectAttrMap;
@@ -120,10 +40,7 @@ public:
     EffectEvent() :
         mEnabled(true),
         mFileExtension(""),
-        mIsStarted(false),
-        mIsStopping(false),
-        mIsStopped(false),
-        mHardStop(false),
+        mEventState(EVENT_INITIALIZED),
         mStartTime(-1.0f),
         mLifetime(0.0f),
         mEmitterPosition(Vec3f( 0.0f, 0.0f, 0.0f )),
@@ -153,10 +70,12 @@ public:
     void setEmitterOrientation(Vec3f orientation) { mEmitterOrientation = orientation; }
     bool isEnabled() { return mEnabled; }
     
-    // TODO make one function and one state variable
-    bool isStarted() { return mIsStarted; }
-    bool isStopped() { return mIsStopped; }
-    bool isStopping() { return mIsStopping; }
+    // Event state checks
+    bool isInitialized()  { return mEventState == EVENT_INITIALIZED; }
+    bool isStarted()      { return mEventState == EVENT_STARTED;     }
+    bool isRunning()      { return mEventState == EVENT_RUNNING;     }
+    bool isStopping()     { return mEventState == EVENT_STOPPING;    }
+    bool isStopped()      { return mEventState == EVENT_STOPPED;     }
     
     void start();
     void stop(bool hardStop=false);
@@ -177,10 +96,7 @@ protected:
     float mStartTime;
     bool mHardStop;
     
-    //TODO make these all one variable (enum?)
-    bool mIsStarted;
-    bool mIsStopping;
-    bool mIsStopped;
+    EventState mEventState;
             
     bool mEnabled;
     Vec3f mEmitterPosition;

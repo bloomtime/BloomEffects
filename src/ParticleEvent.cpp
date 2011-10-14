@@ -19,15 +19,13 @@ const string PATH_EXTENSION = ".particle.json";
 ParticleEvent::ParticleEvent():
     mRate(1.0f),
     mEmitScale(1.0f),
-    mParticleScale(1.0f),
     mDiffuseColor(Color( 1.0f, 1.0f, 1.0f )),
     mTotalVertices(0),
     mPrevTotalVertices(0),
-    mBlendMode("Alpha"),
+    mBlendMode(BLEND_OPAQUE),
     mParticleLifetime(Vec2f(0.0f,0.0f)),
     mPreviousElapsed(0.0f),
-    mCurrentRate(0.0f),
-    mCurrentAlpha(1.0f)
+    mCurrentRate(0.0f)
 { 
     mFileExtension = PATH_EXTENSION;
     registerAttributes(); 
@@ -48,7 +46,7 @@ void ParticleEvent::processAttributes()
     // if can associate these member vars with the attr name that would be sweet
     mDiffuseTexture =mAttributes.at("DiffuseTexture").getTexture();
     mDiffuseColor = mAttributes.at("DiffuseColor").getColor();
-    mParticleScale = mAttributes.at("ParticleScale").getFloat();
+    mParticleScaleCurve = mAttributes.at("ParticleScale").getCurve();
     mEmitScale = mAttributes.at("EmitScale").getFloat();
     mRate = mAttributes.at("Rate").getFloat();
     mInitialSpeed = mAttributes.at("InitialSpeed").getFloat();
@@ -56,6 +54,7 @@ void ParticleEvent::processAttributes()
     mParticleLifetime = mAttributes.at("ParticleLifetime").getVector2();
     mEmitMode = EMIT_MODES.at(mAttributes.at("EmitMode").getString());
     mAlphaCurve = mAttributes.at("Alpha").getCurve();
+    mBlendMode = BLEND_MODES.at(mAttributes.at("BlendMode").getString());
     
     //mRotationAngle = mAttributes.at("RotationAngle").getFloat();
 }
@@ -63,7 +62,6 @@ void ParticleEvent::processAttributes()
 void ParticleEvent::addNewParticle()
 {
     Particle newParticle;
-    newParticle.scale = mParticleScale;
     newParticle.rotation = 0.0f;
     newParticle.lifetime = 0.0f;
     newParticle.startTime = -1.0f;
@@ -97,15 +95,28 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
 {
     float elapsed = getElapsedSeconds();
     
-    if (getEventElapsedSeconds() >= mLifetime && !mIsStopping)
+    // run through the state gauntlet
+    if (isStarted())
+    {
+        mEventState = EVENT_RUNNING;
+    }
+    
+    if (isRunning() && getEventElapsedSeconds() >= mLifetime)
     {
         stop(mHardStop);
     }
     
-    if (!mIsStarted || (mIsStopping && mHardStop))
-        return;
+    if (isStopping() && mParticles.size() == 0)
+    {
+        mEventState = EVENT_STOPPED;
+    }
     
-    if (mEmitMode == EMIT_CONTINUOUS && !mIsStopping)
+    if (isInitialized() || isStopped())
+    {
+        return;
+    }
+    
+    if (isRunning() && mEmitMode == EMIT_CONTINUOUS)
     {
         float currentElapsed = elapsed - mPreviousElapsed;
         float actualRate = mCurrentRate + mRate * currentElapsed;
@@ -146,12 +157,8 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         float time = interval - floor(interval);
         
         //TODO here need to grab the value from the curve using time
-        mCurrentAlpha = 1.0f;
-    }
-    
-    if (mIsStopping && mParticles.size() == 0)
-    {
-        mIsStopped = true;
+        (*it).alpha = mAlphaCurve.getPosition(time)[1];
+        (*it).scale = mParticleScaleCurve.getPosition(time)[1];
     }
     
 	mTotalVertices = mParticles.size() * 6;
@@ -174,7 +181,7 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         Vec3f pos = (*it).position;
         Color c = (*it).color;
         float scale = (*it).scale;
-		Vec4f col = Vec4f(c.r, c.g, c.b, mCurrentAlpha);
+		Vec4f col = Vec4f(c.r, c.g, c.b, (*it).alpha);
     
         Vec3f right			= bbRight * scale;
         Vec3f up			= bbUp * scale;
@@ -217,18 +224,52 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
 	}    
 }
 
+void ParticleEvent::enableBlendMode()
+{
+    switch (mBlendMode) 
+    {
+        case BLEND_ADDITIVE:
+        {
+            gl::enableAdditiveBlending();
+            break;
+        }
+        case BLEND_ALPHA:
+        {
+            gl::enableAlphaBlending();
+            break;
+        }
+        default:
+        {
+            //opaque!
+            return;                
+        }
+    }
+}
+
+void ParticleEvent::disableBlendMode()
+{
+    switch (mBlendMode) 
+    {
+        case BLEND_ALPHA:
+        {
+            gl::disableAlphaBlending();
+            break;
+        }
+        default:
+        {
+            //opaque or additive
+            return;                
+        }
+    }
+}
+
 void ParticleEvent::draw()
 {    
-    if (!mIsStarted || (mIsStopping && mHardStop))
+    if (isInitialized() || isStopped())
         return;
         
-    // console() << "drawing" << std::endl;
-    //glBlendFunc(GL_SRC_ALPHA, GL_SRC_ONE_MINUS_ALPHA);
-    //glEnable(GL_BLEND);
-    gl::enableAlphaBlending();
-    //gl::enableAdditiveBlending();
-    
-	mDiffuseTexture.enableAndBind();
+    enableBlendMode();	
+    mDiffuseTexture.enableAndBind();
     
 	glEnableClientState( GL_VERTEX_ARRAY );
 	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
@@ -245,8 +286,7 @@ void ParticleEvent::draw()
 	glDisableClientState( GL_COLOR_ARRAY );
     
 	mDiffuseTexture.disable();
-    gl::disableAlphaBlending();
-    //gl::disableAdditiveBlending();
+    disableBlendMode();
 
     // and then any children will be draw after this
 }

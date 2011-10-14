@@ -19,7 +19,7 @@ Effect::Effect(string effectPath)
     mData = getData(effectPath);
 }
 
-json::Value Effect::getData(string effectPath)
+Json::Value Effect::getData(string effectPath)
 {
     DataSourceRef dataSource = loadResource(effectPath);
     Buffer buf = dataSource->getBuffer();
@@ -28,19 +28,31 @@ json::Value Effect::getData(string effectPath)
 	memcpy( bufString.get(), buf.getData(), buf.getDataSize() );
 	bufString.get()[dataSize] = 0;
     
-    return json::deserialize(bufString.get());
+	// Parse and return data
+	Json::Reader reader;
+	Json::Value data;
+	reader.parse(bufString.get(), data);
+	return data;
+}
+
+vector<Json::Value> Effect::readVector(Json::Value object, string key) 
+{ 
+	vector<Json::Value> members;
+	for (uint32_t i = 0; i < object[key].size(); i++)
+		members.push_back(object[key][i]);
+	return members;
 }
 
 void Effect::initializeData()
 {
     if (mData != NULL) {
-        vector<json::Value> events = json::readValues(mData, "Events");
+        vector<Json::Value> events = readVector(mData, "Events");
         
-        vector<json::Value>::iterator it;
+        vector<Json::Value>::iterator it;
         
         for ( it = events.begin(); it != events.end(); it++)
         {
-            json::Value currentBlock = *it;
+            Json::Value currentBlock = *it;
             string EventType = currentBlock["EventType"].asString();
             string EventPath = currentBlock["EventPath"].asString();
             
@@ -72,8 +84,24 @@ void Effect::initializeData()
             // Parse child event path
             if (currentEvent != NULL)
             {
+                // Parse global parameters
+                currentEvent->setEnabled(currentBlock["Enabled"].asBool());
+                
+                // For now, don't even store in memory if it is not enabled
+                if (!currentEvent->isEnabled())
+                    continue;
+
+                currentEvent->setStartTime(currentBlock["StartTime"].asFloat());
+            
+                vector<Json::Value> posValues = readVector(currentBlock, "Position");
+                currentEvent->setEmitterPosition(Vec3f(posValues[0].asFloat(), posValues[1].asFloat(), posValues[2].asFloat()));       
+            
+                vector<Json::Value> orientValues = readVector(currentBlock, "Orientation");
+                currentEvent->setEmitterOrientation(Vec3f(orientValues[0].asFloat(), orientValues[1].asFloat(), orientValues[2].asFloat()));
+                
+                
                 EventPath.append(currentEvent->getPathExtension());
-                json::Value childData = getData(EventPath);
+                Json::Value childData = getData(EventPath);
                 
                 //console() << "EventPath "<< EventPath << std::endl;
                 
@@ -81,17 +109,7 @@ void Effect::initializeData()
                 {
                     parseAttr(childData, i.second, currentEvent);
                 }            
-            
-                // Parse global parameters
-                currentEvent->setEnabled(currentBlock["Enabled"].asBool());
-                currentEvent->setStartTime(currentBlock["StartTime"].asFloat());
-            
-                vector<json::Value> posValues = json::readValues(currentBlock, "Position");
-                currentEvent->setEmitterPosition(Vec3f(posValues[0].asFloat(), posValues[1].asFloat(), posValues[2].asFloat()));       
-            
-                vector<json::Value> orientValues = json::readValues(currentBlock, "Orientation");
-                currentEvent->setEmitterOrientation(Vec3f(orientValues[0].asFloat(), orientValues[1].asFloat(), orientValues[2].asFloat()));
-            
+    
                 //addChild( EffectEventRef(currentEvent) );
                 mEvents.push_back(currentEvent);
             }
@@ -102,7 +120,7 @@ void Effect::initializeData()
     }
 }
 
-void Effect::parseAttr(const json::Value data, EffectAttribute &attr, EffectEvent *currentEvent)
+void Effect::parseAttr(const Json::Value data, EffectAttribute &attr, EffectEvent *currentEvent)
 {
     //console() << "Attr Type is: " << attr.type << std::endl;
     
@@ -110,7 +128,7 @@ void Effect::parseAttr(const json::Value data, EffectAttribute &attr, EffectEven
     
     if (attr.mType == "Color")
     {
-        vector<json::Value> values = json::readValues(data, attr.mName);
+        vector<Json::Value> values = readVector(data, attr.mName);
         currentValue = Color(values[0].asFloat(), values[1].asFloat(), values[2].asFloat());
     }
     else if (attr.mType == "Texture")
@@ -123,12 +141,12 @@ void Effect::parseAttr(const json::Value data, EffectAttribute &attr, EffectEven
     }
     else if (attr.mType == "Vector3")
     {
-        vector<json::Value> values = json::readValues(data, attr.mName);
+        vector<Json::Value> values = readVector(data, attr.mName);
         currentValue = Vec3f(values[0].asFloat(), values[1].asFloat(), values[2].asFloat());
     }
     else if (attr.mType == "Vector2")
     {
-        vector<json::Value> values = json::readValues(data, attr.mName);
+        vector<Json::Value> values = readVector(data, attr.mName);
         currentValue = Vec2f(values[0].asFloat(), values[1].asFloat());
     }
     else if (attr.mType == "Bool")
@@ -143,13 +161,15 @@ void Effect::parseAttr(const json::Value data, EffectAttribute &attr, EffectEven
     {
         floatCurvePoints currentCurve;
         
-        vector<json::Value> pointValues = json::readValues(data, attr.mName);
+        vector<Json::Value> pointValues = readVector(data, attr.mName);
         
-        for (vector<json::Value>::const_iterator it = pointValues.begin(); it != pointValues.end(); ++it)
+        for (vector<Json::Value>::const_iterator it = pointValues.begin(); it != pointValues.end(); ++it)
         {
-            vector<json::Value> pValues = json::readValues((*it), "point");
+            vector<Json::Value> pValues = readVector((*it), "point");
             Vec2f currentPoint = Vec2f(pValues[0].asFloat(), pValues[1].asFloat());
             currentCurve.push_back(currentPoint);
+            
+            //console() << "p is " << currentPoint[0] << " " << currentPoint[1] << std::endl;
         }
         
         currentValue = currentCurve;
@@ -245,13 +265,13 @@ void Effect::deepUpdate()
         
         for( list<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
         {
-            if (((*it)->isStarted() == false) && ((*it)->isStopping() == false) && (getEffectElapsedSeconds() >= (*it)->getStartTime()))
+            if ((*it)->isInitialized() && (getEffectElapsedSeconds() >= (*it)->getStartTime()))
             {
                 (*it)->start();
             }
             
             
-            if ((*it)->isEnabled() && (*it)->isStarted())
+            if ((*it)->isEnabled())
                 (*it)->update(*mCamera);
         }
         

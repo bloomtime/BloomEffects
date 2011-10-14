@@ -1,16 +1,21 @@
 {
    "DiffuseTexture" : "Test2.png",
    "DiffuseColor" : [1.0, 1.0, 1.0],
-   "ParticleScale" : 1,
    "EmitScale" : 12,
    "Rate" : 200.0,
    "InitialSpeed" : 1.0,
    "Lifetime" : 4.0,
+   "BlendMode" : "AdditiveBlend",
    "ParticleLifetime" : [3.0, 1.0],
    "EmitMode" : "Continuous",
    "Alpha" : [
         {"point" : [0.0, 0.0]},
         {"point" : [0.5, 1.0]},
         {"point" : [1.0, 0.0]}
+   ],
+   "ParticleScale" : [
+        {"point" : [0.0, 1.0]},
+        {"point" : [0.5, 1.0]},
+        {"point" : [1.0, 1.0]}
    ]
 }
