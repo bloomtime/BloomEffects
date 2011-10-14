@@ -190,8 +190,6 @@ Effect::~Effect()
     {
         delete (*it);
     }
-    
-    mEvents.clear();
 }
 
 void Effect::start()

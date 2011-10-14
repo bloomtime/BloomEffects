@@ -30,8 +30,8 @@ const float TANGENT_LENGTH = .2f; //.5f for catmull-rom
 class EffectAttribute
 {
 public:
-    EffectAttribute() {};
-    ~EffectAttribute() {};
+    EffectAttribute() {}
+    ~EffectAttribute() {}
     
     string mName;
     string mType;

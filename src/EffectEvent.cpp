@@ -43,6 +43,3 @@ void EffectEvent::registerAttribute(string attrName, string attrType)
     
     mAttributes[attrName] = newAttr;
 }
-
-
-//void EffectEvent::stop()

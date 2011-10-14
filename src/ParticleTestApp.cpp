@@ -66,8 +66,11 @@ void ParticleTestApp::update()
             mTestEffect->deepUpdate();
             
         // why doesn't deleting work?  maybe it is handled by the app?
-        //else
-        //    delete mTestEffect;
+        else
+        {
+            delete mTestEffect;
+            mTestEffect = NULL;
+        }
     }
 
 }

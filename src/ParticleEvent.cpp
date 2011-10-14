@@ -38,7 +38,7 @@ ParticleEvent::~ParticleEvent()
         mVerts = NULL;
     }
     
-    mParticles.clear();
+    //mParticles.clear();
 }
 
 void ParticleEvent::processAttributes()
