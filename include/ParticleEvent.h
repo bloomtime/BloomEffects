@@ -14,6 +14,18 @@
 using namespace ci;
 using namespace std;
 
+enum EmitVolume {
+    VOLUME_SPHERE,
+    VOLUME_BOX,
+    VOLUME_CYLINDER
+};
+
+// add new Emit Modes here
+const boost::unordered_map<string, EmitVolume> EMIT_VOLUMES = boost::assign::map_list_of
+    ("Sphere", VOLUME_SPHERE)
+    ("Box", VOLUME_BOX)
+    ("Cylinder", VOLUME_CYLINDER);
+
 enum EmitMode {
     EMIT_BURST,
     EMIT_CONTINUOUS
@@ -45,19 +57,30 @@ public:
     
     void registerAttributes() 
     {
-        // editable attributes (Name, Type, Member)
-        registerAttribute("DiffuseTexture",   "Texture");
-        registerAttribute("DiffuseColor",     "Color");
-        registerAttribute("ParticleScale",    "Curve");
-        registerAttribute("EmitScale",        "Float");
+        // editable attributes (Name, Type)
         registerAttribute("Rate",             "Float");
-        registerAttribute("InitialSpeed",     "Float");
-        registerAttribute("RotationAngle",    "Float");
-        registerAttribute("BlendMode",        "String");
         registerAttribute("Lifetime",         "Float");
         registerAttribute("ParticleLifetime", "Vector2");
+        registerAttribute("EmitScale",        "Float");
         registerAttribute("EmitMode",         "String");
+        
         registerAttribute("Alpha",            "Curve");
+        registerAttribute("ParticleScale",    "Curve");
+        
+        registerAttribute("DiffuseTexture",   "Texture");
+        registerAttribute("DiffuseColor",     "Color");
+        registerAttribute("BlendMode",        "String");
+
+        registerAttribute("InitialRotation",  "Vector2"); 
+        registerAttribute("InitialSpeed",     "Vector2");
+        registerAttribute("GlobalForce",      "Vector3");
+        registerAttribute("DragForce",        "Vector3"); 
+        registerAttribute("RotationSpeed",    "Vector2");   
+        
+        //TODO attrs not hooked up yet
+        //registerAttribute("RotationSpeed",    "Vector2");
+        //registerAttribute("EmitAngle",        "Vector2");
+        //TODO curves also need up front variance (not per frame variance)
     }
     
     void setup();
@@ -66,36 +89,10 @@ public:
     void deepDraw(){}
     
 private:
-    void processAttributes();
-    void addNewParticle();
-    
-    void enableBlendMode();
-    void disableBlendMode();
-    
-    // user-defined
-    // TODO these and others will need variance eventually (new type)
-    float mRate;
-    float mEmitScale;
-    float mRotationAngle;
-    float mInitialSpeed;
-    EmitMode mEmitMode;
-    Vec2f mParticleLifetime;  // value, variance
-    BlendMode mBlendMode;
-    
-    floatCurve mAlphaCurve;
-    floatCurve mParticleScaleCurve;
-        
-    // for continuous emit mode
-    float mPreviousElapsed;
-    float mCurrentRate;  
-    
-    Color mDiffuseColor;
-    gl::Texture mDiffuseTexture;
-    
-    //---------------------------------
     struct Particle {
         float scale;
         float rotation;
+        float rotationSpeed;
         float startTime;
         float lifetime;
         float maxLifetime;
@@ -103,6 +100,8 @@ private:
         
         Vec3f position;
         Color color;
+        
+        Vec3f velocity;
     };
     
     struct VertexData {
@@ -110,6 +109,44 @@ private:
         ci::Vec2f texture;
         ci::Vec4f color;
     };
+    
+    //-------------------------------------
+    
+    void processAttributes();
+    void addNewParticle();
+    
+    Vec3f getEmitDirection();
+    void updateVelocity(Particle &currentParticle, float seconds);
+    void enableBlendMode();
+    void disableBlendMode();
+    
+    // user-defined attributes
+    float mRate;
+    Vec2f mParticleLifetime;  // value, variance
+    float mEmitScale;
+    EmitMode mEmitMode;
+    EmitVolume mEmitVolume;
+    Vec2f mEmitAngle;
+        
+    floatCurve mAlphaCurve;
+    floatCurve mParticleScaleCurve;
+    
+    Color mDiffuseColor;
+    gl::Texture mDiffuseTexture;
+    BlendMode mBlendMode;
+    
+    float mRotationAngle;
+    Vec2f mInitialSpeed;     // value, variance
+    Vec2f mInitialRotation;  // value, variance
+    Vec2f mRotationSpeed;    // value, variance
+    Vec3f mGlobalForce;  
+    Vec3f mDragForce;
+    
+    //---------------------------------
+    
+    // for continuous emit mode
+    float mPreviousElapsed;
+    float mCurrentRate;  
     
 	int mTotalVertices;
     int mPrevTotalVertices;

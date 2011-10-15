@@ -2,19 +2,24 @@
    "DiffuseTexture" : "Test1.png",
    "DiffuseColor" : [1.0, 1.0, 1.0],
    "EmitScale" : 8,
-   "Rate" : 50.0,
+   "Rate" : 10.0,
    "InitialSpeed" : 1.0,
    "Lifetime" : 4.0,
    "BlendMode" : "AlphaBlend",
-   "ParticleLifetime" : [7.0, 1.0],
+   "ParticleLifetime" : [3.0, 1.0],
+   "InitialSpeed" : [0.1, 0.0],
+   "InitialRotation" : [0.0, 180.0],
+   "RotationSpeed" : [0.0, 100.0],
+   "GlobalForce" : [0.0, 0.1, 0.0],
+   "DragForce" : [0.0, 0.0, 0.0],
    "EmitMode" : "Continuous",
    "Alpha" : [
         {"point" : [0.0, 0.0]},
-        {"point" : [0.2, 1.0]},
+        {"point" : [0.1, 1.0]},
         {"point" : [1.0, 0.0]}
    ],
    "ParticleScale" : [
-        {"point" : [0.0, 0.0]},
+        {"point" : [0.0, 1.0]},
         {"point" : [0.0, 3.0]}
    ]
 }

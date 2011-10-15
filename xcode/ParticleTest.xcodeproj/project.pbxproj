@@ -340,7 +340,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CINDER_PATH = "$(CINDER_PATH_$(USER))";
-				CINDER_PATH_lydiachoy = ../../../Cinder/Cinder;
+				CINDER_PATH_lydiachoy = ../../../Cinder/Cinder_ES2;
 				CINDER_PATH_tom = /Users/tom/Documents/Code/Cinder/Cinder;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -375,7 +375,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CINDER_PATH = "$(CINDER_PATH_$(USER))";
-				CINDER_PATH_lydiachoy = ../../../Cinder/Cinder;
+				CINDER_PATH_lydiachoy = ../../../Cinder/Cinder_ES2;
 				CINDER_PATH_tom = /Users/tom/Documents/Code/Cinder/Cinder;
 				COPY_PHASE_STRIP = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;

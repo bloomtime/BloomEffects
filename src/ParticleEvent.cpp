@@ -19,13 +19,16 @@ const string PATH_EXTENSION = ".particle.json";
 ParticleEvent::ParticleEvent():
     mRate(1.0f),
     mEmitScale(1.0f),
-    mDiffuseColor(Color( 1.0f, 1.0f, 1.0f )),
+    mDiffuseColor(Color(1.0f, 1.0f, 1.0f)),
     mTotalVertices(0),
     mPrevTotalVertices(0),
     mBlendMode(BLEND_OPAQUE),
-    mParticleLifetime(Vec2f(0.0f,0.0f)),
+    mParticleLifetime(Vec2f(0.0f, 0.0f)),
+    mInitialSpeed(Vec2f(0.0f, 0.0f)),
+    mInitialRotation(Vec2f(0.0f, 0.0f)),
     mPreviousElapsed(0.0f),
-    mCurrentRate(0.0f)
+    mCurrentRate(0.0f),
+    mGlobalForce(Vec3f(0.0f, 0.0f, 0.0f))
 { 
     mFileExtension = PATH_EXTENSION;
     registerAttributes(); 
@@ -44,31 +47,52 @@ ParticleEvent::~ParticleEvent()
 void ParticleEvent::processAttributes()
 {
     // if can associate these member vars with the attr name that would be sweet
-    mDiffuseTexture =mAttributes.at("DiffuseTexture").getTexture();
-    mDiffuseColor = mAttributes.at("DiffuseColor").getColor();
-    mParticleScaleCurve = mAttributes.at("ParticleScale").getCurve();
-    mEmitScale = mAttributes.at("EmitScale").getFloat();
     mRate = mAttributes.at("Rate").getFloat();
-    mInitialSpeed = mAttributes.at("InitialSpeed").getFloat();
     mLifetime = mAttributes.at("Lifetime").getFloat();
     mParticleLifetime = mAttributes.at("ParticleLifetime").getVector2();
+    mEmitScale = mAttributes.at("EmitScale").getFloat();
     mEmitMode = EMIT_MODES.at(mAttributes.at("EmitMode").getString());
+    
     mAlphaCurve = mAttributes.at("Alpha").getCurve();
+    mParticleScaleCurve = mAttributes.at("ParticleScale").getCurve();
+    
+    mDiffuseTexture =mAttributes.at("DiffuseTexture").getTexture();
+    mDiffuseColor = mAttributes.at("DiffuseColor").getColor();
     mBlendMode = BLEND_MODES.at(mAttributes.at("BlendMode").getString());
     
-    //mRotationAngle = mAttributes.at("RotationAngle").getFloat();
+    mInitialSpeed = mAttributes.at("InitialSpeed").getVector2();
+    mInitialRotation = mAttributes.at("InitialRotation").getVector2();
+    mGlobalForce = mAttributes.at("GlobalForce").getVector3();
+    mDragForce = mAttributes.at("DragForce").getVector3();
+    mRotationSpeed = mAttributes.at("RotationSpeed").getVector2();
+
+    
+    //TODO attrs not hooked up yet
+    //mRotationSpeed = mAttributes.at("RotationSpeed").getVector2();
+    //mEmitAngle = mAttributes.at("EmitAngle").getVector2();
+    //mRotationAngle = mAttributes.at("StartingRotation").getVector2();
+}
+
+Vec3f ParticleEvent::getEmitDirection()
+{
+    Quatf q = Quatf(Rand::randFloat(-90,90), 0.0f, 0.0f);
+    
+    //TODOOOO
+    return Vec3f(1.0f, 0.0f, 0.0f);
 }
 
 void ParticleEvent::addNewParticle()
 {
     Particle newParticle;
-    newParticle.rotation = 0.0f;
+    newParticle.rotation = (mInitialRotation[0] + Rand::randFloat(-mInitialRotation[1], mInitialRotation[1]));
+    newParticle.rotationSpeed = (mRotationSpeed[0] + Rand::randFloat(-mRotationSpeed[1], mRotationSpeed[1]));
     newParticle.lifetime = 0.0f;
     newParticle.startTime = -1.0f;
-    newParticle.maxLifetime = mParticleLifetime[0] + Rand::randFloat(-mParticleLifetime[1], mParticleLifetime[1]) ;
+    newParticle.maxLifetime = mParticleLifetime[0] + Rand::randFloat(-mParticleLifetime[1], mParticleLifetime[1]);
     newParticle.position = mEmitterPosition + Rand::randVec3f() * mEmitScale;
     newParticle.color = mDiffuseColor;
-    mParticles.push_back(newParticle);
+    newParticle.velocity = getEmitDirection() * (mInitialSpeed[0] + Rand::randFloat(-mInitialSpeed[1], mInitialSpeed[1]));
+    mParticles.push_back(newParticle);;
 }
 
 void ParticleEvent::setup()
@@ -91,13 +115,24 @@ void ParticleEvent::setup()
     }
 }
 
+void ParticleEvent::updateVelocity(Particle &currentParticle, float dt)
+{
+    Vec3f currentVel = currentParticle.velocity + mGlobalForce * dt;
+    
+    currentParticle.velocity = currentVel;
+    
+    //TODO need to add drag
+}
+
 void ParticleEvent::update(const ci::CameraPersp &camera)
 {
     float elapsed = getElapsedSeconds();
+    float dt = elapsed - mPreviousElapsed;    
     
     // run through the state gauntlet
     if (isStarted())
     {
+        mPreviousElapsed = elapsed;
         mEventState = EVENT_RUNNING;
     }
     
@@ -129,12 +164,11 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         {
             addNewParticle();
         }
-        
-        mPreviousElapsed = elapsed;
     }
     
-    Vec3f bbRight, bbUp;
-    camera.getBillboardVectors( &bbRight, &bbUp );   
+    Vec3f bbRight, bbUp, bbAt;
+    camera.getBillboardVectors( &bbRight, &bbUp );  
+    bbAt = cross(bbUp, bbRight);
     
 	for( list<Particle>::iterator it = mParticles.begin(); it != mParticles.end(); ++it )
     {
@@ -159,6 +193,20 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         //TODO here need to grab the value from the curve using time
         (*it).alpha = mAlphaCurve.getPosition(time)[1];
         (*it).scale = mParticleScaleCurve.getPosition(time)[1];
+        
+        // update particle position after applying forces
+        updateVelocity(*it, dt);
+        (*it).position = (*it).position + (*it).velocity;            
+
+        //  update rotation
+        float rot = (*it).rotation + (*it).rotationSpeed * dt;
+        
+        if (rot >= 360.0f)
+            rot = rot - 360.0f;
+        else if (rot < 0.0f)
+            rot = rot + 360;
+            
+        (*it).rotation = rot;
     }
     
 	mTotalVertices = mParticles.size() * 6;
@@ -179,17 +227,18 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
 	for( list<Particle>::const_iterator it = mParticles.begin(); it != mParticles.end(); ++it )
     {
         Vec3f pos = (*it).position;
+        float rot = toRadians((*it).rotation);
         Color c = (*it).color;
         float scale = (*it).scale;
 		Vec4f col = Vec4f(c.r, c.g, c.b, (*it).alpha);
     
-        Vec3f right			= bbRight * scale;
-        Vec3f up			= bbUp * scale;
+        Vec3f right = Quatf( bbAt, rot ) * bbRight * scale;
+        Vec3f up = Quatf( bbAt, rot ) * bbUp * scale;
         
-        Vec3f p1			= pos - right + up;
-        Vec3f p2			= pos + right + up;
-        Vec3f p3			= pos - right - up;
-        Vec3f p4			= pos + right - up;
+        Vec3f p1 = pos - right + up;
+        Vec3f p2 = pos + right + up;
+        Vec3f p3 = pos - right - up;
+        Vec3f p4 = pos + right - up;
         
         mVerts[vIndex].vertex  = p1;
         mVerts[vIndex].texture = Vec2f(0.0f,0.0f);
@@ -222,6 +271,8 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         vIndex++;        
         
 	}    
+    
+    mPreviousElapsed = elapsed;
 }
 
 void ParticleEvent::enableBlendMode()

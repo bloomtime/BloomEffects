@@ -99,7 +99,6 @@ void Effect::initializeData()
                 vector<Json::Value> orientValues = readVector(currentBlock, "Orientation");
                 currentEvent->setEmitterOrientation(Vec3f(orientValues[0].asFloat(), orientValues[1].asFloat(), orientValues[2].asFloat()));
                 
-                
                 EventPath.append(currentEvent->getPathExtension());
                 Json::Value childData = getData(EventPath);
                 

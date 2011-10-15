@@ -124,7 +124,7 @@ namespace cinder
 
 			// Get file size and rewind to beginning
 			ifstream::pos_type size = file.tellg();
-			char * configData = new char[size];
+			char * configData = new char[(int)size];
 			file.seekg(0, ios::beg);
 
 			// Read entire file into JSON data
