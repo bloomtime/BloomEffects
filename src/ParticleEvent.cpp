@@ -130,11 +130,17 @@ void ParticleEvent::setup()
 
 void ParticleEvent::updateVelocity(Particle &currentParticle, float dt)
 {
-    Vec3f currentVel = currentParticle.velocity + mGlobalForce * dt;
+    Vec3f currentVel = currentParticle.velocity;
+    Vec3f drag = Vec3f(0.0f, 0.0f, 0.0f);
     
-    currentParticle.velocity = currentVel;
+    if (mDragForce[0] != 0.0f || mDragForce[1] != 0.0f || mDragForce[2] != 0.0f)
+    {
+        float velSquared = currentVel[0] * currentVel[0] + currentVel[1] * currentVel[1] + currentVel[2] * currentVel[2];
+        float velLength = sqrt(velSquared);
+        drag = -mDragForce * velSquared / velLength;
+    }
     
-    //TODO need to add drag
+    currentParticle.velocity += currentVel * drag + mGlobalForce * dt;
 }
 
 void ParticleEvent::update(const ci::CameraPersp &camera)
@@ -214,7 +220,7 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         
         (*it).position = (*it).position + (*it).velocity;    
 
-        //  update rotation
+        // update rotation
         float rot = (*it).rotation + (*it).rotationSpeed * dt;
         
         if (rot >= 360.0f)

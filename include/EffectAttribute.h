@@ -21,8 +21,6 @@ using namespace ci::app;
 using namespace std;
 
 typedef vector<Vec2f> floatCurvePoints;
-
-//TEMP - needs to be bspline
 typedef BSpline2f floatCurve;
 
 const float TANGENT_LENGTH = .2f; //.5f for catmull-rom 

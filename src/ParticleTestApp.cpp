@@ -63,9 +63,9 @@ void ParticleTestApp::update()
     if (mTestEffect)
     { 
         if (!mTestEffect->isStopped())
+        {
             mTestEffect->deepUpdate();
-            
-        // why doesn't deleting work?  maybe it is handled by the app?
+        }
         else
         {
             delete mTestEffect;
