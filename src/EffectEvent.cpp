@@ -43,3 +43,13 @@ void EffectEvent::registerAttribute(string attrName, string attrType)
     
     mAttributes[attrName] = newAttr;
 }
+
+void EffectEvent::updateEmitter()
+{
+    if (mParentTransformChanged)
+    {
+        mEmitterPosition = mParentTransform.transformPoint(mLocalPosition);
+        mEmitterOrientation = mLocalOrientation * Quatf(mParentTransform);
+        mParentTransformChanged = false;
+    }
+}

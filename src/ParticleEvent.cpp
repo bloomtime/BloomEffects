@@ -27,7 +27,8 @@ ParticleEvent::ParticleEvent():
     mInitialRotation(Vec2f(0.0f, 0.0f)),
     mPreviousElapsed(0.0f),
     mCurrentRate(0.0f),
-    mGlobalForce(Vec3f(0.0f, 0.0f, 0.0f))
+    mGlobalForce(Vec3f(0.0f, 0.0f, 0.0f)),
+    mInheritTransform(false)
 { 
     mEmissionVolume = EmissionVolume();
     mFileExtension = PATH_EXTENSION;
@@ -68,6 +69,7 @@ void ParticleEvent::processAttributes()
     mGlobalForce = mAttributes.at("GlobalForce").getVector3();
     mDragForce = mAttributes.at("DragForce").getVector3();
     mRotationSpeed = mAttributes.at("RotationSpeed").getVector2();
+    mInheritTransform = mAttributes.at("InheritTransform").getBool();
 }
 
 Vec3f ParticleEvent::getEmitDirection()
@@ -94,7 +96,13 @@ void ParticleEvent::addNewParticle()
     newParticle.lifetime = 0.0f;
     newParticle.startTime = -1.0f;
     newParticle.maxLifetime = mParticleLifetime[0] + Rand::randFloat(-mParticleLifetime[1], mParticleLifetime[1]);
-    newParticle.position = mEmitterPosition + (mEmissionVolume.getRandomPoint() * mEmitterOrientation);
+    
+    // if inheriting parent's transform, don't store the source position now--add it later
+    if (mInheritTransform)
+        newParticle.position = mEmissionVolume.getRandomPoint() * mEmitterOrientation;
+    else
+        newParticle.position = mEmitterPosition + (mEmissionVolume.getRandomPoint() * mEmitterOrientation);
+        
     newParticle.color = mDiffuseColor;
     newParticle.velocity = getEmitDirection() * (mInitialSpeed[0] + Rand::randFloat(-mInitialSpeed[1], mInitialSpeed[1]));
     mParticles.push_back(newParticle);;
@@ -131,6 +139,8 @@ void ParticleEvent::updateVelocity(Particle &currentParticle, float dt)
 
 void ParticleEvent::update(const ci::CameraPersp &camera)
 {
+    updateEmitter();
+    
     float elapsed = getElapsedSeconds();
     float dt = elapsed - mPreviousElapsed;    
     
@@ -201,7 +211,8 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         
         // update particle position after applying forces
         updateVelocity(*it, dt);
-        (*it).position = (*it).position + (*it).velocity;            
+        
+        (*it).position = (*it).position + (*it).velocity;    
 
         //  update rotation
         float rot = (*it).rotation + (*it).rotationSpeed * dt;
@@ -232,6 +243,11 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
 	for( list<Particle>::const_iterator it = mParticles.begin(); it != mParticles.end(); ++it )
     {
         Vec3f pos = (*it).position;
+        
+        // if inheriting parent's transform, add it in now since it might have updated
+        if (mInheritTransform)
+            pos += mEmitterPosition;
+        
         float rot = toRadians((*it).rotation);
         Color c = (*it).color;
         float scale = (*it).scale;

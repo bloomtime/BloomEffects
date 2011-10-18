@@ -15,6 +15,7 @@
    "GlobalForce" : [0.0, -2.0, 0.0],
    "DragForce" : [0.0, 0.0, 0.0],
    "EmitMode" : "Continuous",
+   "InheritTransform" : false,
    "Alpha" : [
         {"point" : [0.0, 1.0]},
         {"point" : [1.0, 0.0]}

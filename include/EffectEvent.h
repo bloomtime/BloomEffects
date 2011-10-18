@@ -43,8 +43,10 @@ public:
         mEventState(EVENT_INITIALIZED),
         mStartTime(-1.0f),
         mLifetime(0.0f),
+        mLocalPosition(Vec3f( 0.0f, 0.0f, 0.0f )),
         mEmitterPosition(Vec3f( 0.0f, 0.0f, 0.0f )),
-        mEmitterOrientation(Quatf::identity())
+        mEmitterOrientation(Quatf::identity()),
+        mParentTransformChanged(false)
     {
         mParentTransform.setToIdentity();
     }
@@ -58,7 +60,11 @@ public:
     virtual void update(const ci::CameraPersp &camera) {}
     virtual void draw() {}
     
-    void setParentTransform( const ci::Matrix44f &transform ) { mParentTransform = transform; /* copy OK */ }
+    void setParentTransform( const ci::Matrix44f &transform ) 
+    { 
+        mParentTransform = transform; /* copy OK */ 
+        mParentTransformChanged = true;
+    }
     ci::Matrix44f getTransform() const { return mTransform; /* copy OK */ }
     
     void registerAttribute(string attrName, string attrType);
@@ -71,13 +77,16 @@ public:
     
     void setEmitterPosition(Vec3f position) 
     { 
+        mLocalPosition = position;
         mEmitterPosition = mParentTransform.transformPoint(position);
     }
     void setEmitterOrientation(Vec3f orientation) 
     { 
-        mEmitterOrientation.set(toRadians(orientation[0]),toRadians(orientation[1]), toRadians(orientation[2]));
-        mEmitterOrientation *= Quatf(mParentTransform); 
+        mLocalOrientation.set(toRadians(orientation[0]),toRadians(orientation[1]), toRadians(orientation[2]));
+        mEmitterOrientation = mLocalOrientation * Quatf(mParentTransform); 
     }
+    
+    void updateEmitter();
     
     bool isEnabled() { return mEnabled; }
     
@@ -111,7 +120,11 @@ protected:
     EventState mEventState;
             
     bool mEnabled;
+    bool mParentTransformChanged;
+    Vec3f mLocalPosition;
     Vec3f mEmitterPosition;
+    
+    Quatf mLocalOrientation;
     Quatf mEmitterOrientation;
     
     string mFileExtension;

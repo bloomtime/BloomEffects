@@ -53,7 +53,7 @@ public:
         registerAttribute("EmitScale",        "Vector3");
         registerAttribute("EmitVolumeType",   "String");
         registerAttribute("EmitMode",         "String");
-        registerAttribute("EmitAngle",      "Vector2");
+        registerAttribute("EmitAngle",        "Vector2");
         
         registerAttribute("Alpha",            "Curve");
         registerAttribute("ParticleScale",    "Curve");
@@ -66,7 +66,8 @@ public:
         registerAttribute("InitialSpeed",     "Vector2");
         registerAttribute("GlobalForce",      "Vector3");
         registerAttribute("DragForce",        "Vector3"); 
-        registerAttribute("RotationSpeed",    "Vector2");   
+        registerAttribute("RotationSpeed",    "Vector2");  
+        registerAttribute("InheritTransform", "Bool"); 
 
         //TODO curves also need up front variance (not per frame variance)
     }
@@ -127,6 +128,8 @@ private:
     Vec2f mRotationSpeed;    // value, variance
     Vec3f mGlobalForce;  
     Vec3f mDragForce;
+    
+    bool mInheritTransform;
     
     EmissionVolume mEmissionVolume;
     //---------------------------------

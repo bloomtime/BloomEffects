@@ -66,6 +66,10 @@ public:
     {
         return boost::any_cast<Vec2f>(mValue);
     }
+    bool getBool()
+    {
+        return boost::any_cast<bool>(mValue);
+    }
     string getString()
     {
         return boost::any_cast<string>(mValue);
