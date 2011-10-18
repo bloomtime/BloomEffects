@@ -18,7 +18,6 @@ const string PATH_EXTENSION = ".particle.json";
 
 ParticleEvent::ParticleEvent():
     mRate(1.0f),
-    mEmitScale(1.0f),
     mDiffuseColor(Color(1.0f, 1.0f, 1.0f)),
     mTotalVertices(0),
     mPrevTotalVertices(0),
@@ -30,6 +29,7 @@ ParticleEvent::ParticleEvent():
     mCurrentRate(0.0f),
     mGlobalForce(Vec3f(0.0f, 0.0f, 0.0f))
 { 
+    mEmissionVolume = EmissionVolume();
     mFileExtension = PATH_EXTENSION;
     registerAttributes(); 
 }
@@ -50,13 +50,15 @@ void ParticleEvent::processAttributes()
     mRate = mAttributes.at("Rate").getFloat();
     mLifetime = mAttributes.at("Lifetime").getFloat();
     mParticleLifetime = mAttributes.at("ParticleLifetime").getVector2();
-    mEmitScale = mAttributes.at("EmitScale").getFloat();
     mEmitMode = EMIT_MODES.at(mAttributes.at("EmitMode").getString());
+    
+    mEmissionVolume.setScale(mAttributes.at("EmitScale").getVector3());
+    mEmissionVolume.setVolumeType(EMIT_VOLUMES.at(mAttributes.at("EmitVolumeType").getString()));
     
     mAlphaCurve = mAttributes.at("Alpha").getCurve();
     mParticleScaleCurve = mAttributes.at("ParticleScale").getCurve();
     
-    mDiffuseTexture =mAttributes.at("DiffuseTexture").getTexture();
+    mDiffuseTexture = mAttributes.at("DiffuseTexture").getTexture();
     mDiffuseColor = mAttributes.at("DiffuseColor").getColor();
     mBlendMode = BLEND_MODES.at(mAttributes.at("BlendMode").getString());
     
@@ -66,11 +68,8 @@ void ParticleEvent::processAttributes()
     mDragForce = mAttributes.at("DragForce").getVector3();
     mRotationSpeed = mAttributes.at("RotationSpeed").getVector2();
 
-    
     //TODO attrs not hooked up yet
-    //mRotationSpeed = mAttributes.at("RotationSpeed").getVector2();
     //mEmitAngle = mAttributes.at("EmitAngle").getVector2();
-    //mRotationAngle = mAttributes.at("StartingRotation").getVector2();
 }
 
 Vec3f ParticleEvent::getEmitDirection()
@@ -89,7 +88,7 @@ void ParticleEvent::addNewParticle()
     newParticle.lifetime = 0.0f;
     newParticle.startTime = -1.0f;
     newParticle.maxLifetime = mParticleLifetime[0] + Rand::randFloat(-mParticleLifetime[1], mParticleLifetime[1]);
-    newParticle.position = mEmitterPosition + Rand::randVec3f() * mEmitScale;
+    newParticle.position = mEmitterPosition + mEmissionVolume.getRandomPoint();
     newParticle.color = mDiffuseColor;
     newParticle.velocity = getEmitDirection() * (mInitialSpeed[0] + Rand::randFloat(-mInitialSpeed[1], mInitialSpeed[1]));
     mParticles.push_back(newParticle);;
@@ -136,7 +135,8 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         mEventState = EVENT_RUNNING;
     }
     
-    if (isRunning() && getEventElapsedSeconds() >= mLifetime)
+    // -1.0f lifetime is infinite lifetime
+    if (isRunning() && getEventElapsedSeconds() >= mLifetime && mLifetime != -1.0f)
     {
         stop(mHardStop);
     }
@@ -190,7 +190,6 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         float interval = (*it).lifetime / (*it).maxLifetime;
         float time = interval - floor(interval);
         
-        //TODO here need to grab the value from the curve using time
         (*it).alpha = mAlphaCurve.getPosition(time)[1];
         (*it).scale = mParticleScaleCurve.getPosition(time)[1];
         

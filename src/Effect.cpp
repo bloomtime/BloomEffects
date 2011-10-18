@@ -273,6 +273,7 @@ void Effect::deepUpdate()
         }
         
         /*
+        instead of doing this copy, use static_cast
         std::vector<EffectEventRef> effectChildren;
         std::copy(effectChildren.begin(), effectChildren.end(), std::back_inserter(mChildren));
         

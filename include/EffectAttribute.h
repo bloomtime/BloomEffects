@@ -39,7 +39,12 @@ public:
     
     gl::Texture getTexture() 
     { 
-        return gl::Texture( loadImage( loadResource( boost::any_cast<string>(mValue) ) ) );
+        gl::Texture::Format mipFmt;
+        mipFmt.enableMipmapping( true );
+        mipFmt.setMinFilter( GL_LINEAR_MIPMAP_NEAREST );    
+        mipFmt.setMagFilter( GL_LINEAR ); // TODO: experiment with GL_NEAREST where appropriate
+        
+        return gl::Texture( loadImage( loadResource( boost::any_cast<string>(mValue) ) ), mipFmt );
     }
     float getFloat()
     {

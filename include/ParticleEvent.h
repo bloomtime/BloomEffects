@@ -6,6 +6,7 @@
 
 #pragma once
 #include "EffectEvent.h"
+#include "EmitVolume.h"
 
 #include "cinder/Rand.h"
 #include <vector>
@@ -13,18 +14,6 @@
 
 using namespace ci;
 using namespace std;
-
-enum EmitVolume {
-    VOLUME_SPHERE,
-    VOLUME_BOX,
-    VOLUME_CYLINDER
-};
-
-// add new Emit Modes here
-const boost::unordered_map<string, EmitVolume> EMIT_VOLUMES = boost::assign::map_list_of
-    ("Sphere", VOLUME_SPHERE)
-    ("Box", VOLUME_BOX)
-    ("Cylinder", VOLUME_CYLINDER);
 
 enum EmitMode {
     EMIT_BURST,
@@ -61,7 +50,8 @@ public:
         registerAttribute("Rate",             "Float");
         registerAttribute("Lifetime",         "Float");
         registerAttribute("ParticleLifetime", "Vector2");
-        registerAttribute("EmitScale",        "Float");
+        registerAttribute("EmitScale",        "Vector3");
+        registerAttribute("EmitVolumeType",   "String");
         registerAttribute("EmitMode",         "String");
         
         registerAttribute("Alpha",            "Curve");
@@ -78,8 +68,9 @@ public:
         registerAttribute("RotationSpeed",    "Vector2");   
         
         //TODO attrs not hooked up yet
-        //registerAttribute("RotationSpeed",    "Vector2");
-        //registerAttribute("EmitAngle",        "Vector2");
+        //registerAttribute("EmitAngle",      "Vector2");
+        // maybe make emit angle just 3 axes of random rotation angle ranges...or that emission cone thing
+        
         //TODO curves also need up front variance (not per frame variance)
     }
     
@@ -123,9 +114,7 @@ private:
     // user-defined attributes
     float mRate;
     Vec2f mParticleLifetime;  // value, variance
-    float mEmitScale;
     EmitMode mEmitMode;
-    EmitVolume mEmitVolume;
     Vec2f mEmitAngle;
         
     floatCurve mAlphaCurve;
@@ -142,6 +131,7 @@ private:
     Vec3f mGlobalForce;  
     Vec3f mDragForce;
     
+    EmissionVolume mEmissionVolume;
     //---------------------------------
     
     // for continuous emit mode

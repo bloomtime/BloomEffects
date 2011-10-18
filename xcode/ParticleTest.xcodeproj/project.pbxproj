@@ -45,6 +45,7 @@
 		32CA4F630368D1EE00C91783 /* ParticleTest_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleTest_Prefix.pch; sourceTree = "<group>"; };
 		43CD9798123D6504003B628E /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = ../resources/Icon.png; sourceTree = SOURCE_ROOT; };
 		8D1107310486CEB800E47090 /* ParticleTest-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "ParticleTest-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+		AD01B4A6144CE8C800DD4583 /* EmitVolume.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EmitVolume.h; path = ../include/EmitVolume.h; sourceTree = "<group>"; };
 		AD7DAD94143E28ED009F0A59 /* ParticleEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParticleEvent.cpp; path = ../src/ParticleEvent.cpp; sourceTree = "<group>"; };
 		AD7DAD96143E28F5009F0A59 /* ParticleEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParticleEvent.h; path = ../include/ParticleEvent.h; sourceTree = "<group>"; };
 		AD8B2315143FA9A300DA23EE /* EffectEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EffectEvent.h; path = ../include/EffectEvent.h; sourceTree = "<group>"; };
@@ -110,6 +111,7 @@
 		00CFDFB81138492F0091E310 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				AD01B4A6144CE8C800DD4583 /* EmitVolume.h */,
 				ADEBF5C314478BDC00EF71F6 /* EffectAttribute.h */,
 				AD9231D41444D1A300D89666 /* EffectManager.h */,
 				AD8B2315143FA9A300DA23EE /* EffectEvent.h */,
