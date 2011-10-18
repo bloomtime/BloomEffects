@@ -48,7 +48,9 @@ public:
         mIsStarted(false),
         mIsStopped(false),
         mStartedTime(-1.0f)
-    {}
+    {
+        mTransform.setToIdentity();
+    }
     
     //TODO TEMP TESTING
     Effect(string effectPath);

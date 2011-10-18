@@ -44,8 +44,10 @@ public:
         mStartTime(-1.0f),
         mLifetime(0.0f),
         mEmitterPosition(Vec3f( 0.0f, 0.0f, 0.0f )),
-        mEmitterOrientation(Vec3f( 0.0f, 0.0f, 0.0f))
-        {}
+        mEmitterOrientation(Quatf::identity())
+    {
+        mParentTransform.setToIdentity();
+    }
         
     ~EffectEvent();
     
@@ -56,7 +58,7 @@ public:
     virtual void update(const ci::CameraPersp &camera) {}
     virtual void draw() {}
     
-    void setTransform( const ci::Matrix44f &transform ) { mTransform = transform; /* copy OK */ }
+    void setParentTransform( const ci::Matrix44f &transform ) { mParentTransform = transform; /* copy OK */ }
     ci::Matrix44f getTransform() const { return mTransform; /* copy OK */ }
     
     void registerAttribute(string attrName, string attrType);
@@ -66,8 +68,17 @@ public:
     void setEnabled(bool enabled) { mEnabled = enabled; }
     void setStartTime(float startTime) { mStartTime = startTime; }
     float getStartTime() { return mStartTime; }
-    void setEmitterPosition(Vec3f position) { mEmitterPosition = position; }
-    void setEmitterOrientation(Vec3f orientation) { mEmitterOrientation = orientation; }
+    
+    void setEmitterPosition(Vec3f position) 
+    { 
+        mEmitterPosition = mParentTransform.transformPoint(position);
+    }
+    void setEmitterOrientation(Vec3f orientation) 
+    { 
+        mEmitterOrientation.set(toRadians(orientation[0]),toRadians(orientation[1]), toRadians(orientation[2]));
+        mEmitterOrientation *= Quatf(mParentTransform); 
+    }
+    
     bool isEnabled() { return mEnabled; }
     
     // Event state checks
@@ -91,7 +102,8 @@ protected:
     // mAttachment (parent or joint attachments)
     // bool mInheritTransform
     
-    ci::Matrix44f mTransform;
+    //parent transform
+    ci::Matrix44f mParentTransform;
     float mLifetime;
     float mStartTime;
     bool mHardStop;
@@ -100,7 +112,7 @@ protected:
             
     bool mEnabled;
     Vec3f mEmitterPosition;
-    Vec3f mEmitterOrientation;
+    Quatf mEmitterOrientation;
     
     string mFileExtension;
 };

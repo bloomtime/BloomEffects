@@ -59,7 +59,7 @@ public:
                 // x is radius of cylinder, y is inner radius, z is cylinder height
                 // if y is 0, then the cylinder is "solid", otherwise there is a hole of size y in the center
                 Vec2f xz = Rand::randVec2f() * Rand::randFloat(mScale[1], mScale[0]);
-                randomPoint = Vec3f(xz[0], Rand::randFloat(0.0f, mScale[2]), xz[1]);
+                randomPoint = Vec3f(xz[0], xz[1], Rand::randFloat(0.0f, mScale[2]));
                 break;
             }
             case VOLUME_BOX:

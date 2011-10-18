@@ -53,6 +53,7 @@ public:
         registerAttribute("EmitScale",        "Vector3");
         registerAttribute("EmitVolumeType",   "String");
         registerAttribute("EmitMode",         "String");
+        registerAttribute("EmitAngle",      "Vector2");
         
         registerAttribute("Alpha",            "Curve");
         registerAttribute("ParticleScale",    "Curve");
@@ -66,11 +67,7 @@ public:
         registerAttribute("GlobalForce",      "Vector3");
         registerAttribute("DragForce",        "Vector3"); 
         registerAttribute("RotationSpeed",    "Vector2");   
-        
-        //TODO attrs not hooked up yet
-        //registerAttribute("EmitAngle",      "Vector2");
-        // maybe make emit angle just 3 axes of random rotation angle ranges...or that emission cone thing
-        
+
         //TODO curves also need up front variance (not per frame variance)
     }
     

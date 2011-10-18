@@ -221,7 +221,10 @@ void Effect::setup()
 	for( list<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
     {
         if ((*it)->isEnabled())
+        {
+            (*it)->setParentTransform(mTransform);
             (*it)->setup();
+        }
     }
     
     /*

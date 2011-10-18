@@ -3,6 +3,7 @@
    "DiffuseColor" : [1.0, 1.0, 1.0],
    "EmitScale" : [12, 0.0, 0.0],
    "EmitVolumeType" : "Sphere",
+   "EmitAngle" : [0.0, 0.0],
    "Rate" : 40.0,
    "InitialSpeed" : 0.0,
    "Lifetime" : 4.0,

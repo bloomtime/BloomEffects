@@ -54,7 +54,8 @@ void ParticleEvent::processAttributes()
     
     mEmissionVolume.setScale(mAttributes.at("EmitScale").getVector3());
     mEmissionVolume.setVolumeType(EMIT_VOLUMES.at(mAttributes.at("EmitVolumeType").getString()));
-    
+    mEmitAngle = mAttributes.at("EmitAngle").getVector2();  
+      
     mAlphaCurve = mAttributes.at("Alpha").getCurve();
     mParticleScaleCurve = mAttributes.at("ParticleScale").getCurve();
     
@@ -67,17 +68,22 @@ void ParticleEvent::processAttributes()
     mGlobalForce = mAttributes.at("GlobalForce").getVector3();
     mDragForce = mAttributes.at("DragForce").getVector3();
     mRotationSpeed = mAttributes.at("RotationSpeed").getVector2();
-
-    //TODO attrs not hooked up yet
-    //mEmitAngle = mAttributes.at("EmitAngle").getVector2();
 }
 
 Vec3f ParticleEvent::getEmitDirection()
 {
-    Quatf q = Quatf(Rand::randFloat(-90,90), 0.0f, 0.0f);
+    //Vec2f xz = Rand::randVec2f() * Rand::randFloat(mScale[1], mScale[0]);
     
-    //TODOOOO
-    return Vec3f(1.0f, 0.0f, 0.0f);
+    float coneSizeX = mEmitAngle[0];
+    float coneSizeY = mEmitAngle[1];
+    
+    float rangeX = toRadians(Rand::randFloat(coneSizeX, coneSizeY));
+    float rangeY = toRadians(Rand::randFloat(coneSizeX, coneSizeY));
+    Vec2f coneRange = Rand::randVec2f();
+    
+    Quatf q = Quatf(coneRange[0] * rangeX, coneRange[1] * rangeY, 0.0f);
+    Vec3f emitDir = Vec3f(0.0f, 0.0f, 1.0f) * q;
+    return emitDir * mEmitterOrientation; 
 }
 
 void ParticleEvent::addNewParticle()
@@ -88,7 +94,7 @@ void ParticleEvent::addNewParticle()
     newParticle.lifetime = 0.0f;
     newParticle.startTime = -1.0f;
     newParticle.maxLifetime = mParticleLifetime[0] + Rand::randFloat(-mParticleLifetime[1], mParticleLifetime[1]);
-    newParticle.position = mEmitterPosition + mEmissionVolume.getRandomPoint();
+    newParticle.position = mEmitterPosition + (mEmissionVolume.getRandomPoint() * mEmitterOrientation);
     newParticle.color = mDiffuseColor;
     newParticle.velocity = getEmitDirection() * (mInitialSpeed[0] + Rand::randFloat(-mInitialSpeed[1], mInitialSpeed[1]));
     mParticles.push_back(newParticle);;

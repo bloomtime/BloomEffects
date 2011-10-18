@@ -3,7 +3,7 @@
         {
             "EventType" : "ParticleEvent",
             "EventPath" : "test1",
-            "Position" : [-2.0, 7.0, 0.0],
+            "Position" : [-2.0, -4.0, 0.0],
             "Orientation" : [-90.0, 0.0, 0.0],
             "StartTime" : 0.0,
             "Enabled" : true
