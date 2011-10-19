@@ -21,6 +21,7 @@
 		AD9FF36D1446670F0053E57B /* README in Resources */ = {isa = PBXBuildFile; fileRef = AD9FF3691446670F0053E57B /* README */; };
 		AD9FF36E1446670F0053E57B /* ciJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD9FF36B1446670F0053E57B /* ciJson.cpp */; };
 		AD9FF36F1446670F0053E57B /* jsoncpp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD9FF36C1446670F0053E57B /* jsoncpp.cpp */; };
+		ADA47B7A144E4133000F436A /* cellTest.png in Resources */ = {isa = PBXBuildFile; fileRef = ADA47B79144E4133000F436A /* cellTest.png */; };
 		ADA517AD143E8555003BA388 /* test.effect.json in Resources */ = {isa = PBXBuildFile; fileRef = ADA517AC143E8555003BA388 /* test.effect.json */; };
 		ADA517AF143E8576003BA388 /* test1.particle.json in Resources */ = {isa = PBXBuildFile; fileRef = ADA517AE143E8576003BA388 /* test1.particle.json */; };
 		ADA517B1143E857C003BA388 /* test2.particle.json in Resources */ = {isa = PBXBuildFile; fileRef = ADA517B0143E857C003BA388 /* test2.particle.json */; };
@@ -59,6 +60,7 @@
 		AD9FF3691446670F0053E57B /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		AD9FF36B1446670F0053E57B /* ciJson.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ciJson.cpp; sourceTree = "<group>"; };
 		AD9FF36C1446670F0053E57B /* jsoncpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsoncpp.cpp; sourceTree = "<group>"; };
+		ADA47B79144E4133000F436A /* cellTest.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cellTest.png; path = ../resources/cellTest.png; sourceTree = "<group>"; };
 		ADA517AC143E8555003BA388 /* test.effect.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = test.effect.json; path = ../resources/test.effect.json; sourceTree = "<group>"; };
 		ADA517AE143E8576003BA388 /* test1.particle.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = test1.particle.json; path = ../resources/test1.particle.json; sourceTree = "<group>"; };
 		ADA517B0143E857C003BA388 /* test2.particle.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = test2.particle.json; path = ../resources/test2.particle.json; sourceTree = "<group>"; };
@@ -154,6 +156,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				ADA47B79144E4133000F436A /* cellTest.png */,
 				AD9231C61443FEA800D89666 /* Test2.png */,
 				AD9231C31443FE9F00D89666 /* Test1.png */,
 				ADA517B0143E857C003BA388 /* test2.particle.json */,
@@ -313,6 +316,7 @@
 				AD9231C41443FE9F00D89666 /* Test1.png in Resources */,
 				AD9231C71443FEA800D89666 /* Test2.png in Resources */,
 				AD9FF36D1446670F0053E57B /* README in Resources */,
+				ADA47B7A144E4133000F436A /* cellTest.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -59,7 +59,9 @@ public:
         registerAttribute("ParticleScale",    "Curve");
         
         registerAttribute("DiffuseTexture",   "Texture");
-        registerAttribute("DiffuseColor",     "Color");
+        registerAttribute("DiffuseColorR",    "Curve");
+        registerAttribute("DiffuseColorG",    "Curve");
+        registerAttribute("DiffuseColorB",    "Curve");
         registerAttribute("BlendMode",        "String");
 
         registerAttribute("InitialRotation",  "Vector2"); 
@@ -79,17 +81,20 @@ public:
     
 private:
     struct Particle {
-        float scale;
         float rotation;
         float rotationSpeed;
         float startTime;
         float lifetime;
         float maxLifetime;
+        
+        //TODO need to possibly store curves here with baked in variance.  eesh.  
         float alpha;
+        float scale;
+        float colorR;
+        float colorG;
+        float colorB;
         
-        Vec3f position;
-        Color color;
-        
+        Vec3f position;  
         Vec3f velocity;
     };
     
@@ -115,10 +120,13 @@ private:
     EmitMode mEmitMode;
     Vec2f mEmitAngle;
         
-    floatCurve mAlphaCurve;
-    floatCurve mParticleScaleCurve;
+    AttributeCurve mAlphaCurve;
+    AttributeCurve mParticleScaleCurve;
     
-    Color mDiffuseColor;
+    AttributeCurve mDiffuseRedCurve;
+    AttributeCurve mDiffuseGreenCurve;
+    AttributeCurve mDiffuseBlueCurve;
+    
     gl::Texture mDiffuseTexture;
     BlendMode mBlendMode;
     

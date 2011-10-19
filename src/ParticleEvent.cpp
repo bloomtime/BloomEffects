@@ -18,7 +18,6 @@ const string PATH_EXTENSION = ".particle.json";
 
 ParticleEvent::ParticleEvent():
     mRate(1.0f),
-    mDiffuseColor(Color(1.0f, 1.0f, 1.0f)),
     mTotalVertices(0),
     mPrevTotalVertices(0),
     mBlendMode(BLEND_OPAQUE),
@@ -61,7 +60,9 @@ void ParticleEvent::processAttributes()
     mParticleScaleCurve = mAttributes.at("ParticleScale").getCurve();
     
     mDiffuseTexture = mAttributes.at("DiffuseTexture").getTexture();
-    mDiffuseColor = mAttributes.at("DiffuseColor").getColor();
+    mDiffuseRedCurve = mAttributes.at("DiffuseColorR").getCurve();
+    mDiffuseGreenCurve = mAttributes.at("DiffuseColorG").getCurve();
+    mDiffuseBlueCurve = mAttributes.at("DiffuseColorB").getCurve();
     mBlendMode = BLEND_MODES.at(mAttributes.at("BlendMode").getString());
     
     mInitialSpeed = mAttributes.at("InitialSpeed").getVector2();
@@ -103,7 +104,6 @@ void ParticleEvent::addNewParticle()
     else
         newParticle.position = mEmitterPosition + (mEmissionVolume.getRandomPoint() * mEmitterOrientation);
         
-    newParticle.color = mDiffuseColor;
     newParticle.velocity = getEmitDirection() * (mInitialSpeed[0] + Rand::randFloat(-mInitialSpeed[1], mInitialSpeed[1]));
     mParticles.push_back(newParticle);;
 }
@@ -212,8 +212,12 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         float interval = (*it).lifetime / (*it).maxLifetime;
         float time = interval - floor(interval);
         
-        (*it).alpha = mAlphaCurve.getPosition(time)[1];
-        (*it).scale = mParticleScaleCurve.getPosition(time)[1];
+        (*it).alpha = mAlphaCurve.getValueAtTime(time);
+        (*it).scale = mParticleScaleCurve.getValueAtTime(time);
+        
+        (*it).colorR = mDiffuseRedCurve.getValueAtTime(time);
+        (*it).colorG = mDiffuseGreenCurve.getValueAtTime(time);
+        (*it).colorB = mDiffuseBlueCurve.getValueAtTime(time);
         
         // update particle position after applying forces
         updateVelocity(*it, dt);
@@ -255,7 +259,7 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
             pos += mEmitterPosition;
         
         float rot = toRadians((*it).rotation);
-        Color c = (*it).color;
+        Color c = Color((*it).colorR, (*it).colorG, (*it).colorB);
         float scale = (*it).scale;
 		Vec4f col = Vec4f(c.r, c.g, c.b, (*it).alpha);
     

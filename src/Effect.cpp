@@ -165,7 +165,7 @@ void Effect::parseAttr(const Json::Value data, EffectAttribute &attr, EffectEven
         for (vector<Json::Value>::const_iterator it = pointValues.begin(); it != pointValues.end(); ++it)
         {
             vector<Json::Value> pValues = readVector((*it), "point");
-            Vec2f currentPoint = Vec2f(pValues[0].asFloat(), pValues[1].asFloat());
+            Vec3f currentPoint = Vec3f(pValues[0].asFloat(), pValues[1].asFloat(), pValues[2].asFloat());
             currentCurve.push_back(currentPoint);
             
             //console() << "p is " << currentPoint[0] << " " << currentPoint[1] << std::endl;

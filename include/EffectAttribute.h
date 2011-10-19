@@ -13,6 +13,7 @@
 #include "cinder/gl/Texture.h"
 #include "cinder/app/App.h"
 #include "cinder/BSpline.h"
+#include "cinder/Rand.h"
 #include <boost/unordered_map.hpp>
 #include <boost/assign/list_of.hpp>
 
@@ -20,8 +21,29 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-typedef vector<Vec2f> floatCurvePoints;
+typedef vector<Vec3f> floatCurvePoints;
+typedef vector<Vec2f> varianceCurvePoints;
 typedef BSpline2f floatCurve;
+
+class AttributeCurve
+{
+public:
+    AttributeCurve() {}
+    ~AttributeCurve() {}
+    
+    floatCurve valueCurve;
+    varianceCurvePoints variancePoints;
+    
+    float getValueAtTime(float time)
+    {
+        float currentValue = valueCurve.getPosition(time)[1];
+        return currentValue;
+        
+        // TODO need smooth variance
+        //float currentVariance = variances.getPosition(time)[1];
+        //return currentValue + Rand::randFloat(-currentVariance, currentVariance);
+    }
+};
 
 const float TANGENT_LENGTH = .2f; //.5f for catmull-rom 
 
@@ -72,46 +94,69 @@ public:
     {
         return boost::any_cast<string>(mValue);
     }
-    floatCurve getCurve()
+    AttributeCurve getCurve()
     {
-        vector<ci::Vec2f> curveInput;
+        vector<ci::Vec2f> valueCurveInput;
         
         floatCurvePoints curvePoints = boost::any_cast<floatCurvePoints>(mValue);
         
-        if (curvePoints.size() == 1)
-            curvePoints.push_back(curvePoints[0]);
+        // create begin and end points for tangents
+        curvePoints.insert(curvePoints.begin(), curvePoints[0]);
+        curvePoints.push_back(curvePoints[curvePoints.size()-1]);
         
-        // TODO -- Doesn't handle non-flat tangents right now.  Will have to figure it out!
-        /*
-        Vec2f pFirst = curvePoints[0] + curvePoints[0] - curvePoints[1];
-        curvePoints.insert (curvePoints.begin(), pFirst);
+        // insert begin point for variance (curve constructed later)
+        varianceCurvePoints variancePoints;
+        variancePoints.push_back(Vec2f(curvePoints[0][0], curvePoints[0][2]));
+
+        Vec3f previousPoint = curvePoints[0];
+        Vec3f currentPoint = curvePoints[1];
         
-        float last = curvePoints.size() - 1;
-        Vec2f pLast = curvePoints[last] + curvePoints[last] - curvePoints[last-1];
-        curvePoints.push_back(pLast);
-        */
-        
-        for (int i=0; i < curvePoints.size(); i++)
+        for (int i=1; i < curvePoints.size(); i++)
         {            
-            //TODO catmull-rom
+            variancePoints.push_back(Vec2f(curvePoints[i][0], curvePoints[i][2]));
+            
+            //TODO catmull-rom, not sure if needed now
             //if (i == 0)
             //{
             //    console() << curvePoints[i] << "|" << std::endl;
             //    curveInput.push_back(curvePoints[i]);
             //    continue;
             //}
+              
+            Vec3f nextPoint = curvePoints[i+1];
             
-            Vec2f b1 = Vec2f(curvePoints[i][0] - (curvePoints[i][0] - curvePoints[i-1][0]) * TANGENT_LENGTH, curvePoints[i][1]);
-            Vec2f b2 = Vec2f(curvePoints[i][0]  + (curvePoints[i+1][0] - curvePoints[i][0]) * TANGENT_LENGTH, curvePoints[i][1]);
+            Vec2f currentVec = Vec2f(currentPoint[0], currentPoint[1]);
+            Vec2f previousVec = Vec2f(previousPoint[0], previousPoint[1]);
+            Vec2f nextVec = Vec2f(nextPoint[0], nextPoint[1]);
+            
+            
+            Vec2f b1 = currentVec - (currentVec - previousVec) * TANGENT_LENGTH;
+            Vec2f b2 = currentVec + (nextVec - currentVec) * TANGENT_LENGTH;
+            
+            Vec2f currentVar = Vec2f(currentPoint[0], currentPoint[2]);
+            Vec2f previousVar = Vec2f(previousPoint[0], previousPoint[2]);
+            Vec2f nextVar = Vec2f(nextPoint[0], nextPoint[2]);
+            
+            Vec2f vb1 = currentVar - (currentVar - previousVar) * TANGENT_LENGTH;
+            Vec2f vb2 = currentVar + (nextVar - currentVar) * TANGENT_LENGTH;
             
             //console() << b1 << "|" << b2 << "|" << curvePoints[i] << std::endl;
             
-            curveInput.push_back(b1);
-            curveInput.push_back(curvePoints[i]);
-            curveInput.push_back(b2);
+            valueCurveInput.push_back(b1);
+            valueCurveInput.push_back(currentVec);
+            valueCurveInput.push_back(b2);
+            
+            currentPoint = nextPoint;
+            previousPoint = currentPoint;
         }
         
-        floatCurve newCurve = BSpline2f( curveInput, 3, false, true );
+        float last = curvePoints.size() - 1;
+        variancePoints.push_back(Vec2f(curvePoints[last][0], curvePoints[last][2]));
+        floatCurve newValueCurve = BSpline2f( valueCurveInput, 3, false, true );
+        
+        AttributeCurve newCurve;
+        newCurve.valueCurve = newValueCurve;
+        newCurve.variancePoints = variancePoints;
         
         //console() << newCurve.getPosition(0) << " yay" << std::endl;
         return newCurve;

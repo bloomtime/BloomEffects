@@ -1,27 +1,42 @@
 {
-   "DiffuseTexture" : "Test1.png",
-   "DiffuseColor" : [1.0, 1.0, 1.0],
+   "DiffuseTexture" : "cellTest.png",
    "EmitVolumeType" : "Cylinder",
    "EmitScale" : [8.0, 8.0, 0.0],
    "EmitAngle" : [90.0, 90.0],
-   "Rate" : 15.0,
+   "Rate" : 100.0,
    "Lifetime" : -1.0,
-   "BlendMode" : "AlphaBlend",
+   "BlendMode" : "AdditiveBlend",
    "ParticleLifetime" : [5.0, 1.0],
-   "InitialSpeed" : [0.01, 0.0],
+   "InitialSpeed" : [0.2, 0.2],
    "InitialRotation" : [0.0, 180.0],
-   "RotationSpeed" : [0.0, 30.0],
+   "RotationSpeed" : [0.0, 200.0],
    "GlobalForce" : [0.0, 0.0, 0.0],
    "DragForce" : [0.0, 0.0, 0.0],
    "EmitMode" : "Continuous",
    "InheritTransform" : false,
+   "DiffuseColorR" : [
+        {"point" : [0.0, 1.0, 0.0]},
+        {"point" : [0.5, 1.0, 0.0]},
+        {"point" : [1.0, 0.0, 0.0]}
+   ],
+   "DiffuseColorG" : [
+        {"point" : [0.0, 0.0, 0.0]},
+        {"point" : [0.5, 1.0, 0.0]},
+        {"point" : [1.0, 1.0, 0.0]}
+   ],
+   "DiffuseColorB" : [
+        {"point" : [0.0, 1.0, 0.0]},
+        {"point" : [0.5, 0.0, 0.0]},
+        {"point" : [1.0, 1.0, 0.0]}
+   ],
    "Alpha" : [
-        {"point" : [0.0, 0.0]},
-        {"point" : [0.05, 1.0]},
-        {"point" : [1.0, 0.0]}
+        {"point" : [0.0, 0.0, 0.0]},
+        {"point" : [0.05, 1.0, 0.0]},
+        {"point" : [1.0, 0.0, 0.0]}
    ],
    "ParticleScale" : [
-        {"point" : [0.0, 1.0]},
-        {"point" : [1.0, 1.0]}
+        {"point" : [0.0, 1.0, 0.5]},
+        {"point" : [0.5, 3.0, 1.0]},
+        {"point" : [1.0, 0.0, 0.0]}
    ]
 }

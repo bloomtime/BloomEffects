@@ -20,8 +20,6 @@ class ParticleTestApp : public AppCocoaTouch {
 	virtual void	update();
 	virtual void	draw();
 		
-
-	Matrix44f	mCubeRotation;
 	gl::Texture mTex;
 	CameraPersp	mCam;
     

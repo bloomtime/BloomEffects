@@ -1,6 +1,20 @@
 {
    "DiffuseTexture" : "Test2.png",
-   "DiffuseColor" : [1.0, 1.0, 1.0],
+   "DiffuseColorR" : [
+        {"point" : [0.0, 1.0, 0.0]},
+        {"point" : [0.5, 1.0, 0.0]},
+        {"point" : [1.0, 1.0, 0.0]}
+   ],
+   "DiffuseColorG" : [
+        {"point" : [0.0, 0.0, 0.0]},
+        {"point" : [0.5, 0.0, 0.0]},
+        {"point" : [1.0, 0.0, 0.0]}
+   ],
+   "DiffuseColorB" : [
+        {"point" : [0.0, 1.0, 0.0]},
+        {"point" : [0.5, 1.0, 0.0]},
+        {"point" : [1.0, 1.0, 0.0]}
+   ],
    "EmitScale" : [12, 0.0, 0.0],
    "EmitVolumeType" : "Sphere",
    "EmitAngle" : [0.0, 0.0],
@@ -17,12 +31,12 @@
    "EmitMode" : "Continuous",
    "InheritTransform" : false,
    "Alpha" : [
-        {"point" : [0.0, 1.0]},
-        {"point" : [1.0, 0.0]}
+        {"point" : [0.0, 1.0, 0.0]},
+        {"point" : [1.0, 0.0, 0.0]}
    ],
    "ParticleScale" : [
-        {"point" : [0.0, 1.0]},
-        {"point" : [0.5, 2.0]},
-        {"point" : [1.0, 1.0]}
+        {"point" : [0.0, 1.0, 0.0]},
+        {"point" : [0.5, 2.0, 0.0]},
+        {"point" : [1.0, 1.0, 0.0]}
    ]
 }
