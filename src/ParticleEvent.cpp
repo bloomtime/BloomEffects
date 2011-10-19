@@ -56,13 +56,13 @@ void ParticleEvent::processAttributes()
     mEmissionVolume.setVolumeType(EMIT_VOLUMES.at(mAttributes.at("EmitVolumeType").getString()));
     mEmitAngle = mAttributes.at("EmitAngle").getVector2();  
       
-    mAlphaCurve = mAttributes.at("Alpha").getCurve();
-    mParticleScaleCurve = mAttributes.at("ParticleScale").getCurve();
+    mAlphaCurve = mAttributes.at("Alpha").getCurvePoints();
+    mParticleScaleCurve = mAttributes.at("ParticleScale").getCurvePoints();
     
     mDiffuseTexture = mAttributes.at("DiffuseTexture").getTexture();
-    mDiffuseRedCurve = mAttributes.at("DiffuseColorR").getCurve();
-    mDiffuseGreenCurve = mAttributes.at("DiffuseColorG").getCurve();
-    mDiffuseBlueCurve = mAttributes.at("DiffuseColorB").getCurve();
+    mDiffuseRedCurve = mAttributes.at("DiffuseColorR").getCurvePoints();
+    mDiffuseGreenCurve = mAttributes.at("DiffuseColorG").getCurvePoints();
+    mDiffuseBlueCurve = mAttributes.at("DiffuseColorB").getCurvePoints();
     mBlendMode = BLEND_MODES.at(mAttributes.at("BlendMode").getString());
     
     mInitialSpeed = mAttributes.at("InitialSpeed").getVector2();
@@ -89,6 +89,44 @@ Vec3f ParticleEvent::getEmitDirection()
     return emitDir * mEmitterOrientation; 
 }
 
+floatCurve ParticleEvent::getNewCurve(AttributeCurvePoints &curvePoints)
+{
+    vector<ci::Vec2f> curveInput;
+ 
+    vec2Points valuePoints = curvePoints.valuePoints;
+    vec2Points variancePoints = curvePoints.variancePoints;
+       
+    Vec2f previousPoint = Vec2f(valuePoints[0][0], valuePoints[0][1] + Rand::randFloat(-variancePoints[0][1], variancePoints[0][1]));
+    Vec2f currentPoint = Vec2f(valuePoints[1][0], valuePoints[1][1] + Rand::randFloat(-variancePoints[1][1], variancePoints[1][1]));
+    
+    for (int i=1; i < valuePoints.size()-1; i++)
+    {            
+        //TODO catmull-rom, not sure if needed now
+        //if (i == 0)
+        //{
+        //    console() << curvePoints[i] << "|" << std::endl;
+        //    curveInput.push_back(curvePoints[i]);
+        //    continue;
+        //}
+          
+        Vec2f nextPoint = Vec2f(valuePoints[i+1][0], valuePoints[i+1][1] + Rand::randFloat(-variancePoints[i+1][1], variancePoints[i+1][1]));
+
+        Vec2f b1 = currentPoint - (currentPoint - previousPoint) * TANGENT_LENGTH;
+        Vec2f b2 = currentPoint + (nextPoint - currentPoint) * TANGENT_LENGTH;
+        
+        //console() << b1 << "|" << b2 << "|" << curvePoints[i] << std::endl;
+        
+        curveInput.push_back(b1);
+        curveInput.push_back(currentPoint);
+        curveInput.push_back(b2);
+        
+        currentPoint = nextPoint;
+        previousPoint = currentPoint;
+    }
+
+    return BSpline2f( curveInput, 3, false, true );
+}
+
 void ParticleEvent::addNewParticle()
 {
     Particle newParticle;
@@ -105,6 +143,21 @@ void ParticleEvent::addNewParticle()
         newParticle.position = mEmitterPosition + (mEmissionVolume.getRandomPoint() * mEmitterOrientation);
         
     newParticle.velocity = getEmitDirection() * (mInitialSpeed[0] + Rand::randFloat(-mInitialSpeed[1], mInitialSpeed[1]));
+    
+    //TODO here store variance-baked-in curve values 
+    newParticle.alphaCurve = getNewCurve(mAlphaCurve);
+    newParticle.scaleCurve = getNewCurve(mParticleScaleCurve);
+    newParticle.colorRCurve = getNewCurve(mDiffuseRedCurve); 
+    newParticle.colorGCurve = getNewCurve(mDiffuseGreenCurve);
+    newParticle.colorBCurve = getNewCurve(mDiffuseBlueCurve);
+    
+    //curve lookup on per particle curves
+    newParticle.alpha = newParticle.alphaCurve.getPosition(0.0f)[1];
+    newParticle.scale = newParticle.scaleCurve.getPosition(0.0f)[1];
+    newParticle.colorR = newParticle.colorRCurve.getPosition(0.0f)[1];        
+    newParticle.colorG = newParticle.colorGCurve.getPosition(0.0f)[1];      
+    newParticle.colorB = newParticle.colorBCurve.getPosition(0.0f)[1];   
+        
     mParticles.push_back(newParticle);;
 }
 
@@ -212,13 +265,15 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         float interval = (*it).lifetime / (*it).maxLifetime;
         float time = interval - floor(interval);
         
-        (*it).alpha = mAlphaCurve.getValueAtTime(time);
-        (*it).scale = mParticleScaleCurve.getValueAtTime(time);
+        //curve lookup on per particle curves
+        (*it).alpha = (*it).alphaCurve.getPosition(time)[1];
+        float currentScale = (*it).scaleCurve.getPosition(time)[1];
         
-        (*it).colorR = mDiffuseRedCurve.getValueAtTime(time);
-        (*it).colorG = mDiffuseGreenCurve.getValueAtTime(time);
-        (*it).colorB = mDiffuseBlueCurve.getValueAtTime(time);
-        
+        (*it).scale = currentScale;
+        (*it).colorR = (*it).colorRCurve.getPosition(time)[1];        
+        (*it).colorG = (*it).colorGCurve.getPosition(time)[1];      
+        (*it).colorB = (*it).colorBCurve.getPosition(time)[1];      
+                
         // update particle position after applying forces
         updateVelocity(*it, dt);
         
@@ -259,9 +314,8 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
             pos += mEmitterPosition;
         
         float rot = toRadians((*it).rotation);
-        Color c = Color((*it).colorR, (*it).colorG, (*it).colorB);
         float scale = (*it).scale;
-		Vec4f col = Vec4f(c.r, c.g, c.b, (*it).alpha);
+		Vec4f col = Vec4f((*it).colorR, (*it).colorG, (*it).colorB, (*it).alpha);
     
         Vec3f right = Quatf( bbAt, rot ) * bbRight * scale;
         Vec3f up = Quatf( bbAt, rot ) * bbUp * scale;

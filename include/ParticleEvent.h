@@ -94,6 +94,12 @@ private:
         float colorG;
         float colorB;
         
+        floatCurve alphaCurve;
+        floatCurve scaleCurve;
+        floatCurve colorRCurve;
+        floatCurve colorGCurve;
+        floatCurve colorBCurve;
+        
         Vec3f position;  
         Vec3f velocity;
     };
@@ -107,6 +113,7 @@ private:
     //-------------------------------------
     
     void processAttributes();
+    floatCurve getNewCurve(AttributeCurvePoints &curvePoints);
     void addNewParticle();
     
     Vec3f getEmitDirection();
@@ -120,12 +127,12 @@ private:
     EmitMode mEmitMode;
     Vec2f mEmitAngle;
         
-    AttributeCurve mAlphaCurve;
-    AttributeCurve mParticleScaleCurve;
+    AttributeCurvePoints mAlphaCurve;
+    AttributeCurvePoints mParticleScaleCurve;
     
-    AttributeCurve mDiffuseRedCurve;
-    AttributeCurve mDiffuseGreenCurve;
-    AttributeCurve mDiffuseBlueCurve;
+    AttributeCurvePoints mDiffuseRedCurve;
+    AttributeCurvePoints mDiffuseGreenCurve;
+    AttributeCurvePoints mDiffuseBlueCurve;
     
     gl::Texture mDiffuseTexture;
     BlendMode mBlendMode;
