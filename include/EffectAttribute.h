@@ -11,6 +11,7 @@
 
 #include "cinder/ImageIo.h"
 #include "cinder/gl/Texture.h"
+#include "cinder/gl/GlslProg.h"
 #include "cinder/app/App.h"
 #include "cinder/BSpline.h"
 #include "cinder/Rand.h"
@@ -45,12 +46,23 @@ public:
     
     gl::Texture getTexture() 
     { 
-        gl::Texture::Format mipFmt;
-        mipFmt.enableMipmapping( true );
-        mipFmt.setMinFilter( GL_LINEAR_MIPMAP_NEAREST );    
-        mipFmt.setMagFilter( GL_LINEAR ); // TODO: experiment with GL_NEAREST where appropriate
+        //gl::Texture::Format mipFmt;
+        // TODO reenable mipmapping later--right now it is blowing up on device
+        //mipFmt.enableMipmapping( true );
+        //mipFmt.setMinFilter( GL_LINEAR_MIPMAP_NEAREST );    
+        //mipFmt.setMagFilter( GL_LINEAR ); // TODO: experiment with GL_NEAREST where appropriate
         
-        return gl::Texture( loadImage( loadResource( boost::any_cast<string>(mValue) ) ), mipFmt );
+        string val = boost::any_cast<string>(mValue);
+        return gl::Texture( loadImage( loadResource( val ) ) );
+        //return gl::Texture( loadImage( loadResource( val ) ), mipFmt );
+    }
+    gl::GlslProg getShader()
+    {
+        string prefix = boost::any_cast<string>(mValue);
+        string vert = prefix + "_vert.glsl";
+        string frag = prefix + "_frag.glsl";
+        
+        return gl::GlslProg( loadResource( vert ), loadResource( frag ) );
     }
     float getFloat()
     {

@@ -10,6 +10,10 @@
 //TODO DEBUG only
 #include "cinder/app/App.h"
 #include "cinder/Rand.h"
+#include "cinder/gl/Texture.h"
+#include "cinder/gl/gl.h"
+#include "cinder/app/AppBasic.h"
+#include "cinder/Area.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -64,6 +68,11 @@ void ParticleEvent::processAttributes()
     mDiffuseGreenCurve = mAttributes.at("DiffuseColorG").getCurvePoints();
     mDiffuseBlueCurve = mAttributes.at("DiffuseColorB").getCurvePoints();
     mBlendMode = BLEND_MODES.at(mAttributes.at("BlendMode").getString());
+    
+    mShader = mAttributes.at("Shader").getShader();
+    vtx_handle = mShader.getAttribLocation("a_position");
+    txc_handle = mShader.getAttribLocation("a_texcoord");
+    col_handle = mShader.getAttribLocation("a_color");
     
     mInitialSpeed = mAttributes.at("InitialSpeed").getVector2();
     mInitialRotation = mAttributes.at("InitialRotation").getVector2();
@@ -360,6 +369,7 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
     mPreviousElapsed = elapsed;
 }
 
+
 void ParticleEvent::enableBlendMode()
 {
     switch (mBlendMode) 
@@ -403,26 +413,32 @@ void ParticleEvent::draw()
 {    
     if (isInitialized() || isStopped())
         return;
-        
+    
     enableBlendMode();	
-    mDiffuseTexture.enableAndBind();
-    
-	glEnableClientState( GL_VERTEX_ARRAY );
-	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	glEnableClientState( GL_COLOR_ARRAY );
-    
-	glVertexPointer( 3, GL_FLOAT, sizeof(VertexData), mVerts );
-	glTexCoordPointer( 2, GL_FLOAT, sizeof(VertexData), &mVerts[0].texture );
-	glColorPointer( 4, GL_FLOAT, sizeof(VertexData), &mVerts[0].color );
-	
-	glDrawArrays( GL_TRIANGLES, 0, mTotalVertices );
-	
-	glDisableClientState( GL_VERTEX_ARRAY );
-	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-	glDisableClientState( GL_COLOR_ARRAY );
-    
-	mDiffuseTexture.disable();
-    disableBlendMode();
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(VertexData), mVerts, GL_DYNAMIC_DRAW);  //maybe use GL_STATIC_DRAW?
 
-    // and then any children will be draw after this
+    mShader.bind();
+    mDiffuseTexture.bind(1);
+    glEnable(GL_TEXTURE_2D);
+    mShader.uniform("u_diffuseTex", 1);
+    mShader.uniform("u_mvp_matrix", mCamera->getProjectionMatrix() * mCamera->getModelViewMatrix());
+    
+    glEnableVertexAttribArray(vtx_handle);
+    glEnableVertexAttribArray(txc_handle);
+    glEnableVertexAttribArray(col_handle);
+    
+    glVertexAttribPointer(vtx_handle, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), &mVerts[0].vertex);    
+    glVertexAttribPointer(txc_handle, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), &mVerts[0].texture);
+    glVertexAttribPointer(col_handle, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), &mVerts[0].color);
+
+    glDrawArrays(GL_TRIANGLES, 0, mTotalVertices);
+    
+    glDisableVertexAttribArray(col_handle);
+    glDisableVertexAttribArray(txc_handle);
+    glDisableVertexAttribArray(vtx_handle);
+
+ 	mDiffuseTexture.unbind();
+    mShader.unbind();
+       
+    disableBlendMode();
 }

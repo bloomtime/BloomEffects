@@ -4,6 +4,7 @@
 #include "cinder/ImageIo.h"
 #include "cinder/gl/Texture.h"
 #include "cinder/Camera.h"
+#include "cinder/gl/Fbo.h"
 //#include "json/json.h"
 
 #include "Effect.h"
@@ -15,25 +16,31 @@ using namespace ci::app;
 
 class ParticleTestApp : public AppCocoaTouch {
   public:
+    void prepareSettings(Settings *settings);
 	virtual void	setup();
-	virtual void	resize( ResizeEvent event );
 	virtual void	update();
 	virtual void	draw();
 		
 	gl::Texture mTex;
-	CameraPersp	mCam;
     
     Json::Value mData;
     
     Effect* mTestEffect;
     
-    // TODO:  This will be the effect manager eventually, which inherits from BloomSceneRef
-    BloomSceneRef mBloomSceneRef;
     CameraPersp mCamera;
+    
+    GLuint m_framebuffer;
+    GLuint m_renderbuffer;
     
   protected:
     //void LoadFile( DataSourceRef dataSource 
 };
+
+void ParticleTestApp::prepareSettings(Settings *settings)
+{
+    settings->enableMultiTouch(true);
+    settings->setFrameRate(60);
+}
 
 void ParticleTestApp::setup()
 {
@@ -42,18 +49,22 @@ void ParticleTestApp::setup()
 	mCamera.lookAt( Vec3f(0.0f, 0.0f, -50.f), Vec3f::zero());  //TODO rough
     
     //mBloomSceneRef = BloomScene::create( this );
+    glGenRenderbuffers(1, &m_renderbuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_renderbuffer);
     
+    glGenFramebuffers(1, &m_framebuffer); 
+    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer); 
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_renderbuffer);
+
+    //glEnable(GL_TEXTURE_2D);
+    glViewport(0, 0, getWindowWidth(), getWindowHeight());
+
     mTestEffect = new Effect("test.effect.json");
     mTestEffect->setCamera(mCamera);
     mTestEffect->setup();
     
     mTestEffect->start();
-}
-
-void ParticleTestApp::resize( ResizeEvent event )
-{
-	//mCam.lookAt( Vec3f( 3, 2, -3 ), Vec3f::zero() );
-	//mCam.setPerspective( 60, event.getAspectRatio(), 1, 1000 );
+    
 }
 
 void ParticleTestApp::update()
@@ -71,13 +82,19 @@ void ParticleTestApp::update()
         }
     }
 
+	//fgl::enableDepthRead();
+	//gl::enableDepthWrite();
+    
+    
+    //Need to put this somewhere maybe in cleanup
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(VertexData), mVerts, GL_DYNAMIC_DRAW);  //maybe use GL_STATIC_DRAW?
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void ParticleTestApp::draw()
-{
+{  
     gl::clear( Color( 0.0f, 0.0f, 0.0f ) );
-    //gl::setMatricesWindow( getWindowSize() );
-    gl::setMatrices( mCamera );
+    //gl::setMatrices( mCamera );
         
     if (mTestEffect && !mTestEffect->isStopped())
         mTestEffect->draw();

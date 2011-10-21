@@ -134,6 +134,10 @@ void Effect::parseAttr(const Json::Value data, EffectAttribute &attr, EffectEven
     {
         currentValue = data[attr.mName].asString();
     }
+    else if (attr.mType == "Shader")
+    {
+        currentValue = data[attr.mName].asString();
+    }
     else if (attr.mType == "Float")
     {
         currentValue = data[attr.mName].asFloat();
@@ -223,6 +227,7 @@ void Effect::setup()
         if ((*it)->isEnabled())
         {
             (*it)->setParentTransform(mTransform);
+            (*it)->setCamera(mCamera);
             (*it)->setup();
         }
     }

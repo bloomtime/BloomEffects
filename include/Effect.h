@@ -5,7 +5,6 @@
 //
 
 #pragma once
-#include "BloomNode.h"
 #include "EffectEvent.h"
 
 #include "cinder/Camera.h"
@@ -40,7 +39,7 @@ enum ChildEvent {
 const boost::unordered_map<string, ChildEvent> CHILD_EVENTS = boost::assign::map_list_of
     ("ParticleEvent", PARTICLE_EVENT);
 
-class Effect : public BloomNode {
+class Effect {
 
 public:
     Effect():

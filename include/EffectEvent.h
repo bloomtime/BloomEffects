@@ -5,10 +5,10 @@
 //
 
 #pragma once
-#include "BloomNode.h"
 #include "EffectAttribute.h"
 
 #include "cinder/Cinder.h"
+#include "cinder/Camera.h"
 #include "cinder/Camera.h"
 #include "cinder/gl/Texture.h"
 #include <boost/unordered_map.hpp>
@@ -34,7 +34,7 @@ enum EventState
 
 typedef boost::unordered_map<string, EffectAttribute> EffectAttrMap;
 
-class EffectEvent : public BloomNode {
+class EffectEvent {
 
 public:
     EffectEvent() :
@@ -60,12 +60,17 @@ public:
     virtual void update(const ci::CameraPersp &camera) {}
     virtual void draw() {}
     
+    void setCamera(ci::CameraPersp *camera)
+    {
+        mCamera = camera;
+    }
+
     void setParentTransform( const ci::Matrix44f &transform ) 
     { 
         mParentTransform = transform; /* copy OK */ 
         mParentTransformChanged = true;
     }
-    ci::Matrix44f getTransform() const { return mTransform; /* copy OK */ }
+    ci::Matrix44f getTransform() const { return mParentTransform; /* copy OK */ }
     
     void registerAttribute(string attrName, string attrType);
         
@@ -110,6 +115,8 @@ protected:
     // TODOs:
     // mAttachment (parent or joint attachments)
     // bool mInheritTransform
+    
+    ci::CameraPersp* mCamera;
     
     //parent transform
     ci::Matrix44f mParentTransform;

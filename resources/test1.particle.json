@@ -1,5 +1,6 @@
 {
    "DiffuseTexture" : "cellTest.png",
+   "Shader" : "Particle",
    "EmitVolumeType" : "Cylinder",
    "EmitScale" : [8.0, 8.0, 0.0],
    "EmitAngle" : [90.0, 90.0],

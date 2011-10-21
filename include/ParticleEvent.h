@@ -9,6 +9,7 @@
 #include "EmitVolume.h"
 
 #include "cinder/Rand.h"
+#include "cinder/gl/GlslProg.h"
 #include <vector>
 #include <list>
 
@@ -58,6 +59,7 @@ public:
         registerAttribute("Alpha",            "Curve");
         registerAttribute("ParticleScale",    "Curve");
         
+        registerAttribute("Shader"        ,   "Shader");
         registerAttribute("DiffuseTexture",   "Texture");
         registerAttribute("DiffuseColorR",    "Curve");
         registerAttribute("DiffuseColorG",    "Curve");
@@ -147,6 +149,9 @@ private:
     bool mInheritTransform;
     
     EmissionVolume mEmissionVolume;
+    
+    gl::GlslProg mShader;
+    GLuint vtx_handle, txc_handle, col_handle;
     //---------------------------------
     
     // for continuous emit mode

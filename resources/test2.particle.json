@@ -1,5 +1,6 @@
 {
    "DiffuseTexture" : "Test2.png",
+   "Shader" : "Particle",
    "DiffuseColorR" : [
         {"point" : [0.0, 1.0, 0.0]},
         {"point" : [0.5, 1.0, 0.0]},
