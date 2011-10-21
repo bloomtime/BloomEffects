@@ -6,18 +6,15 @@
 
 #pragma once
 #include "EffectEvent.h"
+#include "ParticleEvent.h"
 
 #include "cinder/Camera.h"
-#include "cinder/DataSource.h"
-#include "cinder/Function.h"
 #include "cinder/Matrix.h"
 #include "cinder/Cinder.h"
 #include "cinder/Vector.h"
 #include <vector>
 #include <list>
 
-//TODO for now Effect is going to handle the file parsing and data grabbing.  Will need to separate this out when I figure out how the custom attributes for different EffectEvents are handled    
-//#include "ciJson.h"
 #include "json/json.h"
 #include "cinder/ImageIo.h"
 #include "cinder/gl/Texture.h"
@@ -60,7 +57,6 @@ public:
     
     void setup();
     void update();
-    void deepUpdate();
     void draw();
     
     void start();
@@ -68,7 +64,7 @@ public:
     float getEffectElapsedSeconds();
     
     void initializeData();
-    void setCamera(ci::CameraPersp &camera);
+    void setCamera(ci::CameraPersp *camera);
     void setTransform( const ci::Matrix44f &transform ) { mTransform = transform; /* copy OK */ }
     ci::Matrix44f getTransform() const { return mTransform; /* copy OK */ }
     
@@ -81,11 +77,11 @@ private:
     void parseAttr(const Json::Value data, EffectAttribute &attr, EffectEvent *currentEvent);
     
     ci::Matrix44f mTransform;
+    bool mIsVisible;
+    float mStartedTime;
     
     // TODO need to move this to effectsmanager later
     ci::CameraPersp* mCamera;
-    bool mIsVisible;
-    float mStartedTime;
     
     bool mIsStarted;
     bool mIsStopped;
@@ -93,6 +89,5 @@ private:
     //TODO TEMP TESTING-parsing should be moved elsewhere
     Json::Value mData;
     
-    //TODO maybe need to convert to BloomNoderefs instead
     std::list<EffectEvent *> mEvents;
 };

@@ -1,13 +1,9 @@
 #include "cinder/app/AppCocoaTouch.h"
 #include "cinder/app/Renderer.h"
 #include "cinder/Surface.h"
-#include "cinder/ImageIo.h"
-#include "cinder/gl/Texture.h"
 #include "cinder/Camera.h"
-#include "cinder/gl/Fbo.h"
-//#include "json/json.h"
 
-#include "Effect.h"
+#include "EffectsManager.h"
 #include <boost/algorithm/string.hpp>
 
 using namespace std;
@@ -20,20 +16,10 @@ class ParticleTestApp : public AppCocoaTouch {
 	virtual void	setup();
 	virtual void	update();
 	virtual void	draw();
-		
-	gl::Texture mTex;
     
-    Json::Value mData;
-    
-    Effect* mTestEffect;
+    EffectsManager* mEffectsManager;
     
     CameraPersp mCamera;
-    
-    GLuint m_framebuffer;
-    GLuint m_renderbuffer;
-    
-  protected:
-    //void LoadFile( DataSourceRef dataSource 
 };
 
 void ParticleTestApp::prepareSettings(Settings *settings)
@@ -44,61 +30,27 @@ void ParticleTestApp::prepareSettings(Settings *settings)
 
 void ParticleTestApp::setup()
 {
-	mCamera.setPerspective( 60.0f, getWindowAspectRatio(), 0.001f, 2000.0f );
+    mCamera.setPerspective( 60.0f, getWindowAspectRatio(), 0.001f, 2000.0f );
     mCamera.setWorldUp( Vec3f(0.0f, 1.0f, 0.0f) );
 	mCamera.lookAt( Vec3f(0.0f, 0.0f, -50.f), Vec3f::zero());  //TODO rough
     
-    //mBloomSceneRef = BloomScene::create( this );
-    glGenRenderbuffers(1, &m_renderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_renderbuffer);
+    mEffectsManager = new EffectsManager();
+    mEffectsManager->setCamera(&mCamera);
+    mEffectsManager->setup();
     
-    glGenFramebuffers(1, &m_framebuffer); 
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer); 
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_renderbuffer);
-
-    //glEnable(GL_TEXTURE_2D);
-    glViewport(0, 0, getWindowWidth(), getWindowHeight());
-
-    mTestEffect = new Effect("test.effect.json");
-    mTestEffect->setCamera(mCamera);
-    mTestEffect->setup();
-    
-    mTestEffect->start();
-    
+    mEffectsManager->createEffect("test");
 }
 
 void ParticleTestApp::update()
 {
-    if (mTestEffect)
-    { 
-        if (!mTestEffect->isStopped())
-        {
-            mTestEffect->deepUpdate();
-        }
-        else
-        {
-            delete mTestEffect;
-            mTestEffect = NULL;
-        }
-    }
-
-	//fgl::enableDepthRead();
-	//gl::enableDepthWrite();
-    
-    
-    //Need to put this somewhere maybe in cleanup
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(VertexData), mVerts, GL_DYNAMIC_DRAW);  //maybe use GL_STATIC_DRAW?
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
+    mEffectsManager->update();
 }
 
 void ParticleTestApp::draw()
 {  
     gl::clear( Color( 0.0f, 0.0f, 0.0f ) );
-    //gl::setMatrices( mCamera );
-        
-    if (mTestEffect && !mTestEffect->isStopped())
-        mTestEffect->draw();
-        
+    
+    mEffectsManager->draw();
 }
 
 CINDER_APP_COCOA_TOUCH( ParticleTestApp, RendererGl )

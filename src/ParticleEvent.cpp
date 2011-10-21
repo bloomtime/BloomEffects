@@ -6,17 +6,11 @@
 
 #include "ParticleEvent.h"
 
-
-//TODO DEBUG only
-#include "cinder/app/App.h"
 #include "cinder/Rand.h"
 #include "cinder/gl/Texture.h"
 #include "cinder/gl/gl.h"
-#include "cinder/app/AppBasic.h"
-#include "cinder/Area.h"
 
 using namespace ci;
-using namespace ci::app;
 
 const string PATH_EXTENSION = ".particle.json";
 
@@ -108,22 +102,13 @@ floatCurve ParticleEvent::getNewCurve(AttributeCurvePoints &curvePoints)
     Vec2f previousPoint = Vec2f(valuePoints[0][0], valuePoints[0][1] + Rand::randFloat(-variancePoints[0][1], variancePoints[0][1]));
     Vec2f currentPoint = Vec2f(valuePoints[1][0], valuePoints[1][1] + Rand::randFloat(-variancePoints[1][1], variancePoints[1][1]));
     
+    // two tangent points (b1 and b2) per control point
     for (int i=1; i < valuePoints.size()-1; i++)
     {            
-        //TODO catmull-rom, not sure if needed now
-        //if (i == 0)
-        //{
-        //    console() << curvePoints[i] << "|" << std::endl;
-        //    curveInput.push_back(curvePoints[i]);
-        //    continue;
-        //}
-          
         Vec2f nextPoint = Vec2f(valuePoints[i+1][0], valuePoints[i+1][1] + Rand::randFloat(-variancePoints[i+1][1], variancePoints[i+1][1]));
 
         Vec2f b1 = currentPoint - (currentPoint - previousPoint) * TANGENT_LENGTH;
         Vec2f b2 = currentPoint + (nextPoint - currentPoint) * TANGENT_LENGTH;
-        
-        //console() << b1 << "|" << b2 << "|" << curvePoints[i] << std::endl;
         
         curveInput.push_back(b1);
         curveInput.push_back(currentPoint);
@@ -153,14 +138,14 @@ void ParticleEvent::addNewParticle()
         
     newParticle.velocity = getEmitDirection() * (mInitialSpeed[0] + Rand::randFloat(-mInitialSpeed[1], mInitialSpeed[1]));
     
-    //TODO here store variance-baked-in curve values 
+    // store curve values that have variance baked in
     newParticle.alphaCurve = getNewCurve(mAlphaCurve);
     newParticle.scaleCurve = getNewCurve(mParticleScaleCurve);
     newParticle.colorRCurve = getNewCurve(mDiffuseRedCurve); 
     newParticle.colorGCurve = getNewCurve(mDiffuseGreenCurve);
     newParticle.colorBCurve = getNewCurve(mDiffuseBlueCurve);
     
-    //curve lookup on per particle curves
+    // curve lookup on per particle curves
     newParticle.alpha = newParticle.alphaCurve.getPosition(0.0f)[1];
     newParticle.scale = newParticle.scaleCurve.getPosition(0.0f)[1];
     newParticle.colorR = newParticle.colorRCurve.getPosition(0.0f)[1];        
@@ -274,7 +259,7 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         float interval = (*it).lifetime / (*it).maxLifetime;
         float time = interval - floor(interval);
         
-        //curve lookup on per particle curves
+        // curve lookup on per particle curves
         (*it).alpha = (*it).alphaCurve.getPosition(time)[1];
         float currentScale = (*it).scaleCurve.getPosition(time)[1];
         
@@ -415,7 +400,6 @@ void ParticleEvent::draw()
         return;
     
     enableBlendMode();	
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(VertexData), mVerts, GL_DYNAMIC_DRAW);  //maybe use GL_STATIC_DRAW?
 
     mShader.bind();
     mDiffuseTexture.bind(1);

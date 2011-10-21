@@ -5,7 +5,6 @@
 //
 
 #include "Effect.h"
-#include "ParticleEvent.h"
 
 #include <boost/foreach.hpp>
 #include <boost/any.hpp>
@@ -187,7 +186,7 @@ void Effect::parseAttr(const Json::Value data, EffectAttribute &attr, EffectEven
 
 Effect::~Effect()
 {
-    delete mCamera; 
+    mCamera = NULL;
     
 	for( list<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
     {
@@ -249,25 +248,22 @@ void Effect::setup()
 
 void Effect::update()
 {
-    for( list<EffectEvent *>::iterator it = mEvents.begin(); it != mEvents.end(); ++it )
-    {
-        if ((*it)->isStopped())
-        {
-            delete (*it);  
-            it = mEvents.erase( it );
-        }
-    }          
-    
-    if (mIsStarted && mEvents.size() == 0)
-        mIsStopped = true;
-}
-
-void Effect::deepUpdate()
-{
     if (mIsVisible && mIsStarted) {
-        // update self
-        update();
+        // clean up any children
+        for( list<EffectEvent *>::iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+        {
+            if ((*it)->isStopped())
+            {
+                delete (*it);  
+                it = mEvents.erase( it );
+            }
+        }          
+    
+        // if no children left, stop self
+        if (mIsStarted && mEvents.size() == 0)
+            mIsStopped = true;
         
+        // update children
         for( list<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
         {
             if ((*it)->isInitialized() && (getEffectElapsedSeconds() >= (*it)->getStartTime()))
@@ -304,7 +300,7 @@ void Effect::draw()
     }
 }
 
-void Effect::setCamera(ci::CameraPersp &camera)
+void Effect::setCamera(ci::CameraPersp *camera)
 {
-    mCamera = &camera;
+    mCamera = camera;
 }

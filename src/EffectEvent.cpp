@@ -5,11 +5,13 @@
 //
 
 #include "EffectEvent.h"
+
 #include <boost/foreach.hpp>
 
 EffectEvent::~EffectEvent()
 {    
     mAttributes.clear();
+    mCamera = NULL;
 }
 
 void EffectEvent::start()

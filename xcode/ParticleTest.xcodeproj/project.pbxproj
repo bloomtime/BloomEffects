@@ -16,6 +16,7 @@
 		43CD9799123D6504003B628E /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 43CD9798123D6504003B628E /* Icon.png */; };
 		AD02F60D144F753D00B40953 /* Particle_vert.glsl in Resources */ = {isa = PBXBuildFile; fileRef = AD02F60C144F753D00B40953 /* Particle_vert.glsl */; };
 		AD02F60F144F754200B40953 /* Particle_frag.glsl in Resources */ = {isa = PBXBuildFile; fileRef = AD02F60E144F754200B40953 /* Particle_frag.glsl */; };
+		AD34F8E1145218AB0000A7E7 /* EffectsManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD34F8E0145218AB0000A7E7 /* EffectsManager.cpp */; };
 		AD7DAD95143E28ED009F0A59 /* ParticleEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD7DAD94143E28ED009F0A59 /* ParticleEvent.cpp */; };
 		AD8B2317143FA9AE00DA23EE /* EffectEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD8B2316143FA9AE00DA23EE /* EffectEvent.cpp */; };
 		AD9231C41443FE9F00D89666 /* Test1.png in Resources */ = {isa = PBXBuildFile; fileRef = AD9231C31443FE9F00D89666 /* Test1.png */; };
@@ -49,13 +50,14 @@
 		AD01B4A6144CE8C800DD4583 /* EmitVolume.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EmitVolume.h; path = ../include/EmitVolume.h; sourceTree = "<group>"; };
 		AD02F60C144F753D00B40953 /* Particle_vert.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = Particle_vert.glsl; path = ../resources/Particle_vert.glsl; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.glsl; };
 		AD02F60E144F754200B40953 /* Particle_frag.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = Particle_frag.glsl; path = ../resources/Particle_frag.glsl; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.glsl; };
+		AD34F8E0145218AB0000A7E7 /* EffectsManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EffectsManager.cpp; path = ../src/EffectsManager.cpp; sourceTree = "<group>"; };
+		AD34F8E2145218D10000A7E7 /* EffectsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EffectsManager.h; path = ../include/EffectsManager.h; sourceTree = "<group>"; };
 		AD7DAD94143E28ED009F0A59 /* ParticleEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParticleEvent.cpp; path = ../src/ParticleEvent.cpp; sourceTree = "<group>"; };
 		AD7DAD96143E28F5009F0A59 /* ParticleEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParticleEvent.h; path = ../include/ParticleEvent.h; sourceTree = "<group>"; };
 		AD8B2315143FA9A300DA23EE /* EffectEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EffectEvent.h; path = ../include/EffectEvent.h; sourceTree = "<group>"; };
 		AD8B2316143FA9AE00DA23EE /* EffectEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EffectEvent.cpp; path = ../src/EffectEvent.cpp; sourceTree = "<group>"; };
 		AD9231C31443FE9F00D89666 /* Test1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Test1.png; path = ../resources/Test1.png; sourceTree = "<group>"; };
 		AD9231C61443FEA800D89666 /* Test2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Test2.png; path = ../resources/Test2.png; sourceTree = "<group>"; };
-		AD9231D41444D1A300D89666 /* EffectManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EffectManager.h; path = ../include/EffectManager.h; sourceTree = "<group>"; };
 		AD9FF3651446670F0053E57B /* ciJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ciJson.h; sourceTree = "<group>"; };
 		AD9FF3671446670F0053E57B /* json-forwards.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "json-forwards.h"; sourceTree = "<group>"; };
 		AD9FF3681446670F0053E57B /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json.h; sourceTree = "<group>"; };
@@ -100,6 +102,7 @@
 		00CFDFA7113848F40091E310 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				AD34F8E0145218AB0000A7E7 /* EffectsManager.cpp */,
 				AD8B2316143FA9AE00DA23EE /* EffectEvent.cpp */,
 				ADA517B3143F7B57003BA388 /* Effect.cpp */,
 				AD7DAD94143E28ED009F0A59 /* ParticleEvent.cpp */,
@@ -111,9 +114,9 @@
 		00CFDFB81138492F0091E310 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				AD34F8E2145218D10000A7E7 /* EffectsManager.h */,
 				AD01B4A6144CE8C800DD4583 /* EmitVolume.h */,
 				ADEBF5C314478BDC00EF71F6 /* EffectAttribute.h */,
-				AD9231D41444D1A300D89666 /* EffectManager.h */,
 				AD8B2315143FA9A300DA23EE /* EffectEvent.h */,
 				ADA517B2143F7B48003BA388 /* Effect.h */,
 				AD7DAD96143E28F5009F0A59 /* ParticleEvent.h */,
@@ -306,6 +309,7 @@
 				AD8B2317143FA9AE00DA23EE /* EffectEvent.cpp in Sources */,
 				AD9FF36E1446670F0053E57B /* ciJson.cpp in Sources */,
 				AD9FF36F1446670F0053E57B /* jsoncpp.cpp in Sources */,
+				AD34F8E1145218AB0000A7E7 /* EffectsManager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
