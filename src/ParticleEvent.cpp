@@ -25,7 +25,11 @@ ParticleEvent::ParticleEvent():
     mPreviousElapsed(0.0f),
     mCurrentRate(0.0f),
     mGlobalForce(Vec3f(0.0f, 0.0f, 0.0f)),
-    mInheritTransform(false)
+    mInheritTransform(false),
+    mTiledTexture(true),
+    mBlendTiles(false),
+    mNumTiles(1.0f),
+    mTileWidth(1.0f)
 { 
     mEmissionVolume = EmissionVolume();
     mFileExtension = PATH_EXTENSION;
@@ -58,15 +62,21 @@ void ParticleEvent::processAttributes()
     mParticleScaleCurve = mAttributes.at("ParticleScale").getCurvePoints();
     
     mDiffuseTexture = mAttributes.at("DiffuseTexture").getTexture();
+    mDiffuseTexture.setWrap(GL_REPEAT, GL_REPEAT);
+    
     mDiffuseRedCurve = mAttributes.at("DiffuseColorR").getCurvePoints();
     mDiffuseGreenCurve = mAttributes.at("DiffuseColorG").getCurvePoints();
     mDiffuseBlueCurve = mAttributes.at("DiffuseColorB").getCurvePoints();
+    mTileUVCurve = mAttributes.at("TileUV").getCurvePoints();
     mBlendMode = BLEND_MODES.at(mAttributes.at("BlendMode").getString());
+    mTiledTexture = mAttributes.at("TiledTexture").getBool();
+    mBlendTiles = mAttributes.at("BlendTiles").getBool();
     
     mShader = mAttributes.at("Shader").getShader();
     vtx_handle = mShader.getAttribLocation("a_position");
     txc_handle = mShader.getAttribLocation("a_texcoord");
     col_handle = mShader.getAttribLocation("a_color");
+    tile_handle = mShader.getAttribLocation("a_tileIndex");
     
     mInitialSpeed = mAttributes.at("InitialSpeed").getVector2();
     mInitialRotation = mAttributes.at("InitialRotation").getVector2();
@@ -144,6 +154,7 @@ void ParticleEvent::addNewParticle()
     newParticle.colorRCurve = getNewCurve(mDiffuseRedCurve); 
     newParticle.colorGCurve = getNewCurve(mDiffuseGreenCurve);
     newParticle.colorBCurve = getNewCurve(mDiffuseBlueCurve);
+    newParticle.tileUVCurve = getNewCurve(mTileUVCurve);
     
     // curve lookup on per particle curves
     newParticle.alpha = newParticle.alphaCurve.getPosition(0.0f)[1];
@@ -151,7 +162,9 @@ void ParticleEvent::addNewParticle()
     newParticle.colorR = newParticle.colorRCurve.getPosition(0.0f)[1];        
     newParticle.colorG = newParticle.colorGCurve.getPosition(0.0f)[1];      
     newParticle.colorB = newParticle.colorBCurve.getPosition(0.0f)[1];   
-        
+    
+    newParticle.tileIndex = newParticle.tileUVCurve.getPosition(0.0f)[1] * mNumTiles;
+    
     mParticles.push_back(newParticle);;
 }
 
@@ -172,6 +185,12 @@ void ParticleEvent::setup()
         {
             addNewParticle();
         }
+    }
+    
+    if (mTiledTexture)
+    {
+        mNumTiles = (float)mDiffuseTexture.getWidth()/(float)mDiffuseTexture.getHeight();
+        mTileWidth = (float)mDiffuseTexture.getHeight()/(float)mDiffuseTexture.getWidth();
     }
 }
 
@@ -267,7 +286,9 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         (*it).colorR = (*it).colorRCurve.getPosition(time)[1];        
         (*it).colorG = (*it).colorGCurve.getPosition(time)[1];      
         (*it).colorB = (*it).colorBCurve.getPosition(time)[1];      
-                
+    
+        (*it).tileIndex = (*it).tileUVCurve.getPosition(time)[1] * mNumTiles;
+        
         // update particle position after applying forces
         updateVelocity(*it, dt);
         
@@ -310,7 +331,8 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         float rot = toRadians((*it).rotation);
         float scale = (*it).scale;
 		Vec4f col = Vec4f((*it).colorR, (*it).colorG, (*it).colorB, (*it).alpha);
-    
+        float tileIndex = (*it).tileIndex;
+        
         Vec3f right = Quatf( bbAt, rot ) * bbRight * scale;
         Vec3f up = Quatf( bbAt, rot ) * bbUp * scale;
         
@@ -322,31 +344,37 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
         mVerts[vIndex].vertex  = p1;
         mVerts[vIndex].texture = Vec2f(0.0f,0.0f);
         mVerts[vIndex].color   = col;
+        mVerts[vIndex].tileIndex = tileIndex;
         vIndex++;
         
         mVerts[vIndex].vertex  = p2;
         mVerts[vIndex].texture = Vec2f(1.0f,0.0f);
         mVerts[vIndex].color   = col;
+        mVerts[vIndex].tileIndex = tileIndex;
         vIndex++;
         
         mVerts[vIndex].vertex  = p3;
         mVerts[vIndex].texture = Vec2f(0.0f,1.0f);
         mVerts[vIndex].color   = col;
+        mVerts[vIndex].tileIndex = tileIndex;
         vIndex++;
         
         mVerts[vIndex].vertex  = p2;
         mVerts[vIndex].texture = Vec2f(1.0f,0.0f);
         mVerts[vIndex].color   = col;
+        mVerts[vIndex].tileIndex = tileIndex;
         vIndex++;
         
         mVerts[vIndex].vertex  = p3;
         mVerts[vIndex].texture = Vec2f(0.0f,1.0f);
         mVerts[vIndex].color   = col;
+        mVerts[vIndex].tileIndex = tileIndex;
         vIndex++;
         
         mVerts[vIndex].vertex  = p4;
         mVerts[vIndex].texture = Vec2f(1.0f,1.0f);
         mVerts[vIndex].color   = col;
+        mVerts[vIndex].tileIndex = tileIndex;
         vIndex++;        
         
 	}    
@@ -405,18 +433,23 @@ void ParticleEvent::draw()
     mDiffuseTexture.bind(1);
     glEnable(GL_TEXTURE_2D);
     mShader.uniform("u_diffuseTex", 1);
+    mShader.uniform("u_tileWidth", mTileWidth);
+    mShader.uniform("u_tileBlend", mBlendTiles);
     mShader.uniform("u_mvp_matrix", mCamera->getProjectionMatrix() * mCamera->getModelViewMatrix());
     
     glEnableVertexAttribArray(vtx_handle);
     glEnableVertexAttribArray(txc_handle);
     glEnableVertexAttribArray(col_handle);
+    glEnableVertexAttribArray(tile_handle);
     
     glVertexAttribPointer(vtx_handle, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), &mVerts[0].vertex);    
     glVertexAttribPointer(txc_handle, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), &mVerts[0].texture);
     glVertexAttribPointer(col_handle, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), &mVerts[0].color);
+    glVertexAttribPointer(tile_handle, 1, GL_FLOAT, GL_FALSE, sizeof(VertexData), &mVerts[0].tileIndex);
 
     glDrawArrays(GL_TRIANGLES, 0, mTotalVertices);
     
+    glDisableVertexAttribArray(tile_handle);
     glDisableVertexAttribArray(col_handle);
     glDisableVertexAttribArray(txc_handle);
     glDisableVertexAttribArray(vtx_handle);

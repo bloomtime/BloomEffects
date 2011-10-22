@@ -58,6 +58,7 @@ public:
         
         registerAttribute("Alpha",            "Curve");
         registerAttribute("ParticleScale",    "Curve");
+        registerAttribute("TileUV",           "Curve");
         
         registerAttribute("Shader"        ,   "Shader");
         registerAttribute("DiffuseTexture",   "Texture");
@@ -65,6 +66,8 @@ public:
         registerAttribute("DiffuseColorG",    "Curve");
         registerAttribute("DiffuseColorB",    "Curve");
         registerAttribute("BlendMode",        "String");
+        registerAttribute("TiledTexture",     "Bool");
+        registerAttribute("BlendTiles",       "Bool");
 
         registerAttribute("InitialRotation",  "Vector2"); 
         registerAttribute("InitialSpeed",     "Vector2");
@@ -95,12 +98,15 @@ private:
         float colorR;
         float colorG;
         float colorB;
+        float tileIndex;
+        float tileMix;
         
         floatCurve alphaCurve;
         floatCurve scaleCurve;
         floatCurve colorRCurve;
         floatCurve colorGCurve;
         floatCurve colorBCurve;
+        floatCurve tileUVCurve;
         
         Vec3f position;  
         Vec3f velocity;
@@ -110,6 +116,7 @@ private:
         ci::Vec3f vertex;
         ci::Vec2f texture;
         ci::Vec4f color;
+        float tileIndex;
     };
     
     //-------------------------------------
@@ -136,8 +143,14 @@ private:
     AttributeCurvePoints mDiffuseGreenCurve;
     AttributeCurvePoints mDiffuseBlueCurve;
     
+    AttributeCurvePoints mTileUVCurve;
+    
     gl::Texture mDiffuseTexture;
     BlendMode mBlendMode;
+    bool mTiledTexture;
+    bool mBlendTiles;
+    float mNumTiles;
+    float mTileWidth;
     
     float mRotationAngle;
     Vec2f mInitialSpeed;     // value, variance
@@ -151,7 +164,7 @@ private:
     EmissionVolume mEmissionVolume;
     
     gl::GlslProg mShader;
-    GLuint vtx_handle, txc_handle, col_handle;
+    GLuint vtx_handle, txc_handle, col_handle, tile_handle;
     //---------------------------------
     
     // for continuous emit mode
