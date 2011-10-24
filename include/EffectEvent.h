@@ -34,22 +34,15 @@ enum EventState
 
 typedef boost::unordered_map<string, EffectAttribute> EffectAttrMap;
 
+class EffectEvent;
+
+typedef std::shared_ptr<EffectEvent> EffectEventRef;
+
 class EffectEvent {
 
 public:
-    EffectEvent() :
-        mEnabled(true),
-        mFileExtension(""),
-        mEventState(EVENT_INITIALIZED),
-        mStartTime(-1.0f),
-        mLifetime(0.0f),
-        mLocalPosition(Vec3f( 0.0f, 0.0f, 0.0f )),
-        mEmitterPosition(Vec3f( 0.0f, 0.0f, 0.0f )),
-        mEmitterOrientation(Quatf::identity()),
-        mParentTransformChanged(false)
-    {
-        mParentTransform.setToIdentity();
-    }
+
+    static EffectEventRef create();
         
     ~EffectEvent();
     
@@ -57,7 +50,7 @@ public:
     string getPathExtension() { return mFileExtension; }
     
     virtual void setup() {}
-    virtual void update(const ci::CameraPersp &camera) {}
+    virtual void update() {}
     virtual void draw() {}
     
     void setCamera(ci::CameraPersp *camera)
@@ -110,11 +103,22 @@ public:
     
 protected:
 
-    virtual void processAttributes() {};
+    EffectEvent() :
+        mEnabled(true),
+        mFileExtension(""),
+        mInheritTransform(false),
+        mEventState(EVENT_INITIALIZED),
+        mStartTime(-1.0f),
+        mLifetime(0.0f),
+        mLocalPosition(Vec3f( 0.0f, 0.0f, 0.0f )),
+        mEmitterPosition(Vec3f( 0.0f, 0.0f, 0.0f )),
+        mEmitterOrientation(Quatf::identity()),
+        mParentTransformChanged(false)
+    {
+        mParentTransform.setToIdentity();
+    }
     
-    // TODOs:
-    // mAttachment (parent or joint attachments)
-    // bool mInheritTransform
+    virtual void processAttributes() {};
     
     ci::CameraPersp* mCamera;
     
@@ -123,7 +127,8 @@ protected:
     float mLifetime;
     float mStartTime;
     bool mHardStop;
-    
+    bool mInheritTransform;
+        
     EventState mEventState;
             
     bool mEnabled;
@@ -135,7 +140,5 @@ protected:
     Quatf mEmitterOrientation;
     
     string mFileExtension;
+    
 };
-
-typedef std::shared_ptr<EffectEvent> EffectEventRef;
-

@@ -9,6 +9,16 @@
 #include <boost/foreach.hpp>
 #include <boost/any.hpp>
 
+EffectRef Effect::create()
+{
+    return EffectRef( new Effect() );
+}
+
+EffectRef Effect::createFromPath(string path)
+{
+    return EffectRef( new Effect(path) );
+}
+
 Effect::Effect(string effectPath)
 {
     mIsVisible = true;
@@ -61,14 +71,14 @@ void Effect::initializeData()
             //console() << "EVENT: " << EventPath << " - " << EventType << std::endl;
             
             ChildEvent ChildType = CHILD_EVENTS.at(EventType.c_str());
-            EffectEvent* currentEvent = NULL;
+            EffectEventRef currentEvent;
             
             // handle the different types here
             switch (ChildType) 
             {
                 case PARTICLE_EVENT:
                 {
-                    currentEvent = new ParticleEvent();
+                    currentEvent = ParticleEvent::create();
                     // need to concatenate extension here
                     break;
                 }
@@ -118,7 +128,7 @@ void Effect::initializeData()
     }
 }
 
-void Effect::parseAttr(const Json::Value data, EffectAttribute &attr, EffectEvent *currentEvent)
+void Effect::parseAttr(const Json::Value data, EffectAttribute &attr, EffectEventRef currentEvent)
 {
     //console() << "Attr Type is: " << attr.type << std::endl;
     
@@ -188,9 +198,9 @@ Effect::~Effect()
 {
     mCamera = NULL;
     
-	for( list<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+	for( list<EffectEventRef>::iterator it = mEvents.begin(); it != mEvents.end(); ++it )
     {
-        delete (*it);
+        it = mEvents.erase( it );
     }
 }
 
@@ -202,7 +212,7 @@ void Effect::start()
 
 void Effect::stop(bool hardStop)
 {
-    for( list<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+    for( list<EffectEventRef>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
     {
         if ((*it)->isEnabled())
             (*it)->stop(hardStop);
@@ -221,7 +231,7 @@ void Effect::setup()
 {
     initializeData();
     
-	for( list<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+	for( list<EffectEventRef>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
     {
         if ((*it)->isEnabled())
         {
@@ -250,11 +260,10 @@ void Effect::update()
 {
     if (mIsVisible && mIsStarted) {
         // clean up any children
-        for( list<EffectEvent *>::iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+        for( list<EffectEventRef>::iterator it = mEvents.begin(); it != mEvents.end(); ++it )
         {
             if ((*it)->isStopped())
             {
-                delete (*it);  
                 it = mEvents.erase( it );
             }
         }          
@@ -264,7 +273,7 @@ void Effect::update()
             mIsStopped = true;
         
         // update children
-        for( list<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+        for( list<EffectEventRef>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
         {
             if ((*it)->isInitialized() && (getEffectElapsedSeconds() >= (*it)->getStartTime()))
             {
@@ -273,7 +282,7 @@ void Effect::update()
             
             
             if ((*it)->isEnabled())
-                (*it)->update(*mCamera);
+                (*it)->update();
         }
         
         /*
@@ -293,7 +302,7 @@ void Effect::update()
 
 void Effect::draw()
 {    
-    for( list<EffectEvent *>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+    for( list<EffectEventRef>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
     {
         if ((*it)->isEnabled())
             (*it)->draw();

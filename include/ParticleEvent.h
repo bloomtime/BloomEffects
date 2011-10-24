@@ -37,11 +37,16 @@ const boost::unordered_map<string, BlendMode> BLEND_MODES = boost::assign::map_l
     ("AlphaBlend", BLEND_ALPHA)
     ("AdditiveBlend", BLEND_ADDITIVE)
     ("OpaqueBlend", BLEND_OPAQUE);
-    
+
+class ParticleEvent;
+
+typedef std::shared_ptr<ParticleEvent> ParticleEventRef;
+
 class ParticleEvent : public EffectEvent {
 
 public:
-    ParticleEvent();
+
+    static ParticleEventRef create();
 
     ~ParticleEvent();
     
@@ -80,11 +85,12 @@ public:
     }
     
     void setup();
-    void update(const ci::CameraPersp &camera);
+    void update();
     void draw();
     void deepDraw(){}
     
-private:
+protected:
+
     struct Particle {
         float rotation;
         float rotationSpeed;
@@ -159,8 +165,6 @@ private:
     Vec3f mGlobalForce;  
     Vec3f mDragForce;
     
-    bool mInheritTransform;
-    
     EmissionVolume mEmissionVolume;
     
     gl::GlslProg mShader;
@@ -176,4 +180,8 @@ private:
     
     std::list<Particle> mParticles;
 	VertexData *mVerts;
+    
+private: 
+
+    ParticleEvent();
 };

@@ -17,7 +17,7 @@ class ParticleTestApp : public AppCocoaTouch {
 	virtual void	update();
 	virtual void	draw();
     
-    EffectsManager* mEffectsManager;
+    EffectsManagerRef mEffectsManager;
     
     CameraPersp mCamera;
 };
@@ -34,11 +34,16 @@ void ParticleTestApp::setup()
     mCamera.setWorldUp( Vec3f(0.0f, 1.0f, 0.0f) );
 	mCamera.lookAt( Vec3f(0.0f, 0.0f, -50.f), Vec3f::zero());  //TODO rough
     
-    mEffectsManager = new EffectsManager();
+    mEffectsManager = EffectsManager::create();
     mEffectsManager->setCamera(&mCamera);
     mEffectsManager->setup();
     
-    mEffectsManager->createEffect("test");
+    // just a test
+    EffectRef testEffect = mEffectsManager->createEffect("test");
+    ci::Matrix44f transform;
+    transform.setToIdentity();
+    
+    testEffect->setTransform(transform);
 }
 
 void ParticleTestApp::update()

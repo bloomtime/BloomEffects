@@ -1,7 +1,7 @@
 {
    "DiffuseTexture" : "Test2.png",
    "TiledTexture" : false,
-   "BlendTiles" : false,
+   "BlendTiles" : true,
    "TileUV" : [
         {"point" : [0.0, 0.0, 0.0]},
         {"point" : [0.5, 0.5, 0.0]},

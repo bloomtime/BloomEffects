@@ -26,6 +26,13 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
+class Effect;
+
+// for sharing ownership:
+typedef std::shared_ptr<Effect> EffectRef;
+
+// for avoiding circular refs:
+typedef std::weak_ptr<Effect> EffectWeakRef;
 
 //TODO there might be a better way to register these types
 enum ChildEvent {
@@ -39,17 +46,9 @@ const boost::unordered_map<string, ChildEvent> CHILD_EVENTS = boost::assign::map
 class Effect {
 
 public:
-    Effect():
-        mIsVisible(true),
-        mIsStarted(false),
-        mIsStopped(false),
-        mStartedTime(-1.0f)
-    {
-        mTransform.setToIdentity();
-    }
-    
-    //TODO TEMP TESTING
-    Effect(string effectPath);
+
+    static EffectRef create();
+    static EffectRef createFromPath(string path);
     
     ~Effect();
     
@@ -71,10 +70,11 @@ public:
     bool isStarted() { return mIsStarted; }
     bool isStopped() { return mIsStopped; }
 
-private:
+protected:
+
     vector<Json::Value> readVector(Json::Value object, string key);
     Json::Value getData(string effectPath);
-    void parseAttr(const Json::Value data, EffectAttribute &attr, EffectEvent *currentEvent);
+    void parseAttr(const Json::Value data, EffectAttribute &attr, EffectEventRef currentEvent);
     
     ci::Matrix44f mTransform;
     bool mIsVisible;
@@ -89,5 +89,19 @@ private:
     //TODO TEMP TESTING-parsing should be moved elsewhere
     Json::Value mData;
     
-    std::list<EffectEvent *> mEvents;
+    std::list<EffectEventRef> mEvents;
+    
+private:  
+
+    Effect():
+        mIsVisible(true),
+        mIsStarted(false),
+        mIsStopped(false),
+        mStartedTime(-1.0f)
+    {
+        mTransform.setToIdentity();
+    }
+    
+    //TODO need to move the parsing elsewhere
+    Effect(string effectPath);
 };

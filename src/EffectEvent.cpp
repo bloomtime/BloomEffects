@@ -8,6 +8,7 @@
 
 #include <boost/foreach.hpp>
 
+
 EffectEvent::~EffectEvent()
 {    
     mAttributes.clear();

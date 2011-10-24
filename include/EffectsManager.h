@@ -17,10 +17,16 @@ using namespace std;
 using namespace ci;
 using namespace ci::app;
 
+class EffectsManager;
+
+typedef std::shared_ptr<EffectsManager> EffectsManagerRef;
+
 class EffectsManager
 {
 public:
-    EffectsManager();
+
+    static EffectsManagerRef create();
+    
     ~EffectsManager(); 
     
 	void setup();
@@ -28,13 +34,8 @@ public:
 	void draw();
     
     void setCamera(ci::CameraPersp *camera) { mCamera = camera; }
-    void createEffect(string effectName, bool start=true);
-    void stopEffect(bool hardStop = false);
-    
-    //STUB
-    Json::Value mData;
-    
-    Effect* mTestEffect;
+    EffectRef createEffect(string effectName, bool start=true);
+    void destroyEffect(EffectRef effect, bool hardStop = false);
     
     CameraPersp* mCamera;
     GLuint m_framebuffer;
@@ -42,7 +43,12 @@ public:
     
 protected:
 
-    std::list<Effect *> mEffects;
+    std::list<EffectRef> mEffects;
+    
+    
+private:
+
+    EffectsManager();
 };
 
 //TODO

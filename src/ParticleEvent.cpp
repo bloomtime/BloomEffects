@@ -14,6 +14,11 @@ using namespace ci;
 
 const string PATH_EXTENSION = ".particle.json";
 
+ParticleEventRef ParticleEvent::create()
+{
+    return ParticleEventRef( new ParticleEvent() );
+}
+
 ParticleEvent::ParticleEvent():
     mRate(1.0f),
     mTotalVertices(0),
@@ -25,7 +30,6 @@ ParticleEvent::ParticleEvent():
     mPreviousElapsed(0.0f),
     mCurrentRate(0.0f),
     mGlobalForce(Vec3f(0.0f, 0.0f, 0.0f)),
-    mInheritTransform(false),
     mTiledTexture(true),
     mBlendTiles(false),
     mNumTiles(1.0f),
@@ -209,7 +213,7 @@ void ParticleEvent::updateVelocity(Particle &currentParticle, float dt)
     currentParticle.velocity += currentVel * drag + mGlobalForce * dt;
 }
 
-void ParticleEvent::update(const ci::CameraPersp &camera)
+void ParticleEvent::update()
 {
     updateEmitter();
     
@@ -255,7 +259,7 @@ void ParticleEvent::update(const ci::CameraPersp &camera)
     }
     
     Vec3f bbRight, bbUp, bbAt;
-    camera.getBillboardVectors( &bbRight, &bbUp );  
+    mCamera->getBillboardVectors( &bbRight, &bbUp );  
     bbAt = cross(bbUp, bbRight);
     
 	for( list<Particle>::iterator it = mParticles.begin(); it != mParticles.end(); ++it )

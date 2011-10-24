@@ -2,6 +2,11 @@
 
 const string FX_EXTENSION = ".effect.json";
 
+EffectsManagerRef EffectsManager::create()
+{
+    return EffectsManagerRef( new EffectsManager() );
+}
+
 EffectsManager::EffectsManager()
 {
 }
@@ -11,9 +16,10 @@ EffectsManager::~EffectsManager()
     //necessary?
     glBindBuffer(GL_ARRAY_BUFFER, 0);  
     
-	for( list<Effect *>::const_iterator it = mEffects.begin(); it != mEffects.end(); ++it )
+	for( list<EffectRef>::iterator it = mEffects.begin(); it != mEffects.end(); ++it )
     {
-        delete (*it);
+        //(*it) = NULL;
+        it = mEffects.erase(it);
     }
     
     mCamera = NULL;
@@ -27,18 +33,12 @@ void EffectsManager::setup()
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer); 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_renderbuffer);
     glViewport(0, 0, getWindowWidth(), getWindowHeight());
-
-    mTestEffect = new Effect("test.effect.json");
-    mTestEffect->setCamera(mCamera);
-    mTestEffect->setup();
-    
-    mTestEffect->start();
 }
 
 
-void EffectsManager::createEffect(string effectName, bool start)
+EffectRef EffectsManager::createEffect(string effectName, bool start)
 {
-    Effect *newEffect = new Effect(effectName + FX_EXTENSION);
+    EffectRef newEffect = Effect::createFromPath(effectName + FX_EXTENSION);
     newEffect->setCamera(mCamera);
     newEffect->setup();
     
@@ -46,17 +46,25 @@ void EffectsManager::createEffect(string effectName, bool start)
     
     if (start)
         newEffect->start();
+        
+    return newEffect;
 }
 
-void EffectsManager::stopEffect(bool hardStop)
+void EffectsManager::destroyEffect(EffectRef effect, bool hardStop)
 {
-    // pass around fx pointer or uid?
+	for( list<EffectRef>::iterator it = mEffects.begin(); it != mEffects.end(); ++it )
+    {
+        if ((*it) == effect)
+        {
+            (*it)->stop(hardStop);
+            it = mEffects.erase(it);
+        }
+    }
 }
-
 
 void EffectsManager::update()
 {
-	for( list<Effect *>::iterator it = mEffects.begin(); it != mEffects.end(); ++it )
+	for( list<EffectRef>::iterator it = mEffects.begin(); it != mEffects.end(); ++it )
     {
         if (!(*it)->isStopped())
         {
@@ -64,7 +72,6 @@ void EffectsManager::update()
         }
         else
         {
-            delete (*it);  
             it = mEffects.erase(it);
         }
     }
@@ -75,7 +82,7 @@ void EffectsManager::update()
 
 void EffectsManager::draw()
 {  
-	for( list<Effect *>::const_iterator it = mEffects.begin(); it != mEffects.end(); ++it )
+	for( list<EffectRef>::const_iterator it = mEffects.begin(); it != mEffects.end(); ++it )
     {
         if (!(*it)->isStopped())
         {
