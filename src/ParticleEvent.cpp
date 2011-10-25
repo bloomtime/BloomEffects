@@ -33,7 +33,8 @@ ParticleEvent::ParticleEvent():
     mTiledTexture(true),
     mBlendTiles(false),
     mNumTiles(1.0f),
-    mTileWidth(1.0f)
+    mTileWidth(1.0f),
+    mVerts(NULL)
 { 
     mEmissionVolume = EmissionVolume();
     mFileExtension = PATH_EXTENSION;
