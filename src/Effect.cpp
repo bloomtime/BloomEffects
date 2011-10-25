@@ -65,6 +65,11 @@ void Effect::initializeData()
             string EventType = currentBlock["EventType"].asString();
             string EventPath = currentBlock["EventPath"].asString();
             
+            bool enabled = currentBlock["Enabled"].asBool();
+            
+            if (!enabled)
+                continue;
+            
             if (EventType == "" || EventPath == "")
                 break;
             
@@ -91,15 +96,11 @@ void Effect::initializeData()
             }
             
             // Parse child event path
-            if (currentEvent != NULL)
+            if (currentEvent)
             {
                 // Parse global parameters
-                currentEvent->setEnabled(currentBlock["Enabled"].asBool());
+                currentEvent->setEnabled(enabled);
                 
-                // For now, don't even store in memory if it is not enabled
-                if (!currentEvent->isEnabled())
-                    continue;
-
                 currentEvent->setStartTime(currentBlock["StartTime"].asFloat());
             
                 vector<Json::Value> posValues = readVector(currentBlock, "Position");
