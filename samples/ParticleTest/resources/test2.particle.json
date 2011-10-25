@@ -1,0 +1,50 @@
+{
+   "DiffuseTexture" : "cellTest.png",
+   "TiledTexture" : false,
+   "BlendTiles" : true,
+   "TileUV" : [
+        {"point" : [0.0, 0.0, 0.0]},
+        {"point" : [0.5, 0.5, 0.0]},
+        {"point" : [1.0, 1.0, 0.0]}
+   ]
+   "Shader" : "Particle",
+   "DiffuseColorR" : [
+        {"point" : [0.0, 1.0, 0.0]},
+        {"point" : [0.5, 1.0, 0.0]},
+        {"point" : [1.0, 1.0, 0.0]}
+   ],
+   "DiffuseColorG" : [
+        {"point" : [0.0, 0.0, 0.0]},
+        {"point" : [0.5, 0.0, 0.0]},
+        {"point" : [1.0, 0.0, 0.0]}
+   ],
+   "DiffuseColorB" : [
+        {"point" : [0.0, 1.0, 0.0]},
+        {"point" : [0.5, 1.0, 0.0]},
+        {"point" : [1.0, 1.0, 0.0]}
+   ],
+   "EmitScale" : [12, 0.0, 0.0],
+   "EmitVolumeType" : "Sphere",
+   "EmitAngle" : [0.0, 0.0],
+   "Rate" : 40.0,
+   "InitialSpeed" : 0.0,
+   "Lifetime" : 4.0,
+   "BlendMode" : "AdditiveBlend",
+   "ParticleLifetime" : [3.0, 1.0],
+   "InitialSpeed" : [0.1, 0.0],
+   "InitialRotation" : [0.0, 0.0],
+   "RotationSpeed" : [0.0, 200.0],
+   "GlobalForce" : [0.0, -2.0, 0.0],
+   "DragForce" : [0.0, 0.0, 0.0],
+   "EmitMode" : "Continuous",
+   "InheritTransform" : false,
+   "Alpha" : [
+        {"point" : [0.0, 1.0, 0.0]},
+        {"point" : [1.0, 0.0, 0.0]}
+   ],
+   "ParticleScale" : [
+        {"point" : [0.0, 1.0, 0.0]},
+        {"point" : [0.5, 2.0, 0.0]},
+        {"point" : [1.0, 1.0, 0.0]}
+   ]
+}

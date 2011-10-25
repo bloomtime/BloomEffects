@@ -1,4 +1,1 @@
-jsoncpp came from http://jsoncpp.sourceforge.net/
-and required scons-local to build http://sourceforge.net/projects/scons/files/scons-local/1.2.0/
-but in the end amalgamate.py was used to generate json.h and jsoncpp.cpp that allow us 
-to build for any platform (simulator or device). So that's nice.
+The beginnings of an effects rendering system.
