@@ -51,7 +51,7 @@ private:
     EffectsManager();
 };
 
-//TODO
+//TODO STUB
 class EffectsRenderer 
 {
 public:

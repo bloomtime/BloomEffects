@@ -9,12 +9,13 @@ EffectsManagerRef EffectsManager::create()
 
 EffectsManager::EffectsManager()
 {
+    mCamera = NULL;
 }
 
 EffectsManager::~EffectsManager()
 {
-    //necessary?
-    glBindBuffer(GL_ARRAY_BUFFER, 0);  
+    glDeleteRenderbuffers(1, &m_renderbuffer);
+    glDeleteFramebuffers(1, &m_framebuffer);
     
 	for( list<EffectRef>::iterator it = mEffects.begin(); it != mEffects.end(); ++it )
     {

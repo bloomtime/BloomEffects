@@ -53,33 +53,33 @@ public:
     void registerAttributes() 
     {
         // editable attributes (Name, Type)
-        registerAttribute("Rate",             "Float");
-        registerAttribute("Lifetime",         "Float");
-        registerAttribute("ParticleLifetime", "Vector2");
-        registerAttribute("EmitScale",        "Vector3");
-        registerAttribute("EmitVolumeType",   "String");
-        registerAttribute("EmitMode",         "String");
-        registerAttribute("EmitAngle",        "Vector2");
+        registerAttribute("Rate",             ATTR_FLOAT);
+        registerAttribute("Lifetime",         ATTR_FLOAT);
+        registerAttribute("ParticleLifetime", ATTR_VECTOR2);
+        registerAttribute("EmitScale",        ATTR_VECTOR3);
+        registerAttribute("EmitVolumeType",   ATTR_STRING);
+        registerAttribute("EmitMode",         ATTR_STRING);
+        registerAttribute("EmitAngle",        ATTR_VECTOR2);
         
-        registerAttribute("Alpha",            "Curve");
-        registerAttribute("ParticleScale",    "Curve");
-        registerAttribute("TileUV",           "Curve");
+        registerAttribute("Alpha",            ATTR_CURVE);
+        registerAttribute("ParticleScale",    ATTR_CURVE);
+        registerAttribute("TileUV",           ATTR_CURVE);
         
-        registerAttribute("Shader"        ,   "Shader");
-        registerAttribute("DiffuseTexture",   "Texture");
-        registerAttribute("DiffuseColorR",    "Curve");
-        registerAttribute("DiffuseColorG",    "Curve");
-        registerAttribute("DiffuseColorB",    "Curve");
-        registerAttribute("BlendMode",        "String");
-        registerAttribute("TiledTexture",     "Bool");
-        registerAttribute("BlendTiles",       "Bool");
+        registerAttribute("Shader"        ,   ATTR_SHADER);
+        registerAttribute("DiffuseTexture",   ATTR_TEXTURE);
+        registerAttribute("DiffuseColorR",    ATTR_CURVE);
+        registerAttribute("DiffuseColorG",    ATTR_CURVE);
+        registerAttribute("DiffuseColorB",    ATTR_CURVE);
+        registerAttribute("BlendMode",        ATTR_STRING);
+        registerAttribute("TiledTexture",     ATTR_BOOL);
+        registerAttribute("BlendTiles",       ATTR_BOOL);
 
-        registerAttribute("InitialRotation",  "Vector2"); 
-        registerAttribute("InitialSpeed",     "Vector2");
-        registerAttribute("GlobalForce",      "Vector3");
-        registerAttribute("DragForce",        "Vector3"); 
-        registerAttribute("RotationSpeed",    "Vector2");  
-        registerAttribute("InheritTransform", "Bool"); 
+        registerAttribute("InitialRotation",  ATTR_VECTOR2); 
+        registerAttribute("InitialSpeed",     ATTR_VECTOR2);
+        registerAttribute("GlobalForce",      ATTR_VECTOR3);
+        registerAttribute("DragForce",        ATTR_VECTOR3); 
+        registerAttribute("RotationSpeed",    ATTR_VECTOR2);  
+        registerAttribute("InheritTransform", ATTR_BOOL); 
 
         //TODO curves also need up front variance (not per frame variance)
     }
@@ -98,7 +98,6 @@ protected:
         float lifetime;
         float maxLifetime;
         
-        //TODO need to possibly store curves here with baked in variance.  eesh.  
         float alpha;
         float scale;
         float colorR;

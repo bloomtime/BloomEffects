@@ -24,6 +24,7 @@ Effect::Effect(string effectPath)
     mIsVisible = true;
     mIsStarted = false;
     mIsStopped = false;
+    mCamera = NULL;
     
     mData = getData(effectPath);
 }
@@ -62,20 +63,20 @@ void Effect::initializeData()
         for ( it = events.begin(); it != events.end(); it++)
         {
             Json::Value currentBlock = *it;
-            string EventType = currentBlock["EventType"].asString();
-            string EventPath = currentBlock["EventPath"].asString();
+            string eventType = currentBlock["EventType"].asString();
+            string eventPath = currentBlock["EventPath"].asString();
             
             bool enabled = currentBlock["Enabled"].asBool();
             
             if (!enabled)
                 continue;
             
-            if (EventType == "" || EventPath == "")
+            if (eventType == "" || eventPath == "")
                 break;
             
             //console() << "EVENT: " << EventPath << " - " << EventType << std::endl;
             
-            ChildEvent ChildType = CHILD_EVENTS.at(EventType.c_str());
+            ChildEvent ChildType = CHILD_EVENTS.at(eventType.c_str());
             EffectEventRef currentEvent;
             
             // handle the different types here
@@ -90,7 +91,7 @@ void Effect::initializeData()
                 default:
                 {
                     //nothing!
-                    console() << "WARNING: Unrecognized EventType" << EventType << std::endl;
+                    console() << "WARNING: Unrecognized EventType" << eventType << std::endl;
                     return;                
                 }
             }
@@ -104,13 +105,13 @@ void Effect::initializeData()
                 currentEvent->setStartTime(currentBlock["StartTime"].asFloat());
             
                 vector<Json::Value> posValues = readVector(currentBlock, "Position");
-                currentEvent->setEmitterPosition(Vec3f(posValues[0].asFloat(), posValues[1].asFloat(), posValues[2].asFloat()));       
+                currentEvent->setSourcePosition(Vec3f(posValues[0].asFloat(), posValues[1].asFloat(), posValues[2].asFloat()));       
             
                 vector<Json::Value> orientValues = readVector(currentBlock, "Orientation");
-                currentEvent->setEmitterOrientation(Vec3f(orientValues[0].asFloat(), orientValues[1].asFloat(), orientValues[2].asFloat()));
+                currentEvent->setSourceOrientation(Vec3f(orientValues[0].asFloat(), orientValues[1].asFloat(), orientValues[2].asFloat()));
                 
-                EventPath.append(currentEvent->getPathExtension());
-                Json::Value childData = getData(EventPath);
+                eventPath.append(currentEvent->getPathExtension());
+                Json::Value childData = getData(eventPath);
                 
                 //console() << "EventPath "<< EventPath << std::endl;
                 
@@ -135,63 +136,76 @@ void Effect::parseAttr(const Json::Value data, EffectAttribute &attr, EffectEven
     
     boost::any currentValue;
     
-    if (attr.mType == "Color")
+    switch (attr.mType) 
     {
-        vector<Json::Value> values = readVector(data, attr.mName);
-        currentValue = Color(values[0].asFloat(), values[1].asFloat(), values[2].asFloat());
-    }
-    else if (attr.mType == "Texture")
-    {
-        currentValue = data[attr.mName].asString();
-    }
-    else if (attr.mType == "Shader")
-    {
-        currentValue = data[attr.mName].asString();
-    }
-    else if (attr.mType == "Float")
-    {
-        currentValue = data[attr.mName].asFloat();
-    }
-    else if (attr.mType == "Vector3")
-    {
-        vector<Json::Value> values = readVector(data, attr.mName);
-        currentValue = Vec3f(values[0].asFloat(), values[1].asFloat(), values[2].asFloat());
-    }
-    else if (attr.mType == "Vector2")
-    {
-        vector<Json::Value> values = readVector(data, attr.mName);
-        currentValue = Vec2f(values[0].asFloat(), values[1].asFloat());
-    }
-    else if (attr.mType == "Bool")
-    {
-        currentValue = data[attr.mName].asBool();
-    }
-    else if (attr.mType == "String")
-    {
-        currentValue = data[attr.mName].asString();
-    }
-    else if (attr.mType == "Curve")
-    {
-        floatCurvePoints currentCurve;
-        
-        vector<Json::Value> pointValues = readVector(data, attr.mName);
-        
-        for (vector<Json::Value>::const_iterator it = pointValues.begin(); it != pointValues.end(); ++it)
+        case ATTR_COLOR:
         {
-            vector<Json::Value> pValues = readVector((*it), "point");
-            Vec3f currentPoint = Vec3f(pValues[0].asFloat(), pValues[1].asFloat(), pValues[2].asFloat());
-            currentCurve.push_back(currentPoint);
-            
-            //console() << "p is " << currentPoint[0] << " " << currentPoint[1] << std::endl;
+            vector<Json::Value> values = readVector(data, attr.mName);
+            currentValue = Color(values[0].asFloat(), values[1].asFloat(), values[2].asFloat());
+            break;
         }
+        case ATTR_TEXTURE:
+        {
+            currentValue = data[attr.mName].asString();
+            break;
+        }
+        case ATTR_SHADER:
+        {
+            currentValue = data[attr.mName].asString();
+            break;
+        }
+        case ATTR_FLOAT:
+        {
+            currentValue = data[attr.mName].asFloat();
+            break;
+        }
+        case ATTR_VECTOR3:
+        {
+            vector<Json::Value> values = readVector(data, attr.mName);
+            currentValue = Vec3f(values[0].asFloat(), values[1].asFloat(), values[2].asFloat());
+            break;
+        }
+        case ATTR_VECTOR2:
+        {
+            vector<Json::Value> values = readVector(data, attr.mName);
+            currentValue = Vec2f(values[0].asFloat(), values[1].asFloat());
+            break;
+        }
+        case ATTR_BOOL:
+        {
+            currentValue = data[attr.mName].asBool();
+            break;
+        }
+        case ATTR_STRING:
+        {
+            currentValue = data[attr.mName].asString();
+            break;
+        }
+        case ATTR_CURVE:
+        {
+            floatCurvePoints currentCurve;
         
-        currentValue = currentCurve;
+            vector<Json::Value> pointValues = readVector(data, attr.mName);
+        
+            for (vector<Json::Value>::const_iterator it = pointValues.begin(); it != pointValues.end(); ++it)
+            {
+                vector<Json::Value> pValues = readVector((*it), "point");
+                Vec3f currentPoint = Vec3f(pValues[0].asFloat(), pValues[1].asFloat(), pValues[2].asFloat());
+                currentCurve.push_back(currentPoint);
+            
+                //console() << "p is " << currentPoint[0] << " " << currentPoint[1] << std::endl;
+            }
+        
+            currentValue = currentCurve;
+            break;
+        }
+        default:
+        {
+            console() << "ERROR:  Unrecognized Attr Type" << std::endl;
+            break;               
+        }
     }
-    else
-    {
-        console() << "ERROR:  Unrecognized Attr Type" << std::endl;
-    }
-    
+
     currentEvent->setAttribute(attr.mName, currentValue);
 }
 
@@ -241,20 +255,6 @@ void Effect::setup()
             (*it)->setup();
         }
     }
-    
-    /*
-    std::vector<EffectEventRef> effectChildren;
-    std::copy(effectChildren.begin(), effectChildren.end(), std::back_inserter(mChildren));
-    
-    // update children
-    BOOST_FOREACH(EffectEventRef effectChild, effectChildren) 
-    {  
-        if (effectChild->isEnabled()) 
-        {
-            effectChild->setup();
-        }
-    }
-    */
 }
 
 void Effect::update()
@@ -286,18 +286,6 @@ void Effect::update()
                 (*it)->update();
         }
         
-        /*
-        instead of doing this copy, use static_cast
-        std::vector<EffectEventRef> effectChildren;
-        std::copy(effectChildren.begin(), effectChildren.end(), std::back_inserter(mChildren));
-        
-        // update children
-        BOOST_FOREACH(EffectEventRef effectChild, effectChildren) {  
-            effectChild->update(*mCamera);
-            // TODO:  maybe at some point an effect's children will have children, but not at the moment
-            //child->deepUpdate();
-        }
-        */
     }
 }
 

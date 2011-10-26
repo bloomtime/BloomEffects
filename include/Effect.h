@@ -80,7 +80,6 @@ protected:
     bool mIsVisible;
     float mStartedTime;
     
-    // TODO need to move this to effectsmanager later
     ci::CameraPersp* mCamera;
     
     bool mIsStarted;
@@ -97,7 +96,8 @@ private:
         mIsVisible(true),
         mIsStarted(false),
         mIsStopped(false),
-        mStartedTime(-1.0f)
+        mStartedTime(-1.0f),
+        mCamera(NULL)
     {
         mTransform.setToIdentity();
     }

@@ -38,7 +38,7 @@ float EffectEvent::getEventElapsedSeconds()
     return getElapsedSeconds () - mStartTime;
 }
 
-void EffectEvent::registerAttribute(string attrName, string attrType)
+void EffectEvent::registerAttribute(string attrName, AttributeType attrType)
 {
     EffectAttribute newAttr;
     newAttr.mName = attrName;
@@ -47,12 +47,12 @@ void EffectEvent::registerAttribute(string attrName, string attrType)
     mAttributes[attrName] = newAttr;
 }
 
-void EffectEvent::updateEmitter()
+void EffectEvent::updateSource()
 {
     if (mParentTransformChanged)
     {
-        mEmitterPosition = mParentTransform.transformPoint(mLocalPosition);
-        mEmitterOrientation = mLocalOrientation * Quatf(mParentTransform);
+        mSourcePosition = mParentTransform.transformPoint(mLocalPosition);
+        mSourceOrientation = mLocalOrientation * Quatf(mParentTransform);
         mParentTransformChanged = false;
     }
 }

@@ -65,7 +65,7 @@ public:
     }
     ci::Matrix44f getTransform() const { return mParentTransform; /* copy OK */ }
     
-    void registerAttribute(string attrName, string attrType);
+    void registerAttribute(string attrName, AttributeType attrType);
         
     EffectAttrMap getAttributes() { return mAttributes; }
     void setAttribute(string name, boost::any value) { mAttributes[name].mValue = value; }
@@ -73,18 +73,18 @@ public:
     void setStartTime(float startTime) { mStartTime = startTime; }
     float getStartTime() { return mStartTime; }
     
-    void setEmitterPosition(Vec3f position) 
+    void setSourcePosition(Vec3f position) 
     { 
         mLocalPosition = position;
-        mEmitterPosition = mParentTransform.transformPoint(position);
+        mSourcePosition = mParentTransform.transformPoint(position);
     }
-    void setEmitterOrientation(Vec3f orientation) 
+    void setSourceOrientation(Vec3f orientation) 
     { 
         mLocalOrientation.set(toRadians(orientation[0]),toRadians(orientation[1]), toRadians(orientation[2]));
-        mEmitterOrientation = mLocalOrientation * Quatf(mParentTransform); 
+        mSourceOrientation = mLocalOrientation * Quatf(mParentTransform); 
     }
     
-    void updateEmitter();
+    void updateSource();
     
     bool isEnabled() { return mEnabled; }
     
@@ -111,9 +111,10 @@ protected:
         mStartTime(-1.0f),
         mLifetime(0.0f),
         mLocalPosition(Vec3f( 0.0f, 0.0f, 0.0f )),
-        mEmitterPosition(Vec3f( 0.0f, 0.0f, 0.0f )),
-        mEmitterOrientation(Quatf::identity()),
-        mParentTransformChanged(false)
+        mSourcePosition(Vec3f( 0.0f, 0.0f, 0.0f )),
+        mSourceOrientation(Quatf::identity()),
+        mParentTransformChanged(false),
+        mCamera(NULL)
     {
         mParentTransform.setToIdentity();
     }
@@ -134,10 +135,10 @@ protected:
     bool mEnabled;
     bool mParentTransformChanged;
     Vec3f mLocalPosition;
-    Vec3f mEmitterPosition;
+    Vec3f mSourcePosition;
     
     Quatf mLocalOrientation;
-    Quatf mEmitterOrientation;
+    Quatf mSourceOrientation;
     
     string mFileExtension;
     

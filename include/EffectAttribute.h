@@ -34,6 +34,19 @@ struct AttributeCurvePoints
 
 const float TANGENT_LENGTH = .2f; //.5f for catmull-rom 
 
+enum AttributeType 
+{
+    ATTR_COLOR,
+    ATTR_TEXTURE,
+    ATTR_SHADER,
+    ATTR_FLOAT,
+    ATTR_VECTOR3,
+    ATTR_VECTOR2,
+    ATTR_BOOL,
+    ATTR_STRING,
+    ATTR_CURVE
+};
+
 class EffectAttribute
 {
 public:
@@ -41,7 +54,7 @@ public:
     ~EffectAttribute() {}
     
     string mName;
-    string mType;
+    AttributeType mType;
     boost::any mValue;
     
     gl::Texture getTexture() 

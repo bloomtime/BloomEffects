@@ -93,8 +93,6 @@ void ParticleEvent::processAttributes()
 
 Vec3f ParticleEvent::getEmitDirection()
 {
-    //Vec2f xz = Rand::randVec2f() * Rand::randFloat(mScale[1], mScale[0]);
-    
     float coneSizeX = mEmitAngle[0];
     float coneSizeY = mEmitAngle[1];
     
@@ -104,7 +102,7 @@ Vec3f ParticleEvent::getEmitDirection()
     
     Quatf q = Quatf(coneRange[0] * rangeX, coneRange[1] * rangeY, 0.0f);
     Vec3f emitDir = Vec3f(0.0f, 0.0f, 1.0f) * q;
-    return emitDir * mEmitterOrientation; 
+    return emitDir * mSourceOrientation; 
 }
 
 floatCurve ParticleEvent::getNewCurve(AttributeCurvePoints &curvePoints)
@@ -147,9 +145,9 @@ void ParticleEvent::addNewParticle()
     
     // if inheriting parent's transform, don't store the source position now--add it later
     if (mInheritTransform)
-        newParticle.position = mEmissionVolume.getRandomPoint() * mEmitterOrientation;
+        newParticle.position = mEmissionVolume.getRandomPoint() * mSourceOrientation;
     else
-        newParticle.position = mEmitterPosition + (mEmissionVolume.getRandomPoint() * mEmitterOrientation);
+        newParticle.position = mSourcePosition + (mEmissionVolume.getRandomPoint() * mSourceOrientation);
         
     newParticle.velocity = getEmitDirection() * (mInitialSpeed[0] + Rand::randFloat(-mInitialSpeed[1], mInitialSpeed[1]));
     
@@ -216,7 +214,7 @@ void ParticleEvent::updateVelocity(Particle &currentParticle, float dt)
 
 void ParticleEvent::update()
 {
-    updateEmitter();
+    updateSource();
     
     float elapsed = getElapsedSeconds();
     float dt = elapsed - mPreviousElapsed;    
@@ -331,7 +329,7 @@ void ParticleEvent::update()
         
         // if inheriting parent's transform, add it in now since it might have updated
         if (mInheritTransform)
-            pos += mEmitterPosition;
+            pos += mSourcePosition;
         
         float rot = toRadians((*it).rotation);
         float scale = (*it).scale;
