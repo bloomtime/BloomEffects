@@ -80,14 +80,20 @@ public:
         registerAttribute("DragForce",        ATTR_VECTOR3); 
         registerAttribute("RotationSpeed",    ATTR_VECTOR2);  
         registerAttribute("InheritTransform", ATTR_BOOL); 
-
-        //TODO curves also need up front variance (not per frame variance)
     }
     
     void setup();
     void update();
     void draw();
     void deepDraw(){}
+    
+    void setTintColor( Vec3f color ) 
+    { 
+        //alpha will be handled elsewhere
+        mTintColorAlpha = Vec4f(color, mTintColorAlpha.w); 
+    }
+    
+    void setTintAlpha ( float alpha ) { mTintColorAlpha.w = alpha; }
     
 protected:
 
@@ -98,21 +104,15 @@ protected:
         float lifetime;
         float maxLifetime;
         
-        float alpha;
-        float scale;
-        float colorR;
-        float colorG;
-        float colorB;
-        float tileIndex;
-        float tileMix;
-        
         floatCurve alphaCurve;
         floatCurve scaleCurve;
+        floatCurve tileUVCurve;
+
+        // maybe these shouldn't be curves (for performance), but keeping for now
         floatCurve colorRCurve;
         floatCurve colorGCurve;
         floatCurve colorBCurve;
-        floatCurve tileUVCurve;
-        
+                
         Vec3f position;  
         Vec3f velocity;
     };
@@ -163,6 +163,8 @@ protected:
     Vec2f mRotationSpeed;    // value, variance
     Vec3f mGlobalForce;  
     Vec3f mDragForce;
+    
+    Vec4f mTintColorAlpha;
     
     EmissionVolume mEmissionVolume;
     

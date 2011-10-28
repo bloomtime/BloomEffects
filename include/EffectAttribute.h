@@ -59,15 +59,14 @@ public:
     
     gl::Texture getTexture() 
     { 
-        //gl::Texture::Format mipFmt;
-        // TODO reenable mipmapping later--right now it is blowing up on device
-        //mipFmt.enableMipmapping( true );
-        //mipFmt.setMinFilter( GL_LINEAR_MIPMAP_NEAREST );    
-        //mipFmt.setMagFilter( GL_LINEAR ); // TODO: experiment with GL_NEAREST where appropriate
+        gl::Texture::Format mipFmt;
+        mipFmt.enableMipmapping( true );
+        mipFmt.setMinFilter( GL_LINEAR_MIPMAP_NEAREST );    
+        mipFmt.setMagFilter( GL_LINEAR ); // TODO: experiment with GL_NEAREST where appropriate
         
         string val = boost::any_cast<string>(mValue);
-        return gl::Texture( loadImage( loadResource( val ) ) );
-        //return gl::Texture( loadImage( loadResource( val ) ), mipFmt );
+
+        return gl::Texture( loadImage( loadResource( val ) ), mipFmt );
     }
     gl::GlslProg getShader()
     {

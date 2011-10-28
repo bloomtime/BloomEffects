@@ -29,6 +29,19 @@ Effect::Effect(string effectPath)
     mData = getData(effectPath);
 }
 
+void Effect::setTransform( const ci::Matrix44f &transform ) 
+{ 
+    mTransform = transform; 
+    
+	for( list<EffectEventRef>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+    {
+        if ((*it)->isEnabled())
+        {
+            (*it)->setParentTransform(mTransform);
+        }
+    }
+}
+
 Json::Value Effect::getData(string effectPath)
 {
     DataSourceRef dataSource = loadResource(effectPath);
@@ -295,6 +308,28 @@ void Effect::draw()
     {
         if ((*it)->isEnabled())
             (*it)->draw();
+    }
+}
+
+void Effect::setTintColor(Vec3f color)
+{
+	for( list<EffectEventRef>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+    {
+        if ((*it)->isEnabled())
+        {
+            (*it)->setTintColor(color);
+        }
+    }
+}
+
+void Effect::setSourceScale(float scale)
+{
+	for( list<EffectEventRef>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+    {
+        if ((*it)->isEnabled())
+        {
+            (*it)->setSourceScale(scale);
+        }
     }
 }
 

@@ -58,13 +58,16 @@ public:
     void update();
     void draw();
     
+    void setTintColor(Vec3f color);
+    void setSourceScale(float scale);
+    
     void start();
     void stop(bool hardStop=false);  
     float getEffectElapsedSeconds();
     
     void initializeData();
     void setCamera(ci::CameraPersp *camera);
-    void setTransform( const ci::Matrix44f &transform ) { mTransform = transform; /* copy OK */ }
+    void setTransform( const ci::Matrix44f &transform );
     ci::Matrix44f getTransform() const { return mTransform; /* copy OK */ }
     
     bool isStarted() { return mIsStarted; }

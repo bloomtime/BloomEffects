@@ -34,7 +34,8 @@ ParticleEvent::ParticleEvent():
     mBlendTiles(false),
     mNumTiles(1.0f),
     mTileWidth(1.0f),
-    mVerts(NULL)
+    mVerts(NULL),
+    mTintColorAlpha(Vec4f(1.0f, 1.0f, 1.0f, 1.0f))
 { 
     mEmissionVolume = EmissionVolume();
     mFileExtension = PATH_EXTENSION;
@@ -145,9 +146,9 @@ void ParticleEvent::addNewParticle()
     
     // if inheriting parent's transform, don't store the source position now--add it later
     if (mInheritTransform)
-        newParticle.position = mEmissionVolume.getRandomPoint() * mSourceOrientation;
+        newParticle.position = mEmissionVolume.getRandomPoint(mSourceScale) * mSourceOrientation;
     else
-        newParticle.position = mSourcePosition + (mEmissionVolume.getRandomPoint() * mSourceOrientation);
+        newParticle.position = mSourcePosition + (mEmissionVolume.getRandomPoint(mSourceScale) * mSourceOrientation);
         
     newParticle.velocity = getEmitDirection() * (mInitialSpeed[0] + Rand::randFloat(-mInitialSpeed[1], mInitialSpeed[1]));
     
@@ -158,16 +159,7 @@ void ParticleEvent::addNewParticle()
     newParticle.colorGCurve = getNewCurve(mDiffuseGreenCurve);
     newParticle.colorBCurve = getNewCurve(mDiffuseBlueCurve);
     newParticle.tileUVCurve = getNewCurve(mTileUVCurve);
-    
-    // curve lookup on per particle curves
-    newParticle.alpha = newParticle.alphaCurve.getPosition(0.0f)[1];
-    newParticle.scale = newParticle.scaleCurve.getPosition(0.0f)[1];
-    newParticle.colorR = newParticle.colorRCurve.getPosition(0.0f)[1];        
-    newParticle.colorG = newParticle.colorGCurve.getPosition(0.0f)[1];      
-    newParticle.colorB = newParticle.colorBCurve.getPosition(0.0f)[1];   
-    
-    newParticle.tileIndex = newParticle.tileUVCurve.getPosition(0.0f)[1] * mNumTiles;
-    
+
     mParticles.push_back(newParticle);;
 }
 
@@ -278,20 +270,6 @@ void ParticleEvent::update()
             it = mParticles.erase( it );
         }
         
-        float interval = (*it).lifetime / (*it).maxLifetime;
-        float time = interval - floor(interval);
-        
-        // curve lookup on per particle curves
-        (*it).alpha = (*it).alphaCurve.getPosition(time)[1];
-        float currentScale = (*it).scaleCurve.getPosition(time)[1];
-        
-        (*it).scale = currentScale;
-        (*it).colorR = (*it).colorRCurve.getPosition(time)[1];        
-        (*it).colorG = (*it).colorGCurve.getPosition(time)[1];      
-        (*it).colorB = (*it).colorBCurve.getPosition(time)[1];      
-    
-        (*it).tileIndex = (*it).tileUVCurve.getPosition(time)[1] * mNumTiles;
-        
         // update particle position after applying forces
         updateVelocity(*it, dt);
         
@@ -332,9 +310,19 @@ void ParticleEvent::update()
             pos += mSourcePosition;
         
         float rot = toRadians((*it).rotation);
-        float scale = (*it).scale;
-		Vec4f col = Vec4f((*it).colorR, (*it).colorG, (*it).colorB, (*it).alpha);
-        float tileIndex = (*it).tileIndex;
+        
+        float interval = (*it).lifetime / (*it).maxLifetime;
+        float time = interval - floor(interval);
+        
+        // curve lookups
+        float alpha = (*it).alphaCurve.getPosition(time)[1];
+        float scale = (*it).scaleCurve.getPosition(time)[1] * mSourceScale;
+        float colorR = (*it).colorRCurve.getPosition(time)[1];
+        float colorG = (*it).colorGCurve.getPosition(time)[1];
+        float colorB = (*it).colorBCurve.getPosition(time)[1];
+        float tileIndex = (*it).tileUVCurve.getPosition(time)[1] * mNumTiles;
+        
+		Vec4f col = Vec4f(colorR, colorG, colorB, alpha);
         
         Vec3f right = Quatf( bbAt, rot ) * bbRight * scale;
         Vec3f up = Quatf( bbAt, rot ) * bbUp * scale;
@@ -438,6 +426,7 @@ void ParticleEvent::draw()
     mShader.uniform("u_diffuseTex", 1);
     mShader.uniform("u_tileWidth", mTileWidth);
     mShader.uniform("u_tileBlend", mBlendTiles);
+    mShader.uniform("u_tintColor", mTintColorAlpha);
     mShader.uniform("u_mvp_matrix", mCamera->getProjectionMatrix() * mCamera->getModelViewMatrix());
     
     glEnableVertexAttribArray(vtx_handle);

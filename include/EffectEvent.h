@@ -63,6 +63,9 @@ public:
         mParentTransform = transform; /* copy OK */ 
         mParentTransformChanged = true;
     }
+    
+    virtual void setTintColor( Vec3f color ) {}
+    
     ci::Matrix44f getTransform() const { return mParentTransform; /* copy OK */ }
     
     void registerAttribute(string attrName, AttributeType attrType);
@@ -82,6 +85,10 @@ public:
     { 
         mLocalOrientation.set(toRadians(orientation[0]),toRadians(orientation[1]), toRadians(orientation[2]));
         mSourceOrientation = mLocalOrientation * Quatf(mParentTransform); 
+    }
+    void setSourceScale(float scale)
+    {
+        mSourceScale = scale;
     }
     
     void updateSource();
@@ -114,7 +121,8 @@ protected:
         mSourcePosition(Vec3f( 0.0f, 0.0f, 0.0f )),
         mSourceOrientation(Quatf::identity()),
         mParentTransformChanged(false),
-        mCamera(NULL)
+        mCamera(NULL),
+        mSourceScale(1.0f)
     {
         mParentTransform.setToIdentity();
     }
@@ -136,6 +144,7 @@ protected:
     bool mParentTransformChanged;
     Vec3f mLocalPosition;
     Vec3f mSourcePosition;
+    float mSourceScale;
     
     Quatf mLocalOrientation;
     Quatf mSourceOrientation;

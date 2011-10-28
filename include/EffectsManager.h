@@ -38,8 +38,10 @@ public:
     void destroyEffect(EffectRef effect, bool hardStop = false);
     
     CameraPersp* mCamera;
-    GLuint m_framebuffer;
-    GLuint m_renderbuffer;
+    
+    //TODO not needed yet
+    //GLuint m_framebuffer;
+    //GLuint m_renderbuffer;
     
 protected:
 

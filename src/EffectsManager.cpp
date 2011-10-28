@@ -14,8 +14,9 @@ EffectsManager::EffectsManager()
 
 EffectsManager::~EffectsManager()
 {
-    glDeleteRenderbuffers(1, &m_renderbuffer);
-    glDeleteFramebuffers(1, &m_framebuffer);
+    //TODO not needed yet
+    //glDeleteRenderbuffers(1, &m_renderbuffer);
+    //glDeleteFramebuffers(1, &m_framebuffer);
     
 	for( list<EffectRef>::iterator it = mEffects.begin(); it != mEffects.end(); ++it )
     {
@@ -28,12 +29,13 @@ EffectsManager::~EffectsManager()
 
 void EffectsManager::setup()
 {
-    glGenRenderbuffers(1, &m_renderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_renderbuffer);
-    glGenFramebuffers(1, &m_framebuffer); 
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer); 
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_renderbuffer);
-    glViewport(0, 0, getWindowWidth(), getWindowHeight());
+    //TODO not needed yet
+    //glGenRenderbuffers(1, &m_renderbuffer);
+    //glBindRenderbuffer(GL_RENDERBUFFER, m_renderbuffer);
+    //glGenFramebuffers(1, &m_framebuffer); 
+    //glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer); 
+    //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_renderbuffer);
+    //glViewport(0, 0, getWindowWidth(), getWindowHeight());
 }
 
 
