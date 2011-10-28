@@ -415,15 +415,17 @@ void ParticleEvent::disableBlendMode()
 
 void ParticleEvent::draw()
 {    
-    if (isInitialized() || isStopped())
+    if (isInitialized() || isStopped() || mTotalVertices == 0)
         return;
     
     enableBlendMode();	
 
     mShader.bind();
-    mDiffuseTexture.bind(1);
-    glEnable(GL_TEXTURE_2D);
-    mShader.uniform("u_diffuseTex", 1);
+    mDiffuseTexture.bind(0);
+    
+    // not needed since there is only one texture at the moment
+    // mShader.uniform("u_diffuseTex", 1);
+    
     mShader.uniform("u_tileWidth", mTileWidth);
     mShader.uniform("u_tileBlend", mBlendTiles);
     mShader.uniform("u_tintColor", mTintColorAlpha);
