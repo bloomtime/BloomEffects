@@ -14,21 +14,6 @@ EffectRef Effect::create()
     return EffectRef( new Effect() );
 }
 
-EffectRef Effect::createFromPath(string path)
-{
-    return EffectRef( new Effect(path) );
-}
-
-Effect::Effect(string effectPath)
-{
-    mIsVisible = true;
-    mIsStarted = false;
-    mIsStopped = false;
-    mCamera = NULL;
-    
-    mData = getData(effectPath);
-}
-
 void Effect::setTransform( const ci::Matrix44f &transform ) 
 { 
     mTransform = transform; 
@@ -42,34 +27,10 @@ void Effect::setTransform( const ci::Matrix44f &transform )
     }
 }
 
-Json::Value Effect::getData(string effectPath)
+void Effect::initializeData(Json::Value data)
 {
-    DataSourceRef dataSource = loadResource(effectPath);
-    Buffer buf = dataSource->getBuffer();
-	size_t dataSize = buf.getDataSize();
-	shared_ptr<char> bufString( new char[dataSize+1], checked_array_deleter<char>() );
-	memcpy( bufString.get(), buf.getData(), buf.getDataSize() );
-	bufString.get()[dataSize] = 0;
-    
-	// Parse and return data
-	Json::Reader reader;
-	Json::Value data;
-	reader.parse(bufString.get(), data);
-	return data;
-}
-
-vector<Json::Value> Effect::readVector(Json::Value object, string key) 
-{ 
-	vector<Json::Value> members;
-	for (uint32_t i = 0; i < object[key].size(); i++)
-		members.push_back(object[key][i]);
-	return members;
-}
-
-void Effect::initializeData()
-{
-    if (mData != NULL) {
-        vector<Json::Value> events = readVector(mData, "Events");
+    if (data != NULL) {
+        vector<Json::Value> events = effects::readVector(data, "Events");
         
         vector<Json::Value>::iterator it;
         
@@ -117,14 +78,14 @@ void Effect::initializeData()
                 
                 currentEvent->setStartTime(currentBlock["StartTime"].asFloat());
             
-                vector<Json::Value> posValues = readVector(currentBlock, "Position");
+                vector<Json::Value> posValues = effects::readVector(currentBlock, "Position");
                 currentEvent->setSourcePosition(Vec3f(posValues[0].asFloat(), posValues[1].asFloat(), posValues[2].asFloat()));       
             
-                vector<Json::Value> orientValues = readVector(currentBlock, "Orientation");
+                vector<Json::Value> orientValues = effects::readVector(currentBlock, "Orientation");
                 currentEvent->setSourceOrientation(Vec3f(orientValues[0].asFloat(), orientValues[1].asFloat(), orientValues[2].asFloat()));
                 
                 eventPath.append(currentEvent->getPathExtension());
-                Json::Value childData = getData(eventPath);
+                Json::Value childData = effects::getJsonData(eventPath);
                 
                 //console() << "EventPath "<< EventPath << std::endl;
                 
@@ -153,7 +114,7 @@ void Effect::parseAttr(const Json::Value data, EffectAttribute &attr, EffectEven
     {
         case ATTR_COLOR:
         {
-            vector<Json::Value> values = readVector(data, attr.mName);
+            vector<Json::Value> values = effects::readVector(data, attr.mName);
             currentValue = Color(values[0].asFloat(), values[1].asFloat(), values[2].asFloat());
             break;
         }
@@ -174,13 +135,13 @@ void Effect::parseAttr(const Json::Value data, EffectAttribute &attr, EffectEven
         }
         case ATTR_VECTOR3:
         {
-            vector<Json::Value> values = readVector(data, attr.mName);
+            vector<Json::Value> values = effects::readVector(data, attr.mName);
             currentValue = Vec3f(values[0].asFloat(), values[1].asFloat(), values[2].asFloat());
             break;
         }
         case ATTR_VECTOR2:
         {
-            vector<Json::Value> values = readVector(data, attr.mName);
+            vector<Json::Value> values = effects::readVector(data, attr.mName);
             currentValue = Vec2f(values[0].asFloat(), values[1].asFloat());
             break;
         }
@@ -198,11 +159,11 @@ void Effect::parseAttr(const Json::Value data, EffectAttribute &attr, EffectEven
         {
             floatCurvePoints currentCurve;
         
-            vector<Json::Value> pointValues = readVector(data, attr.mName);
+            vector<Json::Value> pointValues = effects::readVector(data, attr.mName);
         
             for (vector<Json::Value>::const_iterator it = pointValues.begin(); it != pointValues.end(); ++it)
             {
-                vector<Json::Value> pValues = readVector((*it), "point");
+                vector<Json::Value> pValues = effects::readVector((*it), "point");
                 Vec3f currentPoint = Vec3f(pValues[0].asFloat(), pValues[1].asFloat(), pValues[2].asFloat());
                 currentCurve.push_back(currentPoint);
             
@@ -255,9 +216,9 @@ float Effect::getEffectElapsedSeconds()
     return getElapsedSeconds () - mStartedTime;
 }
 
-void Effect::setup()
+void Effect::setup(Json::Value data)
 {
-    initializeData();
+    initializeData(data);
     
 	for( list<EffectEventRef>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
     {

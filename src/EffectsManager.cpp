@@ -41,9 +41,22 @@ void EffectsManager::setup()
 
 EffectRef EffectsManager::createEffect(string effectName, bool start)
 {
-    EffectRef newEffect = Effect::createFromPath(effectName + FX_EXTENSION);
+    Json::Value data;
+    
+    //TODO store all loaded json resources.  Later should store effect resources only, not the json
+    if (mEffectsData.find(effectName) != mEffectsData.end())
+    {
+        data = mEffectsData.at(effectName);
+    }
+    else
+    {
+        data = effects::getJsonData(effectName + FX_EXTENSION);
+        mEffectsData[effectName] = data;
+    }
+    
+    EffectRef newEffect = Effect::create();
     newEffect->setCamera(mCamera);
-    newEffect->setup();
+    newEffect->setup(data);
     
     mEffects.push_back(newEffect);
     
@@ -93,3 +106,4 @@ void EffectsManager::draw()
         }
     }
 }
+

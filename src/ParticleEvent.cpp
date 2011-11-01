@@ -79,7 +79,7 @@ void ParticleEvent::processAttributes()
     mBlendTiles = mAttributes.at("BlendTiles").getBool();
     
     mShader = mAttributes.at("Shader").getShader();
-    vtx_handle = mShader.getAttribLocation("a_position");
+    pos_handle = mShader.getAttribLocation("a_position");
     txc_handle = mShader.getAttribLocation("a_texcoord");
     col_handle = mShader.getAttribLocation("a_color");
     tile_handle = mShader.getAttribLocation("a_tileIndex");
@@ -187,6 +187,10 @@ void ParticleEvent::setup()
         mNumTiles = (float)mDiffuseTexture.getWidth()/(float)mDiffuseTexture.getHeight();
         mTileWidth = (float)mDiffuseTexture.getHeight()/(float)mDiffuseTexture.getWidth();
     }
+    
+    //TODO VBO
+    //glGenBuffers(1, &vtx_buffer); 
+    //glBindBuffer(GL_ARRAY_BUFFER, vtx_buffer);
 }
 
 void ParticleEvent::updateVelocity(Particle &currentParticle, float dt)
@@ -371,6 +375,9 @@ void ParticleEvent::update()
 	}    
     
     mPreviousElapsed = elapsed;
+    
+    //TODO VBO
+    //glBufferData(GL_ARRAY_BUFFER, mTotalVertices * sizeof(mVerts[0]), &mVerts[0], GL_DYNAMIC_DRAW);
 }
 
 
@@ -422,6 +429,7 @@ void ParticleEvent::draw()
 
     mShader.bind();
     mDiffuseTexture.bind(0);
+    //glBindBuffer(GL_ARRAY_BUFFER, vtx_buffer);
     
     // not needed since there is only one texture at the moment
     // mShader.uniform("u_diffuseTex", 1);
@@ -431,22 +439,29 @@ void ParticleEvent::draw()
     mShader.uniform("u_tintColor", mTintColorAlpha);
     mShader.uniform("u_mvp_matrix", mCamera->getProjectionMatrix() * mCamera->getModelViewMatrix());
     
-    glEnableVertexAttribArray(vtx_handle);
+    GLsizei stride = sizeof(VertexData);
+    //const GLvoid* colOffset = (GLvoid*) sizeof(vec3);
+    //const GLvoid* texOffset = (GLvoid*) sizeof(vec3);
+    //const GLvoid* tileOffset = (GLvoid*) sizeof(vec3);
+    
+    glVertexAttribPointer(pos_handle, 3, GL_FLOAT, GL_FALSE, stride, &mVerts[0].vertex);    
+    glVertexAttribPointer(col_handle, 4, GL_FLOAT, GL_FALSE, stride, &mVerts[0].color);
+    glVertexAttribPointer(txc_handle, 2, GL_FLOAT, GL_FALSE, stride, &mVerts[0].texture);
+    glVertexAttribPointer(tile_handle, 1, GL_FLOAT, GL_FALSE, stride, &mVerts[0].tileIndex);
+
+    glEnableVertexAttribArray(pos_handle);
     glEnableVertexAttribArray(txc_handle);
     glEnableVertexAttribArray(col_handle);
     glEnableVertexAttribArray(tile_handle);
     
-    glVertexAttribPointer(vtx_handle, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), &mVerts[0].vertex);    
-    glVertexAttribPointer(txc_handle, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), &mVerts[0].texture);
-    glVertexAttribPointer(col_handle, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), &mVerts[0].color);
-    glVertexAttribPointer(tile_handle, 1, GL_FLOAT, GL_FALSE, sizeof(VertexData), &mVerts[0].tileIndex);
-
     glDrawArrays(GL_TRIANGLES, 0, mTotalVertices);
     
     glDisableVertexAttribArray(tile_handle);
     glDisableVertexAttribArray(col_handle);
     glDisableVertexAttribArray(txc_handle);
-    glDisableVertexAttribArray(vtx_handle);
+    glDisableVertexAttribArray(pos_handle);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
  	mDiffuseTexture.unbind();
     mShader.unbind();

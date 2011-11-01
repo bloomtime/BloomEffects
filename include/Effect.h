@@ -15,15 +15,13 @@
 #include <vector>
 #include <list>
 
-#include "json/json.h"
+#include "EffectJson.h"
 #include "cinder/ImageIo.h"
 #include "cinder/gl/Texture.h"
-#include "cinder/app/App.h"
 #include <boost/unordered_map.hpp>
 #include <boost/assign/list_of.hpp>
 
 using namespace ci;
-using namespace ci::app;
 using namespace std;
 
 class Effect;
@@ -48,13 +46,12 @@ class Effect {
 public:
 
     static EffectRef create();
-    static EffectRef createFromPath(string path);
     
     ~Effect();
     
     friend class EffectEvent;
     
-    void setup();
+    void setup(Json::Value data);
     void update();
     void draw();
     
@@ -65,7 +62,7 @@ public:
     void stop(bool hardStop=false);  
     float getEffectElapsedSeconds();
     
-    void initializeData();
+    void initializeData(Json::Value data);
     void setCamera(ci::CameraPersp *camera);
     void setTransform( const ci::Matrix44f &transform );
     ci::Matrix44f getTransform() const { return mTransform; /* copy OK */ }
@@ -75,8 +72,6 @@ public:
 
 protected:
 
-    vector<Json::Value> readVector(Json::Value object, string key);
-    Json::Value getData(string effectPath);
     void parseAttr(const Json::Value data, EffectAttribute &attr, EffectEventRef currentEvent);
     
     ci::Matrix44f mTransform;
@@ -87,10 +82,7 @@ protected:
     
     bool mIsStarted;
     bool mIsStopped;
-    
-    //TODO TEMP TESTING-parsing should be moved elsewhere
-    Json::Value mData;
-    
+
     std::list<EffectEventRef> mEvents;
     
 private:  
@@ -104,7 +96,4 @@ private:
     {
         mTransform.setToIdentity();
     }
-    
-    //TODO need to move the parsing elsewhere
-    Effect(string effectPath);
 };

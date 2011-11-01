@@ -10,16 +10,22 @@
 #include "cinder/Camera.h"
 //#include "json/json.h"
 
+#include "json/json.h"
+#include "EffectJson.h"
 #include "Effect.h"
 #include <list>
 
 using namespace std;
 using namespace ci;
-using namespace ci::app;
+
+//DEBUG
+//using namespace ci::app;
 
 class EffectsManager;
 
 typedef std::shared_ptr<EffectsManager> EffectsManagerRef;
+typedef boost::unordered_map<string, Json::Value> EffectJsonMap;
+
 
 class EffectsManager
 {
@@ -47,6 +53,8 @@ protected:
 
     std::list<EffectRef> mEffects;
     
+    //fake cache of json resources
+    EffectJsonMap mEffectsData;
     
 private:
 
