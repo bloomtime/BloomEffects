@@ -56,9 +56,10 @@ protected:
 
     std::list<EffectRef> mEffects;
     
-    //fake cache of json resources
+    //cache of json resources
     EffectJsonMap mEffectsData;
     
+    //cache of event attributes
     EventAttrMap mEventAttrs;
     
 private:

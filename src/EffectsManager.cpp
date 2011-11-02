@@ -26,6 +26,9 @@ EffectsManager::~EffectsManager()
     }
     
     mCamera = NULL;
+    
+    mEffectsData.clear();
+    mEventAttrs.clear();
 }
 
 void EffectsManager::setup()
