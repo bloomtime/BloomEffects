@@ -25,7 +25,7 @@ class EffectsManager;
 
 typedef std::shared_ptr<EffectsManager> EffectsManagerRef;
 typedef boost::unordered_map<string, Json::Value> EffectJsonMap;
-
+typedef boost::unordered_map<string, EffectAttrMap> EventAttrMap;
 
 class EffectsManager
 {
@@ -43,6 +43,9 @@ public:
     EffectRef createEffect(string effectName, bool start=true);
     void destroyEffect(EffectRef effect, bool hardStop = false);
     
+    EffectEventList initializeData(Json::Value data);
+    void parseAttr(const Json::Value data, EffectAttribute &attr, EffectEventRef currentEvent);
+    
     CameraPersp* mCamera;
     
     //TODO not needed yet
@@ -55,6 +58,8 @@ protected:
     
     //fake cache of json resources
     EffectJsonMap mEffectsData;
+    
+    EventAttrMap mEventAttrs;
     
 private:
 

@@ -32,14 +32,20 @@ typedef std::shared_ptr<Effect> EffectRef;
 // for avoiding circular refs:
 typedef std::weak_ptr<Effect> EffectWeakRef;
 
+typedef list<EffectEventRef> EffectEventList;
+
 //TODO there might be a better way to register these types
-enum ChildEvent {
+enum ChildEventType {
     PARTICLE_EVENT
 };
 
 // add new child events here
-const boost::unordered_map<string, ChildEvent> CHILD_EVENTS = boost::assign::map_list_of
+const boost::unordered_map<string, ChildEventType> CHILD_EVENT_TYPES = boost::assign::map_list_of
     ("ParticleEvent", PARTICLE_EVENT);
+    
+class ChildEvent {
+
+};
 
 class Effect {
 
@@ -51,7 +57,7 @@ public:
     
     friend class EffectEvent;
     
-    void setup(Json::Value data);
+    void setup(EffectEventList events);
     void update();
     void draw();
     
