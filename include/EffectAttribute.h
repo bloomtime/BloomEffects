@@ -57,6 +57,10 @@ public:
     AttributeType mType;
     boost::any mValue;
     
+    // quick and dirty cache
+    static boost::unordered_map<string, gl::Texture> sTextureCache;
+    static boost::unordered_map<string, gl::GlslProg> sShaderCache;
+    
     gl::Texture getTexture() 
     { 
         gl::Texture::Format mipFmt;
@@ -65,16 +69,28 @@ public:
         mipFmt.setMagFilter( GL_LINEAR ); // TODO: experiment with GL_NEAREST where appropriate
         
         string val = boost::any_cast<string>(mValue);
-
-        return gl::Texture( loadImage( loadResource( val ) ), mipFmt );
+        
+        if (sTextureCache.find(val) != sTextureCache.end()) {
+            return sTextureCache[val];
+        }
+        
+        gl::Texture texture = gl::Texture( loadImage( loadResource( val ) ), mipFmt );
+        sTextureCache[val] = texture;
+        return texture;
     }
     gl::GlslProg getShader()
     {
         string prefix = boost::any_cast<string>(mValue);
         string vert = prefix + "_vert.glsl";
         string frag = prefix + "_frag.glsl";
+
+        if (sShaderCache.find(prefix) != sShaderCache.end()) {
+            return sShaderCache[prefix];
+        }
         
-        return gl::GlslProg( loadResource( vert ), loadResource( frag ) );
+        gl::GlslProg prog = gl::GlslProg( loadResource( vert ), loadResource( frag ) );
+        sShaderCache[prefix] = prog;
+        return prog;
     }
     float getFloat()
     {
