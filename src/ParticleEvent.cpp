@@ -294,7 +294,7 @@ void ParticleEvent::update()
 	
     if (mTotalVertices != mPrevTotalVertices) {
         if (mVerts != NULL) {
-            delete[] mVerts; 
+            //delete mVerts; 
             mVerts = NULL;
         }
         if (mTotalVertices > 0) {
