@@ -80,6 +80,7 @@ public:
         registerAttribute("DragForce",        ATTR_VECTOR3); 
         registerAttribute("RotationSpeed",    ATTR_VECTOR2);  
         registerAttribute("InheritTransform", ATTR_BOOL); 
+        registerAttribute("CameraAttached",   ATTR_BOOL);
     }
     
     void setup();
@@ -149,6 +150,8 @@ protected:
     AttributeCurvePoints mDiffuseBlueCurve;
     
     AttributeCurvePoints mTileUVCurve;
+    
+    bool mCameraAttached;
     
     gl::Texture mDiffuseTexture;
     BlendMode mBlendMode;

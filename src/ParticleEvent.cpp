@@ -35,6 +35,7 @@ ParticleEvent::ParticleEvent():
     mNumTiles(1.0f),
     mTileWidth(1.0f),
     mVerts(NULL),
+    mCameraAttached(false),
     mTintColorAlpha(Vec4f(1.0f, 1.0f, 1.0f, 1.0f))
 { 
     mEmissionVolume = EmissionVolume();
@@ -90,6 +91,7 @@ void ParticleEvent::processAttributes()
     mDragForce = mAttributes.at("DragForce").getVector3();
     mRotationSpeed = mAttributes.at("RotationSpeed").getVector2();
     mInheritTransform = mAttributes.at("InheritTransform").getBool();
+    mCameraAttached = mAttributes.at("CameraAttached").getBool();
 }
 
 Vec3f ParticleEvent::getEmitDirection()
@@ -166,6 +168,15 @@ void ParticleEvent::addNewParticle()
 void ParticleEvent::setup()
 {
     processAttributes();
+
+    if (mCameraAttached)
+    {
+        Matrix44f mtx = mCamera->getOrientation().toMatrix44();
+        Vec3f trans = mCamera->getEyePoint();
+        mtx.setTranslate(trans);
+            
+        setParentTransform(mtx);
+    }
     
     mVerts = NULL;
     mPrevTotalVertices = -1;
@@ -210,6 +221,17 @@ void ParticleEvent::updateVelocity(Particle &currentParticle, float dt)
 
 void ParticleEvent::update()
 {
+    //Vec3f eyePoint = mCamera->getEyePoint();
+    
+    if (mCameraAttached)
+    {
+        Matrix44f mtx = mCamera->getOrientation().toMatrix44();
+        Vec3f trans = mCamera->getEyePoint();
+        mtx.setTranslate(trans);
+            
+        setParentTransform(mtx);
+    }
+    
     updateSource();
     
     float elapsed = getElapsedSeconds();
