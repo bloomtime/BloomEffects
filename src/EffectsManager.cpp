@@ -10,7 +10,6 @@ EffectsManagerRef EffectsManager::create()
 
 EffectsManager::EffectsManager()
 {
-    mCamera = NULL;
 }
 
 EffectsManager::~EffectsManager()
@@ -24,8 +23,6 @@ EffectsManager::~EffectsManager()
         //(*it) = NULL;
         it = mEffects.erase(it);
     }
-    
-    mCamera = NULL;
     
     mEffectsData.clear();
     mEventAttrs.clear();
@@ -43,7 +40,7 @@ void EffectsManager::setup()
 }
 
 
-EffectRef EffectsManager::createEffect(string effectName, bool start)
+EffectRef EffectsManager::createEffect(string effectName, bool start, Matrix44f transform)
 {
     Json::Value data;
     
@@ -60,6 +57,7 @@ EffectRef EffectsManager::createEffect(string effectName, bool start)
     
     EffectRef newEffect = Effect::create();
     newEffect->setCamera(mCamera);
+    newEffect->setTransform(transform);
     newEffect->setup(initializeData(data));
     
     mEffects.push_back(newEffect);

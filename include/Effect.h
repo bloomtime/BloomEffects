@@ -69,7 +69,7 @@ public:
     float getEffectElapsedSeconds();
     
     void initializeData(Json::Value data);
-    void setCamera(ci::CameraPersp *camera);
+    void setCamera(CameraRef camera);
     void setTransform( const ci::Matrix44f &transform );
     ci::Matrix44f getTransform() const { return mTransform; /* copy OK */ }
     
@@ -84,7 +84,7 @@ protected:
     bool mIsVisible;
     float mStartedTime;
     
-    ci::CameraPersp* mCamera;
+    CameraRef mCamera;
     
     bool mIsStarted;
     bool mIsStopped;
@@ -97,8 +97,7 @@ private:
         mIsVisible(true),
         mIsStarted(false),
         mIsStopped(false),
-        mStartedTime(-1.0f),
-        mCamera(NULL)
+        mStartedTime(-1.0f)
     {
         mTransform.setToIdentity();
     }

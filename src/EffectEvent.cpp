@@ -11,9 +11,7 @@
 
 EffectEvent::~EffectEvent()
 {    
-    mAttributes.clear();
-    mCamera = NULL;
-}
+    mAttributes.clear();}
 
 void EffectEvent::start()
 {

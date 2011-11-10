@@ -37,6 +37,7 @@ typedef boost::unordered_map<string, EffectAttribute> EffectAttrMap;
 class EffectEvent;
 
 typedef std::shared_ptr<EffectEvent> EffectEventRef;
+typedef std::shared_ptr<CameraPersp> CameraRef;
 
 class EffectEvent {
 
@@ -53,7 +54,7 @@ public:
     virtual void update() {}
     virtual void draw() {}
     
-    void setCamera(ci::CameraPersp *camera)
+    void setCamera(CameraRef camera)
     {
         mCamera = camera;
     }
@@ -124,7 +125,6 @@ protected:
         mSourcePosition(Vec3f( 0.0f, 0.0f, 0.0f )),
         mSourceOrientation(Quatf::identity()),
         mParentTransformChanged(false),
-        mCamera(NULL),
         mSourceScale(1.0f)
     {
         mParentTransform.setToIdentity();
@@ -132,7 +132,7 @@ protected:
     
     virtual void processAttributes() {};
     
-    ci::CameraPersp* mCamera;
+    CameraRef mCamera;
     
     //parent transform
     ci::Matrix44f mParentTransform;

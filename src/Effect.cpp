@@ -30,8 +30,6 @@ void Effect::setTransform( const ci::Matrix44f &transform )
 
 Effect::~Effect()
 {
-    mCamera = NULL;
-    
 	for( list<EffectEventRef>::iterator it = mEvents.begin(); it != mEvents.end(); ++it )
     {
         it = mEvents.erase( it );
@@ -139,7 +137,7 @@ void Effect::setSourceScale(float scale)
     }
 }
 
-void Effect::setCamera(ci::CameraPersp *camera)
+void Effect::setCamera(CameraRef camera)
 {
     mCamera = camera;
 }

@@ -26,6 +26,7 @@ class EffectsManager;
 typedef std::shared_ptr<EffectsManager> EffectsManagerRef;
 typedef boost::unordered_map<string, Json::Value> EffectJsonMap;
 typedef boost::unordered_map<string, EffectAttrMap> EventAttrMap;
+typedef std::shared_ptr<CameraPersp> CameraRef;
 
 class EffectsManager
 {
@@ -39,14 +40,14 @@ public:
 	void update();
 	void draw();
     
-    void setCamera(ci::CameraPersp *camera) { mCamera = camera; }
-    EffectRef createEffect(string effectName, bool start=true);
+    void setCamera(CameraRef camera) { mCamera = camera; }
+    EffectRef createEffect(string effectName, bool start=true, Matrix44f transform=cinder::Matrix44<float>::identity());
     void destroyEffect(EffectRef effect, bool hardStop = false);
     
     EffectEventList initializeData(Json::Value data);
     void parseAttr(const Json::Value data, EffectAttribute &attr, EffectEventRef currentEvent);
     
-    CameraPersp* mCamera;
+    CameraRef mCamera;
     
     //TODO not needed yet
     //GLuint m_framebuffer;
