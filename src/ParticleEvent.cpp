@@ -418,12 +418,12 @@ void ParticleEvent::update()
         }
         else if (screenLength <= minFade)
         {
-            float fadeAmt = (screenLength - mScreenSizeLOD.x) / (minFade - mScreenSizeLOD.x);
+            float fadeAmt = math<float>::clamp(screenLength - mScreenSizeLOD.x, 0.0, 1.0f) / fadeRange;
             alpha *= fadeAmt;
         }
         else if (screenLength >= maxFade)
         {
-            float fadeAmt = (screenLength - maxFade) / (mScreenSizeLOD.y - maxFade);
+            float fadeAmt = (screenLength - maxFade) / fadeRange;
             alpha *= fadeAmt;
         }
         
