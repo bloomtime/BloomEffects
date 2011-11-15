@@ -72,10 +72,11 @@ public:
     void registerAttribute(string attrName, AttributeType attrType);
         
     EffectAttrMap getAttributes() { return mAttributes; }
+    EffectAttribute getAttribute(string attrName);
     
     void setAttributes(EffectAttrMap attributes) {  mAttributes = attributes; }
-    
     void setAttribute(string name, boost::any value) { mAttributes[name].mValue = value; }
+    
     void setEnabled(bool enabled) { mEnabled = enabled; }
     void setStartTime(float startTime) { mStartTime = startTime; }
     float getStartTime() { return mStartTime; }

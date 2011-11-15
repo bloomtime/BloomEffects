@@ -45,6 +45,16 @@ void EffectEvent::registerAttribute(string attrName, AttributeType attrType)
     mAttributes[attrName] = newAttr;
 }
 
+EffectAttribute EffectEvent::getAttribute(string attrName)
+{
+    if (mAttributes.find(attrName) != mAttributes.end())
+    {
+      return mAttributes.at(attrName);
+    }
+    
+    return EffectAttribute();
+}
+
 void EffectEvent::updateSource()
 {
     if (mParentTransformChanged)
