@@ -97,6 +97,7 @@ public:
     
     void setTintAlpha ( float alpha ) { mTintColorAlpha.w = alpha; }
     Vec2f getNormalizedScreenPos(Vec3f worldPos);
+    
 protected:
 
     struct Particle {
@@ -182,6 +183,9 @@ protected:
     
 	int mTotalVertices;
     int mPrevTotalVertices;
+    
+    float mWindowWidth;
+    float mWindowHeight;
     
     std::list<Particle> mParticles;
 	VertexData *mVerts;

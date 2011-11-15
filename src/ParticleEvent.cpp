@@ -46,7 +46,9 @@ ParticleEvent::ParticleEvent():
     mTileUVLerp(Vec3f(0.0f, 0.0f, 0.0f)),
     mDiffuseRedLerp(Vec3f(0.0f, 0.0f, 0.0f)),
     mDiffuseGreenLerp(Vec3f(0.0f, 0.0f, 0.0f)),
-    mDiffuseBlueLerp(Vec3f(0.0f, 0.0f, 0.0f))
+    mDiffuseBlueLerp(Vec3f(0.0f, 0.0f, 0.0f)),
+    mWindowWidth(1.0f),
+    mWindowHeight(1.0f)
 { 
     mEmissionVolume = EmissionVolume();
     mFileExtension = PATH_EXTENSION;
@@ -190,6 +192,10 @@ void ParticleEvent::addNewParticle()
 
 void ParticleEvent::setup()
 {
+    //TODO may have to listen for size changes later
+    mWindowWidth = ci::app::getWindowWidth();
+    mWindowHeight = ci::app::getWindowHeight();
+    
     processAttributes();
 
     if (mCameraAttached)
@@ -244,8 +250,8 @@ void ParticleEvent::updateVelocity(Particle &currentParticle, float dt)
 
 Vec2f ParticleEvent::getNormalizedScreenPos(Vec3f worldPos)
 {
-    Vec2f screenPos =  mCamera->worldToScreen(worldPos, ci::app::getWindowWidth(), ci::app::getWindowHeight());
-    return Vec2f(screenPos.x / ci::app::getWindowWidth(), screenPos.y / ci::app::getWindowHeight());
+    Vec2f screenPos =  mCamera->worldToScreen(worldPos, mWindowWidth, mWindowHeight);
+    return Vec2f(screenPos.x / mWindowWidth, screenPos.y / mWindowHeight);
 }
 
 void ParticleEvent::update()
