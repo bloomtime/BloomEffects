@@ -23,13 +23,12 @@ using namespace ci::app;
 using namespace std;
 
 typedef vector<Vec3f> floatCurvePoints;
-typedef vector<Vec2f> vec2Points;
 typedef BSpline2f floatCurve;
 
 struct AttributeCurvePoints
 { 
-    vec2Points valuePoints;
-    vec2Points variancePoints;
+    vector<Vec2f> valuePoints;
+    vector<Vec2f> variancePoints;
 };
 
 const float TANGENT_LENGTH = .2f; //.5f for catmull-rom 
@@ -127,8 +126,8 @@ public:
         floatCurvePoints curvePoints = boost::any_cast<floatCurvePoints>(mValue);
         
         // insert begin point for values and variance (baked curve constructed later)
-        vec2Points valuePoints;
-        vec2Points variancePoints;
+        vector<Vec2f> valuePoints;
+        vector<Vec2f> variancePoints;
         
         valuePoints.push_back(Vec2f(curvePoints[0][0], curvePoints[0][1]));
         variancePoints.push_back(Vec2f(curvePoints[0][0], curvePoints[0][2]));

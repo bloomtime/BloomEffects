@@ -63,11 +63,11 @@ public:
         
         registerAttribute("Alpha",            ATTR_CURVE);
         registerAttribute("ParticleScale",    ATTR_CURVE);
-        registerAttribute("TileUV",           ATTR_CURVE);
+        registerAttribute("TileUV",           ATTR_VECTOR3);
         
         registerAttribute("Shader"        ,   ATTR_SHADER);
         registerAttribute("DiffuseTexture",   ATTR_TEXTURE);
-        registerAttribute("DiffuseColorR",    ATTR_CURVE);
+        registerAttribute("DiffuseColorR",    ATTR_VECTOR3);
         registerAttribute("DiffuseColorG",    ATTR_CURVE);
         registerAttribute("DiffuseColorB",    ATTR_CURVE);
         registerAttribute("BlendMode",        ATTR_STRING);
@@ -81,6 +81,7 @@ public:
         registerAttribute("RotationSpeed",    ATTR_VECTOR2);  
         registerAttribute("InheritTransform", ATTR_BOOL); 
         registerAttribute("CameraAttached",   ATTR_BOOL);
+        registerAttribute("ScreenSizeLOD",    ATTR_VECTOR2); 
     }
     
     void setup();
@@ -95,7 +96,7 @@ public:
     }
     
     void setTintAlpha ( float alpha ) { mTintColorAlpha.w = alpha; }
-    
+    Vec2f getNormalizedScreenPos(Vec3f worldPos);
 protected:
 
     struct Particle {
@@ -107,10 +108,10 @@ protected:
         
         floatCurve alphaCurve;
         floatCurve scaleCurve;
-        floatCurve tileUVCurve;
+        
+        Vec2f tileUVLerp;
+        Vec2f diffuseRedLerp;
 
-        // maybe these shouldn't be curves (for performance), but keeping for now
-        floatCurve colorRCurve;
         floatCurve colorGCurve;
         floatCurve colorBCurve;
                 
@@ -145,11 +146,11 @@ protected:
     AttributeCurvePoints mAlphaCurve;
     AttributeCurvePoints mParticleScaleCurve;
     
-    AttributeCurvePoints mDiffuseRedCurve;
     AttributeCurvePoints mDiffuseGreenCurve;
     AttributeCurvePoints mDiffuseBlueCurve;
     
-    AttributeCurvePoints mTileUVCurve;
+    Vec3f mTileUVLerp;
+    Vec3f mDiffuseRedLerp;
     
     bool mCameraAttached;
     
@@ -168,6 +169,7 @@ protected:
     Vec3f mDragForce;
     
     Vec4f mTintColorAlpha;
+    Vec2f mScreenSizeLOD;
     
     EmissionVolume mEmissionVolume;
     

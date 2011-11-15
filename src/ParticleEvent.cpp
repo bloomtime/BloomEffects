@@ -24,7 +24,7 @@ ParticleEvent::ParticleEvent():
     mTotalVertices(0),
     mPrevTotalVertices(0),
     mBlendMode(BLEND_OPAQUE),
-    mParticleLifetime(Vec2f(0.0f, 0.0f)),
+    mParticleLifetime(Vec2f(1.0f, 0.0f)),
     mInitialSpeed(Vec2f(0.0f, 0.0f)),
     mInitialRotation(Vec2f(0.0f, 0.0f)),
     mPreviousElapsed(0.0f),
@@ -32,11 +32,19 @@ ParticleEvent::ParticleEvent():
     mGlobalForce(Vec3f(0.0f, 0.0f, 0.0f)),
     mTiledTexture(true),
     mBlendTiles(false),
+    mEmitMode(EMIT_BURST),
+    mEmitAngle(Vec2f(0.0f, 0.0f)),
     mNumTiles(1.0f),
     mTileWidth(1.0f),
     mVerts(NULL),
+    mRotationAngle(0.0f),
+    mRotationSpeed(Vec2f(0.0f, 0.0f)),
     mCameraAttached(false),
-    mTintColorAlpha(Vec4f(1.0f, 1.0f, 1.0f, 1.0f))
+    mDragForce(Vec3f(0.0f, 0.0f, 0.0f)),
+    mScreenSizeLOD(Vec2f(0.0f, 2.0f)),
+    mTintColorAlpha(Vec4f(1.0f, 1.0f, 1.0f, 1.0f)),
+    mTileUVLerp(Vec3f(0.0f, 0.0f, 0.0f)),
+    mDiffuseRedLerp(Vec3f(0.0f, 0.0f, 0.0f))
 { 
     mEmissionVolume = EmissionVolume();
     mFileExtension = PATH_EXTENSION;
@@ -46,11 +54,11 @@ ParticleEvent::ParticleEvent():
 ParticleEvent::~ParticleEvent()
 {
     if (mVerts != NULL)	{
-        delete[] mVerts;
+        delete mVerts;
         mVerts = NULL;
     }
     
-    //mParticles.clear();
+    mParticles.clear();
 }
 
 void ParticleEvent::processAttributes()
@@ -68,16 +76,16 @@ void ParticleEvent::processAttributes()
     mAlphaCurve = mAttributes.at("Alpha").getCurvePoints();
     mParticleScaleCurve = mAttributes.at("ParticleScale").getCurvePoints();
     
-    mDiffuseTexture = mAttributes.at("DiffuseTexture").getTexture();
-    mDiffuseTexture.setWrap(GL_REPEAT, GL_REPEAT);
-    
-    mDiffuseRedCurve = mAttributes.at("DiffuseColorR").getCurvePoints();
+    mDiffuseRedLerp = mAttributes.at("DiffuseColorR").getVector3();
     mDiffuseGreenCurve = mAttributes.at("DiffuseColorG").getCurvePoints();
     mDiffuseBlueCurve = mAttributes.at("DiffuseColorB").getCurvePoints();
-    mTileUVCurve = mAttributes.at("TileUV").getCurvePoints();
+    mTileUVLerp = mAttributes.at("TileUV").getVector3();
     mBlendMode = BLEND_MODES.at(mAttributes.at("BlendMode").getString());
     mTiledTexture = mAttributes.at("TiledTexture").getBool();
     mBlendTiles = mAttributes.at("BlendTiles").getBool();
+    
+    mDiffuseTexture = mAttributes.at("DiffuseTexture").getTexture();
+    mDiffuseTexture.setWrap(GL_REPEAT, GL_REPEAT);
     
     mShader = mAttributes.at("Shader").getShader();
     pos_handle = mShader.getAttribLocation("a_position");
@@ -92,6 +100,7 @@ void ParticleEvent::processAttributes()
     mRotationSpeed = mAttributes.at("RotationSpeed").getVector2();
     mInheritTransform = mAttributes.at("InheritTransform").getBool();
     mCameraAttached = mAttributes.at("CameraAttached").getBool();
+    mScreenSizeLOD = mAttributes.at("ScreenSizeLOD").getVector2();
 }
 
 Vec3f ParticleEvent::getEmitDirection()
@@ -110,10 +119,10 @@ Vec3f ParticleEvent::getEmitDirection()
 
 floatCurve ParticleEvent::getNewCurve(AttributeCurvePoints &curvePoints)
 {
-    vector<ci::Vec2f> curveInput;
+    vector<Vec2f> curveInput;
  
-    vec2Points valuePoints = curvePoints.valuePoints;
-    vec2Points variancePoints = curvePoints.variancePoints;
+    vector<Vec2f> valuePoints = curvePoints.valuePoints;
+    vector<Vec2f> variancePoints = curvePoints.variancePoints;
        
     Vec2f previousPoint = Vec2f(valuePoints[0][0], valuePoints[0][1] + Rand::randFloat(-variancePoints[0][1], variancePoints[0][1]));
     Vec2f currentPoint = Vec2f(valuePoints[1][0], valuePoints[1][1] + Rand::randFloat(-variancePoints[1][1], variancePoints[1][1]));
@@ -157,12 +166,18 @@ void ParticleEvent::addNewParticle()
     // store curve values that have variance baked in
     newParticle.alphaCurve = getNewCurve(mAlphaCurve);
     newParticle.scaleCurve = getNewCurve(mParticleScaleCurve);
-    newParticle.colorRCurve = getNewCurve(mDiffuseRedCurve); 
+    
+    // store lerp values with variance baked in
+    float tileUVVariance = Rand::randFloat(-mTileUVLerp.z, mTileUVLerp.z);
+    newParticle.tileUVLerp = Vec2f(mTileUVLerp.x + tileUVVariance, mTileUVLerp.y + tileUVVariance);
+    
+    float redVariance = Rand::randFloat(-mDiffuseRedLerp.z, mDiffuseRedLerp.z);
+    newParticle.diffuseRedLerp = Vec2f(mDiffuseRedLerp.x + redVariance, mDiffuseRedLerp.y + redVariance);
+                                
     newParticle.colorGCurve = getNewCurve(mDiffuseGreenCurve);
     newParticle.colorBCurve = getNewCurve(mDiffuseBlueCurve);
-    newParticle.tileUVCurve = getNewCurve(mTileUVCurve);
 
-    mParticles.push_back(newParticle);;
+    mParticles.push_back(newParticle);
 }
 
 void ParticleEvent::setup()
@@ -217,6 +232,12 @@ void ParticleEvent::updateVelocity(Particle &currentParticle, float dt)
     }
     
     currentParticle.velocity += currentVel * drag + mGlobalForce * dt;
+}
+
+Vec2f ParticleEvent::getNormalizedScreenPos(Vec3f worldPos)
+{
+    Vec2f screenPos =  mCamera->worldToScreen(worldPos, ci::app::getWindowWidth(), ci::app::getWindowHeight());
+    return Vec2f(screenPos.x / ci::app::getWindowWidth(), screenPos.y / ci::app::getWindowHeight());
 }
 
 void ParticleEvent::update()
@@ -343,10 +364,12 @@ void ParticleEvent::update()
         // curve lookups
         float alpha = (*it).alphaCurve.getPosition(time)[1];
         float scale = (*it).scaleCurve.getPosition(time)[1] * mSourceScale;
-        float colorR = (*it).colorRCurve.getPosition(time)[1];
-        float colorG = (*it).colorGCurve.getPosition(time)[1];
-        float colorB = (*it).colorBCurve.getPosition(time)[1];
-        float tileIndex = (*it).tileUVCurve.getPosition(time)[1] * mNumTiles;
+
+        // instead of curves, these just lerp
+        float tileIndex = lerp((*it).tileUVLerp.x, (*it).tileUVLerp.y, time) * mNumTiles;
+        float colorR = 1.0f; //lerp((*it).diffuseRedLerp.x, (*it).diffuseRedLerp.y, time);
+        float colorG = 1.0f; //lerp((*it).diffuseGreenLerp.x, (*it).diffuseGreenLerp.y, time);
+        float colorB = 1.0f; //lerp((*it).diffuseBlueLerp.x, (*it).diffuseBlueLerp.y, time);
         
 		Vec4f col = Vec4f(colorR, colorG, colorB, alpha);
         
@@ -358,6 +381,45 @@ void ParticleEvent::update()
         Vec3f p3 = pos - right - up;
         Vec3f p4 = pos + right - up;
         
+        //TODO here camera culling and LOD'ing (screen space size)
+        // here, need own camera calculation stuffs
+        Vec2f screenPosA = getNormalizedScreenPos(p1);
+        Vec2f screenPosB = getNormalizedScreenPos(p4);
+        
+        float screenLength = (screenPosB - screenPosA).length();
+        
+        // hardcoded fading threshold for now--user probably doesn't care that much.
+        float fadeRange = .05f;
+        float minFade = mScreenSizeLOD.x + fadeRange;
+        float maxFade = mScreenSizeLOD.y - fadeRange;
+        
+        // test only two corners for now to see if that is enough
+        if ((screenPosA.x < 0.0f || screenPosA.x > 1.0f) && 
+            (screenPosA.x < 0.0f || screenPosA.x > 1.0f) &&
+            (screenPosB.x < 0.0f || screenPosB.x > 1.0f) && 
+            (screenPosB.x < 0.0f || screenPosB.x > 1.0f))
+        {
+            alpha = 0.0f;
+        }
+        else if (screenLength <= minFade)
+        {
+            float fadeAmt = (screenLength - mScreenSizeLOD.x) / (minFade - mScreenSizeLOD.x);
+            alpha *= fadeAmt;
+        }
+        else if (screenLength >= maxFade)
+        {
+            float fadeAmt = (screenLength - maxFade) / (mScreenSizeLOD.y - maxFade);
+            alpha *= fadeAmt;
+        }
+        
+        // don't draw if alpha 0
+        if (alpha == 0)
+        {
+            mTotalVertices-= 6;
+            //realloc(mVerts, mTotalVertices * sizeof(VertexData));
+            continue;
+        }
+
         mVerts[vIndex].vertex  = p1;
         mVerts[vIndex].texture = Vec2f(0.0f,0.0f);
         mVerts[vIndex].color   = col;
