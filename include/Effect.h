@@ -66,7 +66,7 @@ public:
     
     void start();
     void stop(bool hardStop=false);  
-    float getEffectElapsedSeconds();
+    double getEffectElapsedSeconds();
     
     void initializeData(Json::Value data);
     void setCamera(CameraRef camera);
@@ -79,6 +79,9 @@ public:
 protected:
 
     void parseAttr(const Json::Value data, EffectAttribute &attr, EffectEventRef currentEvent);
+    
+    double mActualSeconds;
+    double mPreviousElapsed;
     
     ci::Matrix44f mTransform;
     bool mIsVisible;

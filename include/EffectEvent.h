@@ -39,6 +39,8 @@ class EffectEvent;
 typedef std::shared_ptr<EffectEvent> EffectEventRef;
 typedef std::shared_ptr<CameraPersp> CameraRef;
 
+const float ELAPSED_MAX = .5f;
+
 class EffectEvent {
 
 public:
@@ -109,7 +111,7 @@ public:
     
     void start();
     void stop(bool hardStop=false);
-    float getEventElapsedSeconds();
+    double getEventElapsedSeconds();
     
     EffectAttrMap mAttributes;
     
@@ -126,7 +128,9 @@ protected:
         mSourcePosition(Vec3f( 0.0f, 0.0f, 0.0f )),
         mSourceOrientation(Quatf::identity()),
         mParentTransformChanged(false),
-        mSourceScale(1.0f)
+        mSourceScale(1.0f),
+        mPreviousElapsed(0.0f),
+        mActualSeconds(0.0f)
     {
         mParentTransform.setToIdentity();
     }
@@ -135,13 +139,16 @@ protected:
     
     CameraRef mCamera;
     
+    double mActualSeconds;
+    double mPreviousElapsed;
+    
     //parent transform
     ci::Matrix44f mParentTransform;
     float mLifetime;
     float mStartTime;
     bool mHardStop;
     bool mInheritTransform;
-        
+    
     EventState mEventState;
             
     bool mEnabled;

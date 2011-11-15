@@ -193,8 +193,7 @@ void ParticleEvent::addNewParticle()
 void ParticleEvent::setup()
 {
     //TODO may have to listen for size changes later
-    mWindowWidth = ci::app::getWindowWidth();
-    mWindowHeight = ci::app::getWindowHeight();
+    setWindowDimensions(ci::app::getWindowWidth(), ci::app::getWindowHeight());
     
     processAttributes();
 
@@ -269,18 +268,19 @@ void ParticleEvent::update()
     
     updateSource();
     
-    float elapsed = getElapsedSeconds();
-    float dt = elapsed - mPreviousElapsed;    
+    float totalElapsed = getEventElapsedSeconds();
+    float dt = totalElapsed - mPreviousElapsed;    
+    
+    mPreviousElapsed = totalElapsed;
     
     // run through the state gauntlet
     if (isStarted())
     {
-        mPreviousElapsed = elapsed;
         mEventState = EVENT_RUNNING;
     }
     
     // -1.0f lifetime is infinite lifetime
-    if (isRunning() && getEventElapsedSeconds() >= mLifetime && mLifetime != -1.0f)
+    if (isRunning() && totalElapsed >= mLifetime && mLifetime != -1.0f)
     {
         stop(mHardStop);
     }
@@ -297,8 +297,7 @@ void ParticleEvent::update()
     
     if (isRunning() && mEmitMode == EMIT_CONTINUOUS)
     {
-        float currentElapsed = elapsed - mPreviousElapsed;
-        float actualRate = mCurrentRate + mRate * currentElapsed;
+        float actualRate = mCurrentRate + mRate * dt;
         float rateRounded = floor(actualRate);
         
         // carry over any remainder "rate" to the next frame
@@ -318,12 +317,12 @@ void ParticleEvent::update()
     {
 		if ((*it).startTime == -1.0f)
         {
-            (*it).startTime = elapsed;
+            (*it).startTime = totalElapsed;
             (*it).lifetime = 0.0f;
         }
         else
         {
-            (*it).lifetime = elapsed - (*it).startTime;
+            (*it).lifetime = totalElapsed - (*it).startTime;
         }
         
         if ((*it).lifetime > (*it).maxLifetime)
@@ -472,10 +471,8 @@ void ParticleEvent::update()
         mVerts[vIndex].tileIndex = tileIndex;
         vIndex++;        
         
-	}    
-    
-    mPreviousElapsed = elapsed;
-    
+	}   
+     
     //TODO VBO
     //glBufferData(GL_ARRAY_BUFFER, mTotalVertices * sizeof(mVerts[0]), &mVerts[0], GL_DYNAMIC_DRAW);
 }

@@ -98,6 +98,12 @@ public:
     void setTintAlpha ( float alpha ) { mTintColorAlpha.w = alpha; }
     Vec2f getNormalizedScreenPos(Vec3f worldPos);
     
+    void setWindowDimensions ( float width, float height ) 
+    {
+        mWindowWidth = width;
+        mWindowHeight = height;
+    }
+    
 protected:
 
     struct Particle {

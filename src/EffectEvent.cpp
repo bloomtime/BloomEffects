@@ -11,12 +11,15 @@
 
 EffectEvent::~EffectEvent()
 {    
-    mAttributes.clear();}
+    mAttributes.clear();
+}
 
 void EffectEvent::start()
 {
     mEventState = EVENT_STARTED;
     mStartTime = getElapsedSeconds();
+    mActualSeconds = 0.0f;
+    mPreviousElapsed = mStartTime;
 }
 
 void EffectEvent::stop(bool hardStop)
@@ -28,12 +31,23 @@ void EffectEvent::stop(bool hardStop)
         mEventState = EVENT_STOPPED;
 }
 
-float EffectEvent::getEventElapsedSeconds()
+double EffectEvent::getEventElapsedSeconds()
 {
     if (mStartTime == -1.0f)
         return 0.0f;
         
-    return getElapsedSeconds () - mStartTime;
+    double elapsed = getElapsedSeconds();
+    double deltaTime = elapsed - mPreviousElapsed;
+    
+    if (deltaTime > ELAPSED_MAX)
+    {
+        deltaTime = ELAPSED_MAX;
+    }
+    
+    mPreviousElapsed = elapsed;
+    mActualSeconds += deltaTime;
+    
+    return mActualSeconds;
 }
 
 void EffectEvent::registerAttribute(string attrName, AttributeType attrType)
