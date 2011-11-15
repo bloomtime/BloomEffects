@@ -68,8 +68,8 @@ public:
         registerAttribute("Shader"        ,   ATTR_SHADER);
         registerAttribute("DiffuseTexture",   ATTR_TEXTURE);
         registerAttribute("DiffuseColorR",    ATTR_VECTOR3);
-        registerAttribute("DiffuseColorG",    ATTR_CURVE);
-        registerAttribute("DiffuseColorB",    ATTR_CURVE);
+        registerAttribute("DiffuseColorG",    ATTR_VECTOR3);
+        registerAttribute("DiffuseColorB",    ATTR_VECTOR3);
         registerAttribute("BlendMode",        ATTR_STRING);
         registerAttribute("TiledTexture",     ATTR_BOOL);
         registerAttribute("BlendTiles",       ATTR_BOOL);
@@ -111,9 +111,8 @@ protected:
         
         Vec2f tileUVLerp;
         Vec2f diffuseRedLerp;
-
-        floatCurve colorGCurve;
-        floatCurve colorBCurve;
+        Vec2f diffuseGreenLerp;
+        Vec2f diffuseBlueLerp;
                 
         Vec3f position;  
         Vec3f velocity;
@@ -146,11 +145,10 @@ protected:
     AttributeCurvePoints mAlphaCurve;
     AttributeCurvePoints mParticleScaleCurve;
     
-    AttributeCurvePoints mDiffuseGreenCurve;
-    AttributeCurvePoints mDiffuseBlueCurve;
-    
     Vec3f mTileUVLerp;
     Vec3f mDiffuseRedLerp;
+    Vec3f mDiffuseGreenLerp;
+    Vec3f mDiffuseBlueLerp;
     
     bool mCameraAttached;
     

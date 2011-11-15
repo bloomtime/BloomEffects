@@ -44,7 +44,9 @@ ParticleEvent::ParticleEvent():
     mScreenSizeLOD(Vec2f(0.0f, 2.0f)),
     mTintColorAlpha(Vec4f(1.0f, 1.0f, 1.0f, 1.0f)),
     mTileUVLerp(Vec3f(0.0f, 0.0f, 0.0f)),
-    mDiffuseRedLerp(Vec3f(0.0f, 0.0f, 0.0f))
+    mDiffuseRedLerp(Vec3f(0.0f, 0.0f, 0.0f)),
+    mDiffuseGreenLerp(Vec3f(0.0f, 0.0f, 0.0f)),
+    mDiffuseBlueLerp(Vec3f(0.0f, 0.0f, 0.0f))
 { 
     mEmissionVolume = EmissionVolume();
     mFileExtension = PATH_EXTENSION;
@@ -54,7 +56,7 @@ ParticleEvent::ParticleEvent():
 ParticleEvent::~ParticleEvent()
 {
     if (mVerts != NULL)	{
-        delete mVerts;
+        delete[] mVerts;
         mVerts = NULL;
     }
     
@@ -77,8 +79,8 @@ void ParticleEvent::processAttributes()
     mParticleScaleCurve = mAttributes.at("ParticleScale").getCurvePoints();
     
     mDiffuseRedLerp = mAttributes.at("DiffuseColorR").getVector3();
-    mDiffuseGreenCurve = mAttributes.at("DiffuseColorG").getCurvePoints();
-    mDiffuseBlueCurve = mAttributes.at("DiffuseColorB").getCurvePoints();
+    mDiffuseGreenLerp = mAttributes.at("DiffuseColorG").getVector3();
+    mDiffuseBlueLerp = mAttributes.at("DiffuseColorB").getVector3();
     mTileUVLerp = mAttributes.at("TileUV").getVector3();
     mBlendMode = BLEND_MODES.at(mAttributes.at("BlendMode").getString());
     mTiledTexture = mAttributes.at("TiledTexture").getBool();
@@ -172,11 +174,17 @@ void ParticleEvent::addNewParticle()
     newParticle.tileUVLerp = Vec2f(mTileUVLerp.x + tileUVVariance, mTileUVLerp.y + tileUVVariance);
     
     float redVariance = Rand::randFloat(-mDiffuseRedLerp.z, mDiffuseRedLerp.z);
-    newParticle.diffuseRedLerp = Vec2f(mDiffuseRedLerp.x + redVariance, mDiffuseRedLerp.y + redVariance);
-                                
-    newParticle.colorGCurve = getNewCurve(mDiffuseGreenCurve);
-    newParticle.colorBCurve = getNewCurve(mDiffuseBlueCurve);
-
+    newParticle.diffuseRedLerp = Vec2f(math<float>::clamp(mDiffuseRedLerp.x + redVariance, 0.0f, 1.0f), 
+                                       math<float>::clamp(mDiffuseRedLerp.y + redVariance, 0.0f, 1.0f));
+     
+    float greenVariance = Rand::randFloat(-mDiffuseGreenLerp.z, mDiffuseGreenLerp.z);
+    newParticle.diffuseGreenLerp = Vec2f(math<float>::clamp(mDiffuseGreenLerp.x + greenVariance, 0.0f, 1.0f), 
+                                         math<float>::clamp(mDiffuseGreenLerp.y + greenVariance, 0.0f, 1.0f));
+                      
+    float blueVariance = Rand::randFloat(-mDiffuseBlueLerp.z, mDiffuseBlueLerp.z);
+    newParticle.diffuseBlueLerp = Vec2f(math<float>::clamp(mDiffuseBlueLerp.x + blueVariance, 0.0f, 1.0f), 
+                                        math<float>::clamp(mDiffuseBlueLerp.y + blueVariance, 0.0f, 1.0f));
+    
     mParticles.push_back(newParticle);
 }
 
@@ -315,6 +323,7 @@ void ParticleEvent::update()
         if ((*it).lifetime > (*it).maxLifetime)
         {
             it = mParticles.erase( it );
+            continue;
         }
         
         // update particle position after applying forces
@@ -337,13 +346,14 @@ void ParticleEvent::update()
 	
     if (mTotalVertices != mPrevTotalVertices) {
         if (mVerts != NULL) {
-            //delete mVerts; 
+            delete[] mVerts; 
             mVerts = NULL;
         }
         if (mTotalVertices > 0) {
             mVerts = new VertexData[mTotalVertices];
-            mPrevTotalVertices = mTotalVertices;
         }
+        
+        mPrevTotalVertices = mTotalVertices;
     }
         
 	int vIndex = 0;
@@ -367,9 +377,9 @@ void ParticleEvent::update()
 
         // instead of curves, these just lerp
         float tileIndex = lerp((*it).tileUVLerp.x, (*it).tileUVLerp.y, time) * mNumTiles;
-        float colorR = 1.0f; //lerp((*it).diffuseRedLerp.x, (*it).diffuseRedLerp.y, time);
-        float colorG = 1.0f; //lerp((*it).diffuseGreenLerp.x, (*it).diffuseGreenLerp.y, time);
-        float colorB = 1.0f; //lerp((*it).diffuseBlueLerp.x, (*it).diffuseBlueLerp.y, time);
+        float colorR = lerp((*it).diffuseRedLerp.x, (*it).diffuseRedLerp.y, time);
+        float colorG = lerp((*it).diffuseGreenLerp.x, (*it).diffuseGreenLerp.y, time);
+        float colorB = lerp((*it).diffuseBlueLerp.x, (*it).diffuseBlueLerp.y, time);
         
 		Vec4f col = Vec4f(colorR, colorG, colorB, alpha);
         
