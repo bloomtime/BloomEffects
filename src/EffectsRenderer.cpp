@@ -8,10 +8,23 @@ EffectsRendererRef EffectsRenderer::create()
 EffectsRenderer::EffectsRenderer()
 {
      mBGColor = Color(1.0f, 1.0f, 1.0f);
+     mPostShaderAlpha = 1.0f; 
+     
+     mPostShaderName = "defaultPost";
 }
 
 EffectsRenderer::~EffectsRenderer()
 {
+}
+
+void EffectsRenderer::setPostShader(string shaderName)
+{
+    mPostShaderName = shaderName;
+}
+
+void EffectsRenderer::setPostShaderAlpha(float alpha)
+{
+    mPostShaderAlpha = alpha;
 }
 
 void EffectsRenderer::setup()
@@ -19,7 +32,7 @@ void EffectsRenderer::setup()
     prog = gl::GlslProg(app::App::loadResource("default_texture_vert.glsl"), app::App::loadResource("default_texture_frag.glsl"));
     vtx_handle = prog.getAttribLocation("a_position");
     txc_handle = prog.getAttribLocation("a_texcoord");
-    prog_post = gl::GlslProg(app::App::loadResource("postTest_vert.glsl"), app::App::loadResource("postTest_frag.glsl"));
+    prog_post = gl::GlslProg(app::App::loadResource(mPostShaderName + "_vert.glsl"), app::App::loadResource(mPostShaderName + "_frag.glsl"));
     vtx_handle_post = prog_post.getAttribLocation("a_position");
     txc_handle_post = prog_post.getAttribLocation("a_texcoord");
     
@@ -107,6 +120,7 @@ void EffectsRenderer::draw()
 {  
     prog_post.bind();
     prog_post.uniform("u_mvp_matrix",  mPostCamera.getProjectionMatrix() * mPostCamera.getModelViewMatrix());
+    prog_post.uniform("u_postAlpha", mPostShaderAlpha);
     
     // Draw the Read Buffer
     {

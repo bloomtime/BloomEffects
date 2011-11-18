@@ -36,16 +36,20 @@ public:
 	void draw();
     
     void setBackgroundColor(Color bgColor) { mBGColor = bgColor; }
-    void setCamera(CameraRef camera) { mCamera = camera; }
-    
-    CameraRef mCamera;    
-    CameraOrtho mPostCamera;
+    void setPostShader(string shaderName);
+    void setPostShaderAlpha(float alpha);
         
+protected:
+
+    CameraOrtho mPostCamera;
+
     gl::Fbo ca_read_fbo, ca_write_fbo;
     Vec2i fbo_size;
 
     Color mBGColor;
-
+    string mPostShaderName;
+    float mPostShaderAlpha;
+    
     gl::GlslProg prog, prog_post;
     
     GLuint vtx_handle, txc_handle;

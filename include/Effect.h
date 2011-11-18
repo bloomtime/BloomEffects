@@ -7,6 +7,7 @@
 #pragma once
 #include "EffectEvent.h"
 #include "ParticleEvent.h"
+#include "PostEvent.h"
 
 #include "cinder/Camera.h"
 #include "cinder/Matrix.h"

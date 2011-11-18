@@ -50,6 +50,7 @@ ParticleEvent::ParticleEvent():
     mWindowWidth(1.0f),
     mWindowHeight(1.0f)
 { 
+    mLifetime = 1.0f;
     mEmissionVolume = EmissionVolume();
     mFileExtension = PATH_EXTENSION;
     registerAttributes(); 

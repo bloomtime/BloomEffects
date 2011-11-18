@@ -68,6 +68,7 @@ public:
     GLuint vtx_handle_post, txc_handle_post;
     
 protected:
+
     EffectsRendererRef mRenderer;
     
     std::list<EffectRef> mEffects;
