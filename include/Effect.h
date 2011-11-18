@@ -37,16 +37,14 @@ typedef list<EffectEventRef> EffectEventList;
 
 //TODO there might be a better way to register these types
 enum ChildEventType {
-    PARTICLE_EVENT
+    PARTICLE_EVENT,
+    POST_EVENT
 };
 
 // add new child events here
-const boost::unordered_map<string, ChildEventType> CHILD_EVENT_TYPES = boost::assign::map_list_of
-    ("ParticleEvent", PARTICLE_EVENT);
-    
-class ChildEvent {
-
-};
+const boost::unordered_map<string, ChildEventType> CHILD_EVENT_TYPES = boost::assign::map_list_of<string, ChildEventType>
+    ("ParticleEvent", PARTICLE_EVENT)
+    ("PostEvent",     POST_EVENT);
 
 class Effect {
 

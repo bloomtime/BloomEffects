@@ -96,6 +96,12 @@ EffectEventList EffectsManager::initializeData(Json::Value data)
                     // need to concatenate extension here
                     break;
                 }
+                case POST_EVENT:
+                {
+                    currentEvent = PostEvent::create();
+                    // need to concatenate extension here
+                    break;
+                }
                 default:
                 {
                     //nothing!
