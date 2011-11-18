@@ -8,11 +8,14 @@
 #include "cinder/ImageIo.h"
 #include "cinder/gl/Texture.h"
 #include "cinder/Camera.h"
+#include "cinder/gl/GlslProg.h"
+#include "cinder/gl/Fbo.h"
 //#include "json/json.h"
 
 #include "json/json.h"
 #include "EffectJson.h"
 #include "Effect.h"
+#include "EffectsRenderer.h"
 #include <list>
 
 using namespace std;
@@ -40,6 +43,8 @@ public:
 	void update();
 	void draw();
     
+    void setBackgroundColor(Color bgColor) { mBGColor = bgColor; }
+    
     void setCamera(CameraRef camera) { mCamera = camera; }
     EffectRef createEffect(string effectName, bool start=true, Matrix44f transform=cinder::Matrix44<float>::identity());
     void destroyEffect(EffectRef effect, bool hardStop = false);
@@ -49,12 +54,22 @@ public:
     
     CameraRef mCamera;
     
-    //TODO not needed yet
-    //GLuint m_framebuffer;
-    //GLuint m_renderbuffer;
+    CameraOrtho postCamera;
+        
+    gl::Fbo ca_read_fbo, ca_write_fbo;
+    Vec2i fbo_size;
+
+    Color mBGColor;
+
+    gl::GlslProg prog, prog_post;
+    
+    GLuint mSceneTex;
+    GLuint vtx_handle, txc_handle;
+    GLuint vtx_handle_post, txc_handle_post;
     
 protected:
-
+    EffectsRendererRef mRenderer;
+    
     std::list<EffectRef> mEffects;
     
     //cache of json resources
@@ -66,18 +81,4 @@ protected:
 private:
 
     EffectsManager();
-};
-
-//TODO STUB
-class EffectsRenderer 
-{
-public:
-    EffectsRenderer() {}
-    ~EffectsRenderer() {}    
-
-protected:
-
-    GLuint m_framebuffer;
-    GLuint m_renderbuffer;
-
 };

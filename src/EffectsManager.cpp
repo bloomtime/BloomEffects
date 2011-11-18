@@ -2,7 +2,6 @@
 #include <boost/foreach.hpp>
 
 const string FX_EXTENSION = ".effect.json";
-
 EffectsManagerRef EffectsManager::create()
 {
     return EffectsManagerRef( new EffectsManager() );
@@ -10,14 +9,11 @@ EffectsManagerRef EffectsManager::create()
 
 EffectsManager::EffectsManager()
 {
+     mBGColor = Color(1.0f, 1.0f, 1.0f);
 }
 
 EffectsManager::~EffectsManager()
 {
-    //TODO not needed yet
-    //glDeleteRenderbuffers(1, &m_renderbuffer);
-    //glDeleteFramebuffers(1, &m_framebuffer);
-    
 	for( list<EffectRef>::iterator it = mEffects.begin(); it != mEffects.end(); ++it )
     {
         //(*it) = NULL;
@@ -30,13 +26,8 @@ EffectsManager::~EffectsManager()
 
 void EffectsManager::setup()
 {
-    //TODO not needed yet
-    //glGenRenderbuffers(1, &m_renderbuffer);
-    //glBindRenderbuffer(GL_RENDERBUFFER, m_renderbuffer);
-    //glGenFramebuffers(1, &m_framebuffer); 
-    //glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer); 
-    //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_renderbuffer);
-    //glViewport(0, 0, getWindowWidth(), getWindowHeight());
+    mRenderer = EffectsRenderer::create();
+    mRenderer->setup();
 }
 
 
@@ -259,6 +250,8 @@ void EffectsManager::destroyEffect(EffectRef effect, bool hardStop)
 
 void EffectsManager::update()
 {
+    mRenderer->update(mEffects);
+    
 	for( list<EffectRef>::iterator it = mEffects.begin(); it != mEffects.end(); ++it )
     {
         if (!(*it)->isStopped())
@@ -270,19 +263,10 @@ void EffectsManager::update()
             it = mEffects.erase(it);
         }
     }
-    
-	//gl::enableDepthRead();
-	//gl::enableDepthWrite();
 }
 
 void EffectsManager::draw()
 {  
-	for( list<EffectRef>::const_iterator it = mEffects.begin(); it != mEffects.end(); ++it )
-    {
-        if (!(*it)->isStopped())
-        {
-            (*it)->draw();
-        }
-    }
+    mRenderer->draw();
 }
 

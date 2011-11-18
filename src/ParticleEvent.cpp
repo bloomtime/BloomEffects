@@ -396,8 +396,7 @@ void ParticleEvent::update()
         Vec3f p3 = pos - right - up;
         Vec3f p4 = pos + right - up;
         
-        //TODO here camera culling and LOD'ing (screen space size)
-        // here, need own camera calculation stuffs
+        //camera culling and LOD'ing (screen space size)
         Vec2f screenPosA = getNormalizedScreenPos(p1);
         Vec2f screenPosB = getNormalizedScreenPos(p4);
         
