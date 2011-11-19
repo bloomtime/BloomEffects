@@ -12,10 +12,11 @@
 #include "cinder/gl/Fbo.h"
 //#include "json/json.h"
 
+#include "EffectsRenderer.h"
 #include "json/json.h"
 #include "EffectJson.h"
+#include "EffectsState.h"
 #include "Effect.h"
-#include "EffectsRenderer.h"
 #include <list>
 
 using namespace std;
@@ -43,7 +44,7 @@ public:
 	void update();
 	void draw();
     
-    void setBackgroundColor(Color bgColor) { mBGColor = bgColor; }
+    void setBackgroundColor(Color bgColor);
     
     void setCamera(CameraRef camera) { mCamera = camera; }
     EffectRef createEffect(string effectName, bool start=true, Matrix44f transform=cinder::Matrix44<float>::identity());
@@ -52,23 +53,9 @@ public:
     EffectEventList initializeData(Json::Value data);
     void parseAttr(const Json::Value data, EffectAttribute &attr, EffectEventRef currentEvent);
     
-    CameraRef mCamera;
-    
-    CameraOrtho postCamera;
-        
-    gl::Fbo ca_read_fbo, ca_write_fbo;
-    Vec2i fbo_size;
-
-    Color mBGColor;
-
-    gl::GlslProg prog, prog_post;
-    
-    GLuint mSceneTex;
-    GLuint vtx_handle, txc_handle;
-    GLuint vtx_handle_post, txc_handle_post;
-    
 protected:
-
+    CameraRef mCamera;
+    EffectsStateRef mState;
     EffectsRendererRef mRenderer;
     
     std::list<EffectRef> mEffects;

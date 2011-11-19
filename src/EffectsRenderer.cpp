@@ -1,3 +1,9 @@
+//
+//  EffectsRenderer.cpp
+//
+//  Copyright 2011 Bloom Studio, Inc. All rights reserved.
+//
+
 #include "EffectsRenderer.h"
 
 EffectsRendererRef EffectsRenderer::create()
@@ -8,9 +14,8 @@ EffectsRendererRef EffectsRenderer::create()
 EffectsRenderer::EffectsRenderer()
 {
      mBGColor = Color(1.0f, 1.0f, 1.0f);
-     mPostShaderAlpha = 1.0f; 
      
-     mPostShaderName = "defaultPost";
+     mPostShaderName = DEFAULT_POST_SHADER;
 }
 
 EffectsRenderer::~EffectsRenderer()
@@ -19,23 +24,24 @@ EffectsRenderer::~EffectsRenderer()
 
 void EffectsRenderer::setPostShader(string shaderName)
 {
+    //TODO need to cache here, possibly using EffectAttribute
+    mCurrentPostShader = gl::GlslProg(app::App::loadResource(shaderName + "_vert.glsl"), app::App::loadResource(shaderName + "_frag.glsl"));
+    vtx_handle_post = mCurrentPostShader.getAttribLocation("a_position");
+    txc_handle_post = mCurrentPostShader.getAttribLocation("a_texcoord");
     mPostShaderName = shaderName;
 }
 
-void EffectsRenderer::setPostShaderAlpha(float alpha)
+void EffectsRenderer::setup(EffectsStateRef fxState)
 {
-    mPostShaderAlpha = alpha;
-}
-
-void EffectsRenderer::setup()
-{
-    prog = gl::GlslProg(app::App::loadResource("default_texture_vert.glsl"), app::App::loadResource("default_texture_frag.glsl"));
-    vtx_handle = prog.getAttribLocation("a_position");
-    txc_handle = prog.getAttribLocation("a_texcoord");
-    prog_post = gl::GlslProg(app::App::loadResource(mPostShaderName + "_vert.glsl"), app::App::loadResource(mPostShaderName + "_frag.glsl"));
-    vtx_handle_post = prog_post.getAttribLocation("a_position");
-    txc_handle_post = prog_post.getAttribLocation("a_texcoord");
+    mState = fxState;
     
+    mBasicShader = gl::GlslProg(app::App::loadResource("default_texture_vert.glsl"), app::App::loadResource("default_texture_frag.glsl"));
+    vtx_handle = mBasicShader.getAttribLocation("a_position");
+    txc_handle = mBasicShader.getAttribLocation("a_texcoord");
+    
+    setPostShader(mState->getPostShader());
+    mDefaultPostShader = mCurrentPostShader;
+        
     fbo_size = getWindowSize();
     gl::Fbo::Format fbo_format;
     fbo_format.enableDepthBuffer(false);
@@ -54,6 +60,12 @@ void EffectsRenderer::setup()
 
 void EffectsRenderer::update(list<EffectRef> effects)
 {
+    string stateShader = mState->getPostShader();
+    if (stateShader != mPostShaderName)
+    {
+      setPostShader(stateShader);
+    }
+    
     // CA Calculation Pass: Draw to Write Buffer
     {
         gl::SaveFramebufferBinding fbo_save;
@@ -61,10 +73,10 @@ void EffectsRenderer::update(list<EffectRef> effects)
         // Bind Write Buffer
     	ca_write_fbo.bindFramebuffer();
         
-        prog.bind();
-        prog.uniform("u_tex", 0);
-        prog.uniform("u_params_tex", 1);
-        prog.uniform("u_mvp_matrix", mPostCamera.getProjectionMatrix() * mPostCamera.getModelViewMatrix());
+        mBasicShader.bind();
+        mBasicShader.uniform("u_tex", 0);
+        mBasicShader.uniform("u_params_tex", 1);
+        mBasicShader.uniform("u_mvp_matrix", mPostCamera.getProjectionMatrix() * mPostCamera.getModelViewMatrix());
     
         // Draw the Read Buffer
         {
@@ -106,7 +118,7 @@ void EffectsRenderer::update(list<EffectRef> effects)
             }
         }
 
-        prog.unbind();
+        mBasicShader.unbind();
         
     }
     
@@ -118,9 +130,9 @@ void EffectsRenderer::update(list<EffectRef> effects)
 
 void EffectsRenderer::draw()
 {  
-    prog_post.bind();
-    prog_post.uniform("u_mvp_matrix",  mPostCamera.getProjectionMatrix() * mPostCamera.getModelViewMatrix());
-    prog_post.uniform("u_postAlpha", mPostShaderAlpha);
+    mCurrentPostShader.bind();
+    mCurrentPostShader.uniform("u_mvp_matrix",  mPostCamera.getProjectionMatrix() * mPostCamera.getModelViewMatrix());
+    mCurrentPostShader.uniform("u_postAlpha", mState->getPostShaderAlpha());
     
     // Draw the Read Buffer
     {
@@ -151,6 +163,6 @@ void EffectsRenderer::draw()
 
         glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
     }
-    prog_post.unbind();
+    mCurrentPostShader.unbind();
 }
 

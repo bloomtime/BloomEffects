@@ -6,6 +6,7 @@
 
 #pragma once
 #include "EffectAttribute.h"
+#include "EffectsState.h"
 
 #include "cinder/Cinder.h"
 #include "cinder/Camera.h"
@@ -18,6 +19,8 @@
 #include "cinder/gl/Texture.h"
 #include "cinder/app/App.h"
 #include <boost/unordered_map.hpp>
+
+//#include "EffectsRenderer.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -36,6 +39,7 @@ typedef boost::unordered_map<string, EffectAttribute> EffectAttrMap;
 
 class EffectEvent;
 
+//typedef std::shared_ptr<EffectsRenderer> EffectRendererRef;
 typedef std::shared_ptr<EffectEvent> EffectEventRef;
 typedef std::shared_ptr<CameraPersp> CameraRef;
 
@@ -56,11 +60,9 @@ public:
     virtual void update() {}
     virtual void draw() {}
     
-    void setCamera(CameraRef camera)
-    {
-        mCamera = camera;
-    }
-
+    void setCamera(CameraRef camera) { mCamera = camera; }
+    void setState(EffectsStateRef state) { mState = state; }
+    
     void setParentTransform( const ci::Matrix44f &transform ) 
     { 
         mParentTransform = transform; /* copy OK */ 
@@ -138,6 +140,7 @@ protected:
     virtual void processAttributes() {};
     
     CameraRef mCamera;
+    EffectsStateRef mState;
     
     double mActualSeconds;
     double mPreviousElapsed;

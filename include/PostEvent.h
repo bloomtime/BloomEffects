@@ -46,7 +46,10 @@ protected:
     floatCurve getNewCurve(AttributeCurvePoints &curvePoints);
 
     Vec2f mFadeTime;
-    string mShader;
+    string mShaderName;
+    string mPreviousShader;
+    
+    float mFadeStartTime; // for infinite duration soft stop
             
 private: 
 

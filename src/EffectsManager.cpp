@@ -9,7 +9,6 @@ EffectsManagerRef EffectsManager::create()
 
 EffectsManager::EffectsManager()
 {
-     mBGColor = Color(1.0f, 1.0f, 1.0f);
 }
 
 EffectsManager::~EffectsManager()
@@ -26,10 +25,18 @@ EffectsManager::~EffectsManager()
 
 void EffectsManager::setup()
 {
+    mState = EffectsState::create();
     mRenderer = EffectsRenderer::create();
-    mRenderer->setup();
+    mRenderer->setup(mState);
 }
 
+void EffectsManager::setBackgroundColor(Color bgColor)
+{
+    if (mRenderer)
+    {
+        mRenderer->setBackgroundColor(bgColor);
+    }
+}
 
 EffectRef EffectsManager::createEffect(string effectName, bool start, Matrix44f transform)
 {
@@ -115,7 +122,7 @@ EffectEventList EffectsManager::initializeData(Json::Value data)
             {
                 // Parse global parameters
                 currentEvent->setEnabled(enabled);
-                
+                currentEvent->setState(mState);
                 currentEvent->setStartTime(currentBlock["StartTime"].asFloat());
             
                 vector<Json::Value> posValues = effects::readVector(currentBlock, "Position");
@@ -256,8 +263,6 @@ void EffectsManager::destroyEffect(EffectRef effect, bool hardStop)
 
 void EffectsManager::update()
 {
-    mRenderer->update(mEffects);
-    
 	for( list<EffectRef>::iterator it = mEffects.begin(); it != mEffects.end(); ++it )
     {
         if (!(*it)->isStopped())
@@ -269,6 +274,8 @@ void EffectsManager::update()
             it = mEffects.erase(it);
         }
     }
+    
+    mRenderer->update(mEffects);
 }
 
 void EffectsManager::draw()

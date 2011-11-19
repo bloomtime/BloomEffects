@@ -5,7 +5,7 @@
 //
 
 #include "PostEvent.h"
-#include "EffectsRenderer.h"
+
 // may want texture input later
 //#include "cinder/gl/Texture.h"
 //#include "cinder/gl/gl.h"
@@ -21,7 +21,8 @@ PostEventRef PostEvent::create()
 
 PostEvent::PostEvent():
     mFadeTime(Vec2f(0.0f, 0.0f)),
-    mShader("defaultPost")
+    mShaderName("defaultPost"),
+    mFadeStartTime(-1.0f)
 { 
     mLifetime = 1.0f;
     mFileExtension = PATH_EXTENSION;
@@ -37,18 +38,78 @@ void PostEvent::processAttributes()
     // if can associate these member vars with the attr name that would be sweet
     mLifetime = mAttributes.at("Lifetime").getFloat();
     mFadeTime = mAttributes.at("FadeTime").getVector2();
-    mShader = mAttributes.at("Shader").getString();
+    mShaderName = mAttributes.at("Shader").getString();
 }
 void PostEvent::setup()
 { 
     processAttributes();
-    
-    //TODO here need to set shader on effectsrenderer
 }
 
 void PostEvent::update()
 {
-    //TODO here, need to set fade attribute on effectsrenderer and then revert to previous post shader after it dies
+    float totalElapsed = getEventElapsedSeconds();
+    //float dt = totalElapsed - mPreviousElapsed;  
+    
+    // run through the state gauntlet
+    if (isInitialized())
+    {
+        return;
+    }    
+    else if (isStopped())
+    {
+        mState->setDefaultPostShader();
+        mState->setPostShaderAlpha(1.0f);
+        return;
+    }
+    else if (isStarted())
+    {
+        mEventState = EVENT_RUNNING;
+
+        //TODO here need to set shader on effectsrenderer
+        if (mState)
+            mState->setPostShader(mShaderName);
+    }
+    // -1.0f lifetime is infinite lifetime
+    else if (isRunning() && totalElapsed >= mLifetime && mLifetime != -1.0f)
+    {
+        stop(mHardStop);
+    }
+    //on soft stop, need to fade out if lifetime is infinite
+    else if (isStopping() && mHardStop)
+    {
+        mEventState = EVENT_STOPPED;
+    }
+    
+    float tailFadeRange = mLifetime - mFadeTime.y;
+    
+    // set the post alpha parameter, which is optionally used by the shader
+    if (totalElapsed < mFadeTime.x)
+    {
+        float fadeAmt = totalElapsed / mFadeTime.x;
+        mState->setPostShaderAlpha(fadeAmt);
+    }
+    else if (mLifetime != -1.0f && totalElapsed > tailFadeRange)
+    {
+        float fadeAmt = 1.0f - math<float>::clamp((totalElapsed - tailFadeRange)/mFadeTime.y, 0.0f, 1.0f);
+        mState->setPostShaderAlpha(fadeAmt);
+    }
+    else if (mLifetime == -1.0f && isStopping() && mFadeTime.y > 0.0f)
+    {
+        if (mFadeStartTime == -1.0f)
+        {
+            mFadeStartTime = totalElapsed;
+        }
+        else
+        {
+            float fadeAmt = 1.0f - math<float>::clamp((totalElapsed - mFadeStartTime)/mFadeTime.y, 0.0f, 1.0f);
+            mState->setPostShaderAlpha(fadeAmt);
+            
+            if (fadeAmt == 0.0f)
+                mEventState = EVENT_STOPPED;
+        }
+    }
+    
+    //mPreviousElapsed = totalElapsed;
 }
 
 void PostEvent::draw()
