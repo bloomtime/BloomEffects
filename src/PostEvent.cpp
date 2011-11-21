@@ -51,16 +51,10 @@ void PostEvent::update()
     //float dt = totalElapsed - mPreviousElapsed;  
     
     // run through the state gauntlet
-    if (isInitialized())
+    if (isInitialized() || isStopped())
     {
         return;
     }    
-    else if (isStopped())
-    {
-        mState->setDefaultPostShader();
-        mState->setPostShaderAlpha(1.0f);
-        return;
-    }
     else if (isStarted())
     {
         mEventState = EVENT_RUNNING;
@@ -72,12 +66,11 @@ void PostEvent::update()
     // -1.0f lifetime is infinite lifetime
     else if (isRunning() && totalElapsed >= mLifetime && mLifetime != -1.0f)
     {
-        stop(mHardStop);
-    }
-    //on soft stop, need to fade out if lifetime is infinite
-    else if (isStopping() && mHardStop)
-    {
-        mEventState = EVENT_STOPPED;
+        stop(true);
+        
+        mState->setDefaultPostShader();
+        mState->setPostShaderAlpha(1.0f);
+        return;
     }
     
     float tailFadeRange = mLifetime - mFadeTime.y;
@@ -88,12 +81,12 @@ void PostEvent::update()
         float fadeAmt = totalElapsed / mFadeTime.x;
         mState->setPostShaderAlpha(fadeAmt);
     }
-    else if (mLifetime != -1.0f && totalElapsed > tailFadeRange)
+    else if (isRunning() && mLifetime != -1.0f && totalElapsed > tailFadeRange)
     {
         float fadeAmt = 1.0f - math<float>::clamp((totalElapsed - tailFadeRange)/mFadeTime.y, 0.0f, 1.0f);
         mState->setPostShaderAlpha(fadeAmt);
     }
-    else if (mLifetime == -1.0f && isStopping() && mFadeTime.y > 0.0f)
+    else if (isStopping() && mFadeTime.y > 0.0f)
     {
         if (mFadeStartTime == -1.0f)
         {
