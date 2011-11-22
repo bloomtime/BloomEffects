@@ -73,6 +73,7 @@ void ParticleEvent::processAttributes()
     mLifetime = mAttributes.at("Lifetime").getFloat();
     mParticleLifetime = mAttributes.at("ParticleLifetime").getVector2();
     mEmitMode = EMIT_MODES.at(mAttributes.at("EmitMode").getString());
+    mFaceMode = FACE_MODES.at(mAttributes.at("FacingMode").getString());
     
     mEmissionVolume.setScale(mAttributes.at("EmitScale").getVector3());
     mEmissionVolume.setVolumeType(EMIT_VOLUMES.at(mAttributes.at("EmitVolumeType").getString()));
@@ -311,7 +312,27 @@ void ParticleEvent::update()
     }
     
     Vec3f bbRight, bbUp, bbAt;
-    mCamera->getBillboardVectors( &bbRight, &bbUp );  
+    
+    if (mFaceMode == FACE_AXIS_X)
+    {
+        bbUp = Vec3f(0.0f, 1.0f, 0.0f);
+        bbRight = Vec3f(0.0f, 0.0f, 1.0f);
+    }
+    else if (mFaceMode == FACE_AXIS_Y)
+    {
+        bbUp = Vec3f(-1.0f, 0.0f, 0.0f);
+        bbRight = Vec3f(0.0f, 0.0f, -1.0f);
+    }
+    else if (mFaceMode == FACE_AXIS_Z)
+    {
+        bbUp = Vec3f(0.0f, 1.0f, 0.0f);
+        bbRight = Vec3f(1.0f, 0.0f, 0.0f);
+    }
+    else // FACE_BILLBOARD
+    {
+        mCamera->getBillboardVectors( &bbRight, &bbUp ); 
+    }
+    
     bbAt = cross(bbUp, bbRight);
     
 	for( list<Particle>::iterator it = mParticles.begin(); it != mParticles.end(); ++it )

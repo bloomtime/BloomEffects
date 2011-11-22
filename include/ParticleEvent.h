@@ -16,6 +16,20 @@
 using namespace ci;
 using namespace std;
 
+enum FaceMode {
+    FACE_BILLBOARD,
+    FACE_AXIS_X,
+    FACE_AXIS_Y,
+    FACE_AXIS_Z,
+};
+
+// add new Face Modes here
+const boost::unordered_map<string, FaceMode> FACE_MODES = boost::assign::map_list_of
+    ("Billboard", FACE_BILLBOARD)
+    ("AxisX", FACE_AXIS_X)
+    ("AxisY", FACE_AXIS_Y)
+    ("AxisZ", FACE_AXIS_Z);
+    
 enum EmitMode {
     EMIT_BURST,
     EMIT_CONTINUOUS
@@ -79,7 +93,8 @@ public:
         registerAttribute("GlobalForce",      ATTR_VECTOR3);
         registerAttribute("DragForce",        ATTR_VECTOR3); 
         registerAttribute("RotationSpeed",    ATTR_VECTOR2);  
-        registerAttribute("InheritTransform", ATTR_BOOL); 
+        registerAttribute("InheritTransform", ATTR_BOOL);
+        registerAttribute("FacingMode",       ATTR_STRING);
         registerAttribute("CameraAttached",   ATTR_BOOL);
         registerAttribute("ScreenSizeLOD",    ATTR_VECTOR2); 
     }
@@ -147,6 +162,7 @@ protected:
     float mRate;
     Vec2f mParticleLifetime;  // value, variance
     EmitMode mEmitMode;
+    FaceMode mFaceMode;
     Vec2f mEmitAngle;
         
     AttributeCurvePoints mAlphaCurve;
