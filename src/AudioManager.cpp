@@ -1,0 +1,135 @@
+//
+//  AudioManager.cpp
+//
+//  Copyright 2011 Bloom Studio, Inc. All rights reserved.
+//
+
+#include "cinder/app/App.h"
+#include "AudioManager.h"
+#include <boost/filesystem.hpp>
+
+AudioManager::AudioManager()
+{
+    mSystem = NULL;
+    
+    memset(mChannels, 0, sizeof(mChannels));
+}
+
+AudioManager::~AudioManager()
+{
+    mSystem->release();
+
+    for (int i=0; i < 6; i++)
+    {
+        mChannels[i] = 0;
+    }
+}
+
+
+void AudioManager::ERRCHECK(FMOD_RESULT result)
+{
+    if (result != FMOD_OK)
+    {
+        fprintf(stderr, "FMOD error! (%d) %s\n", result, FMOD_ErrorString(result));
+        exit(-1);
+    }
+}
+
+FMOD::Sound* AudioManager::createSound(string filepath)
+{
+    FMOD::Sound *newSound;
+    FMOD_RESULT result = FMOD_OK;
+    
+    string fullPath = ci::app::App::getResourcePath(filepath).string();
+    result = mSystem->createSound(fullPath.c_str(), FMOD_SOFTWARE, NULL, &newSound);
+    ERRCHECK(result);
+    
+    return newSound;
+}
+
+void AudioManager::playSound(FMOD::Sound* sound) 
+{
+    FMOD_RESULT result = FMOD_OK;
+    
+    for (int i=0; i < MAX_CHANNELS; i++)
+    {   
+        bool isPlaying = false;
+        
+        if (mChannels[i] != NULL)
+        {
+            result = mChannels[i]->isPlaying(&isPlaying);
+            ERRCHECK(result);
+        }
+        
+        if (!isPlaying)
+        {
+            result = mSystem->playSound(FMOD_CHANNEL_FREE, sound, false, &mChannels[i]);
+            ERRCHECK(result);
+            return;
+        }
+    }
+    
+    // for now, if all channels are full, then don't play the sound
+}
+
+bool AudioManager::isPlaying(FMOD::Sound* sound)
+{
+    FMOD_RESULT result = FMOD_OK;
+    FMOD::Sound *currentSound;
+        
+    for (int i=0; i < MAX_CHANNELS; i++)
+    {
+        if (mChannels[i] != NULL)
+        {
+            result = mChannels[i]->getCurrentSound(&currentSound);
+            ERRCHECK(result);
+    
+            if (currentSound == sound)
+                return true;
+        }
+    }
+
+    return false;
+}
+
+void AudioManager::setup()
+{
+    FMOD_RESULT   result        = FMOD_OK;
+    //char          buffer[200]   = {0};
+    unsigned int  version       = 0;
+
+    /*
+        Create a mSystem object and initialize
+    */    
+    result = FMOD::System_Create(&mSystem); 
+    ERRCHECK(result);
+    
+    result = mSystem->getVersion(&version);
+    ERRCHECK(result);
+    
+    if (version < FMOD_VERSION)
+    {
+        fprintf(stderr, "You are using an old version of FMOD %08x.  This program requires %08x\n", version, FMOD_VERSION);
+        exit(-1);
+    }
+    
+    result = mSystem->init(32, FMOD_INIT_NORMAL | FMOD_INIT_ENABLE_PROFILE, NULL);
+    ERRCHECK(result);
+}
+
+void AudioManager::update()
+{
+    /*
+    FMOD_RESULT result          = FMOD_OK;
+    //int         channelsplaying = 0;
+    
+    if (system != NULL)
+    {
+        //result = mSystem->getChannelsPlaying(&channelsplaying);
+        //ERRCHECK(result);
+        
+        result = mSystem->update();
+        ERRCHECK(result);
+    }
+    */
+}

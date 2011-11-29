@@ -283,6 +283,7 @@ void EffectsManager::update()
     }
     
     mRenderer->update(mEffects);
+    mAudioManager->update();
 }
 
 void EffectsManager::draw()
