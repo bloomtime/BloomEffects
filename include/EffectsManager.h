@@ -13,6 +13,7 @@
 //#include "json/json.h"
 
 #include "EffectsRenderer.h"
+#include "AudioManager.h"
 #include "json/json.h"
 #include "EffectJson.h"
 #include "EffectsState.h"
@@ -57,6 +58,7 @@ protected:
     CameraRef mCamera;
     EffectsStateRef mState;
     EffectsRendererRef mRenderer;
+    AudioManagerRef mAudioManager;
     
     std::list<EffectRef> mEffects;
     

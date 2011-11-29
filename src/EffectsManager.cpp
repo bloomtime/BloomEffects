@@ -27,7 +27,9 @@ void EffectsManager::setup()
 {
     mState = EffectsState::create();
     mRenderer = EffectsRenderer::create();
+    mAudioManager = AudioManager::create();
     mRenderer->setup(mState);
+    mAudioManager->setup();
 }
 
 void EffectsManager::setBackgroundColor(Color bgColor)
@@ -107,6 +109,11 @@ EffectEventList EffectsManager::initializeData(Json::Value data)
                 {
                     currentEvent = PostEvent::create();
                     // need to concatenate extension here
+                    break;
+                }
+                case SOUND_EVENT:
+                {
+                    currentEvent = SoundEvent::create(mAudioManager);
                     break;
                 }
                 default:

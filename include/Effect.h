@@ -8,6 +8,7 @@
 #include "EffectEvent.h"
 #include "ParticleEvent.h"
 #include "PostEvent.h"
+#include "SoundEvent.h"
 
 //#include "EffectsRenderer.h"
 
@@ -40,13 +41,15 @@ typedef list<EffectEventRef> EffectEventList;
 //TODO there might be a better way to register these types
 enum ChildEventType {
     PARTICLE_EVENT,
-    POST_EVENT
+    POST_EVENT,
+    SOUND_EVENT
 };
 
 // add new child events here
 const boost::unordered_map<string, ChildEventType> CHILD_EVENT_TYPES = boost::assign::map_list_of<string, ChildEventType>
     ("ParticleEvent", PARTICLE_EVENT)
-    ("PostEvent",     POST_EVENT);
+    ("PostEvent",     POST_EVENT)
+    ("SoundEvent",    SOUND_EVENT);
 
 class Effect {
 

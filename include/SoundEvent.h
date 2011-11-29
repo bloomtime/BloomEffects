@@ -1,10 +1,11 @@
 //
-//  PostEvent.h
+//  SoundEvent.h
 //
 //  Copyright 2011 Bloom Studio, Inc. All rights reserved.
 //
 
 #pragma once
+#include "AudioManager.h"
 #include "EffectEvent.h"
 
 #include "cinder/Rand.h"
@@ -15,24 +16,22 @@
 using namespace ci;
 using namespace std;
 
-class PostEvent;
+class SoundEvent;
 
-typedef std::shared_ptr<PostEvent> PostEventRef;
+typedef std::shared_ptr<SoundEvent> SoundEventRef;
 
-class PostEvent : public EffectEvent {
+class SoundEvent : public EffectEvent {
 
 public:
 
-    static PostEventRef create();
+    static SoundEventRef create(AudioManagerRef audioMgr);
 
-    ~PostEvent();
+    ~SoundEvent();
     
     void registerAttributes() 
     {
         // editable attributes (Name, Type)
-        registerAttribute("Lifetime",         ATTR_FLOAT);
-        registerAttribute("FadeTime",         ATTR_VECTOR2);
-        registerAttribute("Shader",           ATTR_STRING);
+        registerAttribute("Path",             ATTR_STRING);
     }
     
     void setup();
@@ -44,13 +43,11 @@ protected:
     
     void processAttributes();
 
-    Vec2f mFadeTime;
-    string mShaderName;
-    string mPreviousShader;
-    
-    float mFadeStartTime; // for infinite duration soft stop
+    string mFilePath;
+    AudioManagerRef mAudioManager;
+    FMOD::Sound* mSound;
             
 private: 
 
-    PostEvent();
+    SoundEvent(AudioManagerRef audioMgr);
 };
