@@ -257,8 +257,6 @@ Vec2f ParticleEvent::getNormalizedScreenPos(Vec3f worldPos)
 
 void ParticleEvent::update()
 {
-    //Vec3f eyePoint = mCamera->getEyePoint();
-    
     if (mCameraAttached)
     {
         Matrix44f mtx = mCamera->getOrientation().toMatrix44();

@@ -44,9 +44,11 @@ public:
             
     void ERRCHECK(FMOD_RESULT result);
 
-    FMOD::Sound* createSound(string filepath);
-    void playSound(FMOD::Sound* sound, Vec3f pos = Vec3f(0.0f, 0.0f, 0.0f), Vec3f vel = Vec3f(0.0f, 0.0f, 0.0f));
+    FMOD::Sound* createSound(string filepath, bool looping = false);
+    void playSound(FMOD::Sound* sound, float volume=1.0f, Vec3f pos = Vec3f(0.0f, 0.0f, 0.0f), Vec3f vel = Vec3f(0.0f, 0.0f, 0.0f));
     bool isPlaying(FMOD::Sound* sound);
+    void stopSound(FMOD::Sound* sound);
+    void setVolume(FMOD::Sound* sound, float volume);
     void set3DSound(bool is3d) { mIs3D = is3d; }
     
 protected:

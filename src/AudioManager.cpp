@@ -36,7 +36,7 @@ void AudioManager::ERRCHECK(FMOD_RESULT result)
     }
 }
 
-FMOD::Sound* AudioManager::createSound(string filepath)
+FMOD::Sound* AudioManager::createSound(string filepath, bool looping)
 {
     FMOD::Sound *newSound;
     FMOD_RESULT result = FMOD_OK;
@@ -46,9 +46,10 @@ FMOD::Sound* AudioManager::createSound(string filepath)
     int options = FMOD_SOFTWARE;
     
     if (mIs3D)
-    {
         options |= FMOD_3D;
-    }
+    
+    if (looping)
+        options |= FMOD_LOOP_NORMAL;
     
     result = mSystem->createSound(fullPath.c_str(), options , NULL, &newSound);
     ERRCHECK(result);
@@ -56,12 +57,12 @@ FMOD::Sound* AudioManager::createSound(string filepath)
     return newSound;
 }
 
-void AudioManager::playSound(FMOD::Sound* sound, Vec3f pos, Vec3f vel) 
+void AudioManager::playSound(FMOD::Sound* sound, float volume, Vec3f pos, Vec3f vel) 
 {
     FMOD_RESULT result = FMOD_OK;
     
-   FMOD_VECTOR currentPos = { pos[0], pos[1], pos[2] };
-   FMOD_VECTOR currentVel = {  vel[0], vel[1] ,vel[2] };
+    FMOD_VECTOR currentPos = { pos[0], pos[1], pos[2] };
+    FMOD_VECTOR currentVel = { vel[0], vel[1] ,vel[2] };
         
     for (int i=0; i < MAX_CHANNELS; i++)
     {   
@@ -75,6 +76,8 @@ void AudioManager::playSound(FMOD::Sound* sound, Vec3f pos, Vec3f vel)
         
         if (!isPlaying)
         {
+            mChannels[i] = NULL;
+            
             result = mSystem->playSound(FMOD_CHANNEL_FREE, sound, true, &mChannels[i]);
             ERRCHECK(result);
             
@@ -84,6 +87,8 @@ void AudioManager::playSound(FMOD::Sound* sound, Vec3f pos, Vec3f vel)
                 ERRCHECK(result);
             }
             
+            mChannels[i]->setVolume(volume);
+            
             result = mChannels[i]->setPaused(false);
             ERRCHECK(result);
             return;
@@ -91,6 +96,54 @@ void AudioManager::playSound(FMOD::Sound* sound, Vec3f pos, Vec3f vel)
     }
     
     // for now, if all channels are full, then don't play the sound
+}
+
+void AudioManager::stopSound(FMOD::Sound* sound)
+{
+    FMOD_RESULT result = FMOD_OK;
+    FMOD::Sound *currentSound;
+        
+    for (int i=0; i < MAX_CHANNELS; i++)
+    {
+        if (mChannels[i] != NULL)
+        {
+            result = mChannels[i]->getCurrentSound(&currentSound);
+            ERRCHECK(result);
+    
+            bool isPlaying;
+            result = mChannels[i]->isPlaying(&isPlaying);
+            ERRCHECK(result);
+            
+            if (currentSound == sound && isPlaying)
+            {
+                mChannels[i]->stop();
+                mChannels[i] = NULL;
+                return;
+            }
+        }
+    }
+}
+
+void AudioManager::setVolume(FMOD::Sound* sound, float volume)
+{
+    FMOD_RESULT result = FMOD_OK;
+    FMOD::Sound *currentSound;
+        
+    for (int i=0; i < MAX_CHANNELS; i++)
+    {
+        if (mChannels[i] != NULL)
+        {
+            result = mChannels[i]->getCurrentSound(&currentSound);
+            ERRCHECK(result);
+            
+            bool isPlaying;
+            result = mChannels[i]->isPlaying(&isPlaying);
+            ERRCHECK(result);
+    
+            if (currentSound == sound && isPlaying)
+                mChannels[i]->setVolume(volume);
+        }
+    }
 }
 
 bool AudioManager::isPlaying(FMOD::Sound* sound)
@@ -105,7 +158,11 @@ bool AudioManager::isPlaying(FMOD::Sound* sound)
             result = mChannels[i]->getCurrentSound(&currentSound);
             ERRCHECK(result);
     
-            if (currentSound == sound)
+            bool isPlaying;
+            result = mChannels[i]->isPlaying(&isPlaying);
+            ERRCHECK(result);
+            
+            if (currentSound == sound && isPlaying)
                 return true;
         }
     }
@@ -144,7 +201,7 @@ void AudioManager::updateListenerPosition()
 {
     if (mIs3D)
     {
-        FMOD_RESULT   result        = FMOD_OK;
+        FMOD_RESULT   result        = FMOD_OK; 
         Vec3f trans = mCamera->getEyePoint();
         FMOD_VECTOR listenerpos = { trans[0], trans[1], trans[2] };
         
@@ -156,6 +213,21 @@ void AudioManager::updateListenerPosition()
 void AudioManager::update()
 {
     updateListenerPosition();
+    
+    FMOD_RESULT result = FMOD_OK;
+        
+    for (int i=0; i < MAX_CHANNELS; i++)
+    {
+        if (mChannels[i] != NULL)
+        {
+            bool isPlaying;
+            result = mChannels[i]->isPlaying(&isPlaying);
+            ERRCHECK(result);
+            
+            if (!isPlaying)
+                mChannels[i] = NULL;
+        }
+    }
     
     /*
     FMOD_RESULT result          = FMOD_OK;

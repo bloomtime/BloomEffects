@@ -19,7 +19,7 @@ void EffectEvent::start()
     mEventState = EVENT_STARTED;
     mStartTime = getElapsedSeconds();
     mActualSeconds = 0.0f;
-    mPreviousElapsed = mStartTime;
+    mPreviousElapsed = 0.0f;
 }
 
 void EffectEvent::stop(bool hardStop)
@@ -28,7 +28,11 @@ void EffectEvent::stop(bool hardStop)
     mHardStop = hardStop;
     
     if (hardStop)
+    {
         mEventState = EVENT_STOPPED;
+        mStartTime = -1.0f;
+        mActualSeconds = 0.0f;
+    }
 }
 
 double EffectEvent::getEventElapsedSeconds()
@@ -36,7 +40,7 @@ double EffectEvent::getEventElapsedSeconds()
     if (mStartTime == -1.0f)
         return 0.0f;
         
-    double elapsed = getElapsedSeconds();
+    double elapsed = getElapsedSeconds() - mStartTime;
     double deltaTime = elapsed - mPreviousElapsed;
     
     if (deltaTime > ELAPSED_MAX)
@@ -71,6 +75,12 @@ EffectAttribute EffectEvent::getAttribute(string attrName)
 
 void EffectEvent::updateSource()
 {
+    if (mEventState == EVENT_STOPPED)
+    {
+        mStartTime = -1.0f;
+        mActualSeconds = 0.0f;
+    }
+        
     if (mParentTransformChanged)
     {
         mSourcePosition = mParentTransform.transformPoint(mLocalPosition);
