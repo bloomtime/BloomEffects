@@ -30,6 +30,7 @@ void EffectsManager::setup()
     mAudioManager = AudioManager::create();
     mRenderer->setup(mState);
     mAudioManager->setup();
+    mAudioManager->setCamera(mCamera);
 }
 
 void EffectsManager::setBackgroundColor(Color bgColor)

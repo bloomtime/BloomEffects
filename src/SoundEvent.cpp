@@ -46,6 +46,8 @@ void SoundEvent::setup()
 
 void SoundEvent::update()
 {
+    updateSource();
+    
     //float totalElapsed = getEventElapsedSeconds();
     //float dt = totalElapsed - mPreviousElapsed;  
     
@@ -64,7 +66,7 @@ void SoundEvent::update()
         mEventState = EVENT_RUNNING;
         
         //play the sound
-        mAudioManager->playSound(mSound);
+        mAudioManager->playSound(mSound, mSourcePosition);
         
         stop(false);
     }

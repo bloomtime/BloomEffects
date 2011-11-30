@@ -11,6 +11,7 @@
 AudioManager::AudioManager()
 {
     mSystem = NULL;
+    mIs3D = false;
     
     memset(mChannels, 0, sizeof(mChannels));
 }
@@ -41,16 +42,27 @@ FMOD::Sound* AudioManager::createSound(string filepath)
     FMOD_RESULT result = FMOD_OK;
     
     string fullPath = ci::app::App::getResourcePath(filepath).string();
-    result = mSystem->createSound(fullPath.c_str(), FMOD_SOFTWARE, NULL, &newSound);
+    
+    int options = FMOD_SOFTWARE;
+    
+    if (mIs3D)
+    {
+        options |= FMOD_3D;
+    }
+    
+    result = mSystem->createSound(fullPath.c_str(), options , NULL, &newSound);
     ERRCHECK(result);
     
     return newSound;
 }
 
-void AudioManager::playSound(FMOD::Sound* sound) 
+void AudioManager::playSound(FMOD::Sound* sound, Vec3f pos, Vec3f vel) 
 {
     FMOD_RESULT result = FMOD_OK;
     
+   FMOD_VECTOR currentPos = { pos[0], pos[1], pos[2] };
+   FMOD_VECTOR currentVel = {  vel[0], vel[1] ,vel[2] };
+        
     for (int i=0; i < MAX_CHANNELS; i++)
     {   
         bool isPlaying = false;
@@ -63,7 +75,16 @@ void AudioManager::playSound(FMOD::Sound* sound)
         
         if (!isPlaying)
         {
-            result = mSystem->playSound(FMOD_CHANNEL_FREE, sound, false, &mChannels[i]);
+            result = mSystem->playSound(FMOD_CHANNEL_FREE, sound, true, &mChannels[i]);
+            ERRCHECK(result);
+            
+            if (mIs3D)
+            {
+                result = mChannels[i]->set3DAttributes(&currentPos, &currentVel);
+                ERRCHECK(result);
+            }
+            
+            result = mChannels[i]->setPaused(false);
             ERRCHECK(result);
             return;
         }
@@ -115,10 +136,27 @@ void AudioManager::setup()
     
     result = mSystem->init(32, FMOD_INIT_NORMAL | FMOD_INIT_ENABLE_PROFILE, NULL);
     ERRCHECK(result);
+    
+    updateListenerPosition();
+}
+
+void AudioManager::updateListenerPosition()
+{
+    if (mIs3D)
+    {
+        FMOD_RESULT   result        = FMOD_OK;
+        Vec3f trans = mCamera->getEyePoint();
+        FMOD_VECTOR listenerpos = { trans[0], trans[1], trans[2] };
+        
+        result = mSystem->set3DListenerAttributes(0, &listenerpos,NULL,NULL,NULL);
+        ERRCHECK(result);
+    }
 }
 
 void AudioManager::update()
 {
+    updateListenerPosition();
+    
     /*
     FMOD_RESULT result          = FMOD_OK;
     //int         channelsplaying = 0;
