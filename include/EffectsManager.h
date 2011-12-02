@@ -51,6 +51,8 @@ public:
     EffectRef createEffect(string effectName, bool start=true, Matrix44f transform=cinder::Matrix44<float>::identity());
     void destroyEffect(EffectRef effect, bool hardStop = false);
     
+    void loadFEV(string filepath);
+    
     EffectEventList initializeData(Json::Value data);
     void parseAttr(const Json::Value data, EffectAttribute &attr, EffectEventRef currentEvent);
     

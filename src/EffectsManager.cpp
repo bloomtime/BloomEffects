@@ -33,6 +33,12 @@ void EffectsManager::setup()
     mAudioManager->setCamera(mCamera);
 }
 
+void EffectsManager::loadFEV(string filepath)
+{
+    if (mAudioManager)
+        mAudioManager->loadFEV(filepath);
+}
+
 void EffectsManager::setBackgroundColor(Color bgColor)
 {
     if (mRenderer)

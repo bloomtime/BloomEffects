@@ -23,7 +23,9 @@ SoundEvent::SoundEvent(AudioManagerRef audioMgr):
     mFilePath(""),
     mFadeTime(0.0f),
     mPlayMode(PLAY_ONCE),
-    mVolume(1.0f)
+    mVolume(1.0f),
+    mEvent(NULL),
+    mSound(NULL)
 { 
     mLifetime = 0.0f;
     
@@ -34,7 +36,17 @@ SoundEvent::SoundEvent(AudioManagerRef audioMgr):
     
 SoundEvent::~SoundEvent()
 {
-    mSound->release();
+    if (mEvent)
+    {
+        mEvent->release();
+        mEvent = NULL;
+    }
+    
+    if (mSound)
+    {
+        mSound->release();
+        mSound = NULL;
+    }
 }
 
 void SoundEvent::processAttributes()
@@ -44,13 +56,17 @@ void SoundEvent::processAttributes()
     mFadeTime = mAttributes.at("FadeTime").getFloat();
     mVolume = mAttributes.at("Volume").getFloat();
     mPlayMode = PLAY_MODES.at(mAttributes.at("PlayMode").getString());
+    mType = SOUND_TYPES.at(mAttributes.at("Type").getString());
 }
 
 void SoundEvent::setup()
 { 
     processAttributes();
         
-    mSound = mAudioManager->createSound(mFilePath, mPlayMode == PLAY_LOOPING);
+    if (mType == SOUNDTYPE_FILE)
+        mSound = mAudioManager->createSound(mFilePath);
+    else
+        mEvent = mAudioManager->createEvent(mFilePath);
 }
 
 void SoundEvent::doFade(float elapsed, float lifetime)
@@ -66,7 +82,10 @@ void SoundEvent::doFade(float elapsed, float lifetime)
     float totalFade = mVolume * (1.0f - (fadeAmount / mFadeTime));
     
     //fade out based on lifetime and mFadetime
-    mAudioManager->setVolume(mSound, totalFade);
+    if (mType == SOUNDTYPE_FILE)
+        mAudioManager->setSoundVolume(mSound, totalFade);
+    else
+        mEvent->setVolume(totalFade);
 }
 
 void SoundEvent::update()
@@ -78,16 +97,21 @@ void SoundEvent::update()
     // run through the state gauntlet
     if (isInitialized() || isStopped())
     {
-        if (mAudioManager->isPlaying(mSound))
+        if (mAudioManager->isSoundPlaying(mSound))
         {
            mAudioManager->stopSound(mSound);
         }  
+        
+        if (mAudioManager->isEventPlaying(mEvent))
+        {
+           mEvent->stop(true);
+        } 
         
         return;
     }  
     else if (isStopping())
     {
-        if (!mAudioManager->isPlaying(mSound))
+        if (!mAudioManager->isSoundPlaying(mSound) && !mAudioManager->isEventPlaying(mEvent))
         {
             mEventState = EVENT_STOPPED;
         }  
@@ -106,15 +130,29 @@ void SoundEvent::update()
         {
             if (mLifetime == 0.0f)
             {
-                unsigned int lengthMS;
-                mSound->getLength(&lengthMS, FMOD_TIMEUNIT_MS);
-            
-                mLifetime = lengthMS * .001f; 
+                unsigned int lengthMs;
+                
+                if (mType == SOUNDTYPE_FILE)
+                {
+                    mSound->getLength(&lengthMs, FMOD_TIMEUNIT_MS);
+                }
+                else
+                {
+                    FMOD_EVENT_INFO info;
+                    mEvent->getInfo(0,0, &info);
+                    lengthMs = info.lengthms;
+                }
+                
+                mLifetime = lengthMs * .001f; 
             }
             
             if (totalElapsed > mLifetime)
             {
                 mAudioManager->stopSound(mSound);
+                
+                if (mEvent)
+                    mEvent->stop();
+                    
                 mEventState = EVENT_STOPPING;
                 return;
             }
@@ -129,6 +167,10 @@ void SoundEvent::update()
                 if (totalElapsed > mLifetime)
                 {
                     mAudioManager->stopSound(mSound);
+                    
+                    if (mEvent)
+                        mEvent->stop();
+                        
                     mEventState = EVENT_STOPPING;
                     return;
                 }
@@ -140,7 +182,10 @@ void SoundEvent::update()
     else if (isStarted())
     {
         //play the sound
-        mAudioManager->playSound(mSound, mVolume, mSourcePosition);
+        if (mType == SOUNDTYPE_FILE)
+            mAudioManager->playSound(mSound, mVolume, mSourcePosition);
+        else
+            mAudioManager->playEvent(mEvent, mVolume, mSourcePosition);
         
         mEventState = EVENT_RUNNING;
     }

@@ -16,6 +16,16 @@
 using namespace ci;
 using namespace std;
 
+enum SoundType {
+    SOUNDTYPE_EVENT,
+    SOUNDTYPE_FILE
+};
+
+// add new Emit Modes here
+const boost::unordered_map<string, SoundType> SOUND_TYPES = boost::assign::map_list_of
+    ("Event", SOUNDTYPE_EVENT)
+    ("File", SOUNDTYPE_FILE);
+    
 enum PlayMode {
     PLAY_ONCE,
     PLAY_LOOPING
@@ -45,6 +55,7 @@ public:
         registerAttribute("Lifetime",      ATTR_FLOAT);  // when 0, it just plays until stops, or forever if looping
         registerAttribute("FadeTime",      ATTR_FLOAT);  // when looping, amount of time it takes to fade out when stopping
         registerAttribute("PlayMode",      ATTR_STRING);
+        registerAttribute("Type",          ATTR_STRING);
         registerAttribute("Volume",        ATTR_FLOAT);
     }
     
@@ -61,11 +72,13 @@ protected:
     string mFilePath;
     float mFadeTime;
     PlayMode mPlayMode;
+    SoundType mType;
     float mVolume;
     
     AudioManagerRef mAudioManager;
-    FMOD::Sound* mSound;
-            
+    FMOD::Event *mEvent;
+    FMOD::Sound *mSound;
+    
 private: 
 
     SoundEvent(AudioManagerRef audioMgr);

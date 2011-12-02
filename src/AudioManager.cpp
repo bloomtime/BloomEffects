@@ -11,6 +11,7 @@
 AudioManager::AudioManager()
 {
     mSystem = NULL;
+    mEventSystem = NULL;
     mIs3D = false;
     
     memset(mChannels, 0, sizeof(mChannels));
@@ -18,8 +19,13 @@ AudioManager::AudioManager()
 
 AudioManager::~AudioManager()
 {
-    mSystem->release();
-
+    if (mEventSystem)
+    {
+        mEventSystem->release();
+        mEventSystem = NULL;
+        mSystem = NULL;
+    }
+    
     for (int i=0; i < 6; i++)
     {
         mChannels[i] = 0;
@@ -32,12 +38,65 @@ void AudioManager::ERRCHECK(FMOD_RESULT result)
     if (result != FMOD_OK)
     {
         fprintf(stderr, "FMOD error! (%d) %s\n", result, FMOD_ErrorString(result));
-        exit(-1);
+        //exit(-1);
     }
+}
+
+void AudioManager::loadFEV(string filepath)
+{
+    FMOD_RESULT result = FMOD_OK;
+    string fullPath = ci::app::App::getResourcePath(filepath).string();
+    result = mEventSystem->load(fullPath.c_str(), NULL, NULL);
+    ERRCHECK(result);
+}
+
+FMOD::Event* AudioManager::createEvent(string eventPath)
+{
+    FMOD::Event *event;
+    
+    FMOD_RESULT result = FMOD_OK;
+    result = mEventSystem->getEvent(eventPath.c_str(), FMOD_EVENT_DEFAULT, &event);
+    ERRCHECK(result);
+    
+    return event;
+}
+
+void AudioManager::playEvent(FMOD::Event* event, float volume, Vec3f pos, Vec3f vel) 
+{
+    if (event == NULL)
+        return;
+        
+    FMOD_VECTOR currentPos = { pos[0], pos[1], pos[2] };
+    FMOD_VECTOR currentVel = { vel[0], vel[1] ,vel[2] };
+    FMOD_RESULT result = FMOD_OK;
+    
+    event->setVolume(volume);
+    
+    if (mIs3D)
+        event->set3DAttributes(&currentPos, &currentVel);
+        
+    result = event->start();
+    ERRCHECK(result);
+}
+
+bool AudioManager::isEventPlaying(FMOD::Event* event)
+{
+    if (event == NULL)
+        return false;
+        
+    FMOD_EVENT_STATE state = {0};
+    FMOD_RESULT result = FMOD_OK;
+    result = event->getState(&state);
+    ERRCHECK(result);
+    
+    return state & FMOD_EVENT_STATE_PLAYING;
 }
 
 FMOD::Sound* AudioManager::createSound(string filepath, bool looping)
 {
+    if (mSystem == NULL)
+        return NULL;
+        
     FMOD::Sound *newSound;
     FMOD_RESULT result = FMOD_OK;
     
@@ -59,6 +118,9 @@ FMOD::Sound* AudioManager::createSound(string filepath, bool looping)
 
 void AudioManager::playSound(FMOD::Sound* sound, float volume, Vec3f pos, Vec3f vel) 
 {
+    if (mSystem == NULL || sound == NULL)
+        return;
+        
     FMOD_RESULT result = FMOD_OK;
     
     FMOD_VECTOR currentPos = { pos[0], pos[1], pos[2] };
@@ -100,6 +162,9 @@ void AudioManager::playSound(FMOD::Sound* sound, float volume, Vec3f pos, Vec3f 
 
 void AudioManager::stopSound(FMOD::Sound* sound)
 {
+    if (mSystem == NULL || sound == NULL)
+        return;
+        
     FMOD_RESULT result = FMOD_OK;
     FMOD::Sound *currentSound;
         
@@ -124,8 +189,11 @@ void AudioManager::stopSound(FMOD::Sound* sound)
     }
 }
 
-void AudioManager::setVolume(FMOD::Sound* sound, float volume)
+void AudioManager::setSoundVolume(FMOD::Sound* sound, float volume)
 {
+    if (mSystem == NULL || sound == NULL)
+        return;
+        
     FMOD_RESULT result = FMOD_OK;
     FMOD::Sound *currentSound;
         
@@ -146,8 +214,11 @@ void AudioManager::setVolume(FMOD::Sound* sound, float volume)
     }
 }
 
-bool AudioManager::isPlaying(FMOD::Sound* sound)
+bool AudioManager::isSoundPlaying(FMOD::Sound* sound)
 {
+    if (mSystem == NULL || sound == NULL)
+        return false;
+        
     FMOD_RESULT result = FMOD_OK;
     FMOD::Sound *currentSound;
         
@@ -173,33 +244,25 @@ bool AudioManager::isPlaying(FMOD::Sound* sound)
 void AudioManager::setup()
 {
     FMOD_RESULT   result        = FMOD_OK;
-    //char          buffer[200]   = {0};
-    unsigned int  version       = 0;
 
     /*
-        Create a mSystem object and initialize
-    */    
-    result = FMOD::System_Create(&mSystem); 
+        Create an FMOD Event System object and initialize
+    */
+    result = FMOD::EventSystem_Create(&mEventSystem); 
     ERRCHECK(result);
     
-    result = mSystem->getVersion(&version);
+    result = mEventSystem->init(MAX_CHANNELS, FMOD_INIT_NORMAL | FMOD_INIT_ENABLE_PROFILE, NULL, FMOD_EVENT_INIT_NORMAL);
     ERRCHECK(result);
     
-    if (version < FMOD_VERSION)
-    {
-        fprintf(stderr, "You are using an old version of FMOD %08x.  This program requires %08x\n", version, FMOD_VERSION);
-        exit(-1);
-    }
-    
-    result = mSystem->init(32, FMOD_INIT_NORMAL | FMOD_INIT_ENABLE_PROFILE, NULL);
-    ERRCHECK(result);
+    mEventSystem->getSystemObject(&mSystem);
     
     updateListenerPosition();
+
 }
 
 void AudioManager::updateListenerPosition()
 {
-    if (mIs3D)
+    if (mIs3D && mSystem != NULL)
     {
         FMOD_RESULT   result        = FMOD_OK; 
         Vec3f trans = mCamera->getEyePoint();
@@ -218,7 +281,7 @@ void AudioManager::update()
         
     for (int i=0; i < MAX_CHANNELS; i++)
     {
-        if (mChannels[i] != NULL)
+        if (mChannels[i])
         {
             bool isPlaying;
             result = mChannels[i]->isPlaying(&isPlaying);
@@ -229,11 +292,15 @@ void AudioManager::update()
         }
     }
     
-    /*
-    FMOD_RESULT result          = FMOD_OK;
+    if (mEventSystem)
+    {
+        result = mEventSystem->update();
+        ERRCHECK(result);
+    }
+    
     //int         channelsplaying = 0;
     
-    if (system != NULL)
+    if (mSystem)
     {
         //result = mSystem->getChannelsPlaying(&channelsplaying);
         //ERRCHECK(result);
@@ -241,5 +308,4 @@ void AudioManager::update()
         result = mSystem->update();
         ERRCHECK(result);
     }
-    */
 }

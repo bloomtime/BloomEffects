@@ -11,6 +11,7 @@
 
 #include "fmod.hpp"
 #include "fmod_errors.h"
+#include "fmod_event.hpp"
 #include <string>
 
 using namespace std;
@@ -22,7 +23,7 @@ typedef std::shared_ptr<class AudioManager> AudioManagerRef;
 //typedef std::shared_ptr<FMOD::Sound> SoundRef;
 typedef std::shared_ptr<CameraPersp> CameraRef;
 
-const int MAX_CHANNELS = 4;
+const int MAX_CHANNELS = 32;
 
 class AudioManager {
 public:
@@ -41,14 +42,23 @@ public:
     
     FMOD::System   *mSystem;
     FMOD::Channel  *mChannels[MAX_CHANNELS];
-            
+    
+    FMOD::EventSystem *mEventSystem;
+    
     void ERRCHECK(FMOD_RESULT result);
 
+    void loadFEV(string filepath);
+       
+    FMOD::Event* createEvent(string eventPath);
+    void playEvent(FMOD::Event* event, float volume=1.0f, Vec3f pos = Vec3f(0.0f, 0.0f, 0.0f), Vec3f vel = Vec3f(0.0f, 0.0f, 0.0f));
+    bool isEventPlaying(FMOD::Event* event);
+    
+    // below is fmod ex stuff
     FMOD::Sound* createSound(string filepath, bool looping = false);
     void playSound(FMOD::Sound* sound, float volume=1.0f, Vec3f pos = Vec3f(0.0f, 0.0f, 0.0f), Vec3f vel = Vec3f(0.0f, 0.0f, 0.0f));
-    bool isPlaying(FMOD::Sound* sound);
+    bool isSoundPlaying(FMOD::Sound* sound);
     void stopSound(FMOD::Sound* sound);
-    void setVolume(FMOD::Sound* sound, float volume);
+    void setSoundVolume(FMOD::Sound* sound, float volume);
     void set3DSound(bool is3d) { mIs3D = is3d; }
     
 protected:
