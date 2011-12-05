@@ -23,12 +23,12 @@ EffectsManager::~EffectsManager()
     mEventAttrs.clear();
 }
 
-void EffectsManager::setup()
+void EffectsManager::setup(Vec2f windowSize)
 {
     mState = EffectsState::create();
     mRenderer = EffectsRenderer::create();
     mAudioManager = AudioManager::create();
-    mRenderer->setup(mState);
+    mRenderer->setup(mState, windowSize);
     mAudioManager->setup();
     mAudioManager->setCamera(mCamera);
 }
@@ -126,7 +126,7 @@ EffectEventList EffectsManager::initializeData(Json::Value data)
                 default:
                 {
                     //nothing!
-                    console() << "WARNING: Unrecognized EventType" << eventType << std::endl;
+                    std::cout << "WARNING: Unrecognized EventType" << eventType << std::endl;
                     return effectEvents;                
                 }
             }
@@ -177,7 +177,7 @@ EffectEventList EffectsManager::initializeData(Json::Value data)
         }
     }
     else {
-        console() << "ERROR: Invalid Data."<< std::endl;
+        std::cout << "ERROR: Invalid Data."<< std::endl;
     }
     
     return effectEvents;
@@ -254,7 +254,7 @@ void EffectsManager::parseAttr(const Json::Value data, EffectAttribute &attr, Ef
         }
         default:
         {
-            console() << "ERROR:  Unrecognized Attr Type" << std::endl;
+            std::cout << "ERROR:  Unrecognized Attr Type" << std::endl;
             break;               
         }
     }

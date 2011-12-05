@@ -11,7 +11,7 @@ class EffectsState;
 
 typedef std::shared_ptr<EffectsState> EffectsStateRef;
 
-const string DEFAULT_POST_SHADER = "defaultPost";
+const std::string DEFAULT_POST_SHADER = "defaultPost";
 
 class EffectsState
 {
@@ -20,20 +20,20 @@ public:
 
     ~EffectsState() {}
     
-    void setPostShader(string shaderName) { mPostShader = shaderName; }
-    string getPostShader() { return mPostShader; }
+    void setPostShader(std::string shaderName) { mPostShader = shaderName; }
+    std::string getPostShader() { return mPostShader; }
     void setDefaultPostShader() { mPostShader = DEFAULT_POST_SHADER; }
     
     void setPostShaderAlpha(float alpha) { mPostShaderAlpha = alpha; }
     float getPostShaderAlpha() { return mPostShaderAlpha; }
     
 protected:    
-    string mPostShader;
+    std::string mPostShader;
     float mPostShaderAlpha;
     
 private:
     EffectsState() :
-        mPostShader("defaultPost"),
+        mPostShader(DEFAULT_POST_SHADER),
         mPostShaderAlpha(1.0f)
     {
     }

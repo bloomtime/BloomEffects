@@ -41,7 +41,7 @@ public:
     
     ~EffectsManager(); 
     
-	void setup();
+	void setup(Vec2f windowSize);
 	void update();
 	void draw();
     

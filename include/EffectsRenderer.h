@@ -14,9 +14,6 @@
 #include "Effect.h"
 #include "EffectsState.h"
 
-using namespace std;
-using namespace ci;
-
 class EffectsRenderer;
 
 typedef std::shared_ptr<EffectsRenderer> EffectsRendererRef;
@@ -29,30 +26,30 @@ public:
     
     ~EffectsRenderer(); 
     
-	void setup(EffectsStateRef fxState);
+	void setup(EffectsStateRef fxState, ci::Vec2f windowSize);
 	void update(list<EffectRef> effects);
 	void draw();
     
-    void setBackgroundColor(Color bgColor) { mBGColor = bgColor; }
+    void setBackgroundColor(ci::Color bgColor) { mBGColor = bgColor; }
     
     //TODO need to cache here (maybe combine this with effect attribute)
     void setDefaultPostShader() { mCurrentPostShader = mDefaultPostShader; }
-    void setPostShader(string shaderName);
+    void setPostShader(std::string shaderName);
     
 protected:
 
-    CameraOrtho mPostCamera;
+    ci::CameraOrtho mPostCamera;
     EffectsStateRef mState;
 
     gl::Fbo ca_read_fbo, ca_write_fbo;
-    Vec2i fbo_size;
+    ci::Vec2i fbo_size;
 
-    Color mBGColor;
+    ci::Color mBGColor;
     
-    string mPostShaderName;
+    std::string mPostShaderName;
     
-    gl::GlslProg mBasicShader, mCurrentPostShader;
-    gl::GlslProg mDefaultPostShader;
+    ci::gl::GlslProg mBasicShader, mCurrentPostShader;
+    ci::gl::GlslProg mDefaultPostShader;
     
     GLuint vtx_handle, txc_handle;
     GLuint vtx_handle_post, txc_handle_post;

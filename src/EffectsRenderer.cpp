@@ -6,6 +6,9 @@
 
 #include "EffectsRenderer.h"
 
+using namespace std;
+using namespace ci;
+
 EffectsRendererRef EffectsRenderer::create()
 {
     return EffectsRendererRef( new EffectsRenderer() );
@@ -31,7 +34,7 @@ void EffectsRenderer::setPostShader(string shaderName)
     mPostShaderName = shaderName;
 }
 
-void EffectsRenderer::setup(EffectsStateRef fxState)
+void EffectsRenderer::setup(EffectsStateRef fxState, Vec2f windowSize)
 {
     mState = fxState;
     
@@ -42,7 +45,7 @@ void EffectsRenderer::setup(EffectsStateRef fxState)
     setPostShader(mState->getPostShader());
     mDefaultPostShader = mCurrentPostShader;
         
-    fbo_size = getWindowSize();
+    fbo_size = windowSize;
     gl::Fbo::Format fbo_format;
     fbo_format.enableDepthBuffer(false);
     fbo_format.enableMipmapping(false);
@@ -55,7 +58,7 @@ void EffectsRenderer::setup(EffectsStateRef fxState)
     gl::clear( mBGColor ); 
     ca_read_fbo.unbindFramebuffer();
 
-    mPostCamera.setOrtho(0, getWindowWidth(), 0, getWindowHeight(), -1, 1);
+    mPostCamera.setOrtho(0, windowSize.x, 0, windowSize.y, -1, 1);
 }
 
 void EffectsRenderer::update(list<EffectRef> effects)
@@ -80,8 +83,8 @@ void EffectsRenderer::update(list<EffectRef> effects)
     
         // Draw the Read Buffer
         {
-            ci::gl::Texture texture = ca_read_fbo.getTexture();
-            ci::gl::SaveTextureBindState saveBindState( texture.getTarget() );
+            gl::Texture texture = ca_read_fbo.getTexture();
+            gl::SaveTextureBindState saveBindState( texture.getTarget() );
             texture.bind();
             
             Rectf destRect = texture.getCleanBounds();
@@ -136,8 +139,8 @@ void EffectsRenderer::draw()
     
     // Draw the Read Buffer
     {
-        ci::gl::Texture texture = ca_read_fbo.getTexture();
-        ci::gl::SaveTextureBindState saveBindState( texture.getTarget() );
+        gl::Texture texture = ca_read_fbo.getTexture();
+        gl::SaveTextureBindState saveBindState( texture.getTarget() );
         texture.bind();
         
         Rectf destRect = texture.getCleanBounds();
