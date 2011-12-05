@@ -19,7 +19,6 @@
 #include <boost/assign/list_of.hpp>
 
 using namespace ci;
-using namespace ci::app;
 using namespace std;
 
 typedef vector<Vec3f> floatCurvePoints;

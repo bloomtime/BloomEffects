@@ -15,13 +15,12 @@
 
 using namespace ci;
 using namespace std;
-using namespace ci::app;
 
 namespace effects {
 
 static Json::Value getJsonData(string effectPath)
 {
-    DataSourceRef dataSource = loadResource(effectPath);
+    DataSourceRef dataSource = app::loadResource(effectPath);
     Buffer buf = dataSource->getBuffer();
 	size_t dataSize = buf.getDataSize();
 	shared_ptr<char> bufString( new char[dataSize+1], checked_array_deleter<char>() );

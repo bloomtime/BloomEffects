@@ -16,6 +16,7 @@
 #include "cinder/Matrix.h"
 #include "cinder/Cinder.h"
 #include "cinder/Vector.h"
+#include "cinder/Timer.h"
 #include <vector>
 #include <list>
 
@@ -101,13 +102,16 @@ protected:
 
     std::list<EffectEventRef> mEvents;
     
+    ci::Timer mTimer;
+    
 private:  
 
     Effect():
         mIsVisible(true),
         mIsStarted(false),
         mIsStopped(false),
-        mStartedTime(-1.0f)
+        mStartedTime(-1.0f),
+        mTimer(true) // true = auto-start
     {
         mTransform.setToIdentity();
     }

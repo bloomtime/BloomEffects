@@ -17,7 +17,7 @@ EffectEvent::~EffectEvent()
 void EffectEvent::start()
 {
     mEventState = EVENT_STARTED;
-    mStartTime = getElapsedSeconds();
+    mStartTime = mTimer.getSeconds();
     mActualSeconds = 0.0f;
     mPreviousElapsed = 0.0f;
 }
@@ -40,7 +40,7 @@ double EffectEvent::getEventElapsedSeconds()
     if (mStartTime == -1.0f)
         return 0.0f;
         
-    double elapsed = getElapsedSeconds() - mStartTime;
+    double elapsed = mTimer.getSeconds() - mStartTime;
     double deltaTime = elapsed - mPreviousElapsed;
     
     if (deltaTime > ELAPSED_MAX)

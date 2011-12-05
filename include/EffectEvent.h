@@ -11,19 +11,15 @@
 #include "cinder/Cinder.h"
 #include "cinder/Camera.h"
 #include "cinder/Camera.h"
+#include "cinder/Timer.h"
+#include "cinder/ImageIo.h"
 #include "cinder/gl/Texture.h"
 #include <boost/unordered_map.hpp>
 #include <string>
 
-#include "cinder/ImageIo.h"
-#include "cinder/gl/Texture.h"
-#include "cinder/app/App.h"
-#include <boost/unordered_map.hpp>
-
 //#include "EffectsRenderer.h"
 
 using namespace ci;
-using namespace ci::app;
 using namespace std;
 
 enum EventState 
@@ -132,7 +128,8 @@ protected:
         mParentTransformChanged(false),
         mSourceScale(1.0f),
         mPreviousElapsed(0.0f),
-        mActualSeconds(0.0f)
+        mActualSeconds(0.0f),
+        mTimer(true) // true = auto-start
     {
         mParentTransform.setToIdentity();
     }
@@ -164,5 +161,7 @@ protected:
     Quatf mSourceOrientation;
     
     string mFileExtension;
+    
+    Timer mTimer;
     
 };

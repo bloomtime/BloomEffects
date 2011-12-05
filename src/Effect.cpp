@@ -39,7 +39,7 @@ Effect::~Effect()
 void Effect::start()
 {
     mIsStarted = true;
-    mStartedTime = getElapsedSeconds();
+    mStartedTime = mTimer.getSeconds();
     mActualSeconds = 0.0f;
     mPreviousElapsed = mStartedTime;
 }
@@ -58,7 +58,7 @@ double Effect::getEffectElapsedSeconds()
     if (mStartedTime == -1.0f)
         return 0.0f;
         
-    double elapsed = getElapsedSeconds();
+    double elapsed = mTimer.getSeconds();
     double deltaTime = elapsed - mPreviousElapsed;
     
     if (deltaTime > ELAPSED_MAX)
