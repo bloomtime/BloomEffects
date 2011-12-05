@@ -13,9 +13,6 @@
 #include <vector>
 #include <list>
 
-using namespace ci;
-using namespace std;
-
 enum FaceMode {
     FACE_BILLBOARD,
     FACE_AXIS_X,
@@ -99,7 +96,7 @@ public:
         registerAttribute("ScreenSizeLOD",    ATTR_VECTOR2); 
     }
     
-    void setup();
+    void setup(Vec2f windowSize);
     void update();
     void draw();
     void deepDraw(){}

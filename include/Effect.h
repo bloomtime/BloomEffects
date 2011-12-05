@@ -26,9 +26,6 @@
 #include <boost/unordered_map.hpp>
 #include <boost/assign/list_of.hpp>
 
-using namespace ci;
-using namespace std;
-
 class Effect;
 
 // for sharing ownership:
@@ -62,11 +59,11 @@ public:
     
     friend class EffectEvent;
     
-    void setup(EffectEventList events);
+    void setup(EffectEventList events, ci::Vec2f windowSize);
     void update();
     void draw();
     
-    void setTintColor(Vec3f color);
+    void setTintColor(ci::Vec3f color);
     void setSourceScale(float scale);
     
     void start();

@@ -11,8 +11,9 @@
 //#include "cinder/gl/gl.h"
 
 using namespace ci;
+using namespace std;
 
-const string PATH_EXTENSION = ".post.json";
+const std::string PATH_EXTENSION = ".post.json";
 
 PostEventRef PostEvent::create()
 {
@@ -40,7 +41,7 @@ void PostEvent::processAttributes()
     mFadeTime = mAttributes.at("FadeTime").getVector2();
     mShaderName = mAttributes.at("Shader").getString();
 }
-void PostEvent::setup()
+void PostEvent::setup(ci::Vec2f windowSize)
 { 
     processAttributes();
 }

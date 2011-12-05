@@ -19,9 +19,6 @@
 
 //#include "EffectsRenderer.h"
 
-using namespace ci;
-using namespace std;
-
 enum EventState 
 {
     EVENT_INITIALIZED,
@@ -31,13 +28,13 @@ enum EventState
     EVENT_STOPPED
 };
 
-typedef boost::unordered_map<string, EffectAttribute> EffectAttrMap;
+typedef boost::unordered_map<std::string, EffectAttribute> EffectAttrMap;
 
 class EffectEvent;
 
 //typedef std::shared_ptr<EffectsRenderer> EffectRendererRef;
 typedef std::shared_ptr<EffectEvent> EffectEventRef;
-typedef std::shared_ptr<CameraPersp> CameraRef;
+typedef std::shared_ptr<ci::CameraPersp> CameraRef;
 
 const float ELAPSED_MAX = .5f;
 
@@ -50,9 +47,9 @@ public:
     ~EffectEvent();
     
     virtual void registerAttributes() {}
-    string getPathExtension() { return mFileExtension; }
+    std::string getPathExtension() { return mFileExtension; }
     
-    virtual void setup() {}
+    virtual void setup(ci::Vec2f windowSize) {}
     virtual void update() {}
     virtual void draw() {}
     
@@ -65,31 +62,33 @@ public:
         mParentTransformChanged = true;
     }
     
-    virtual void setTintColor( Vec3f color ) {}
+    virtual void setTintColor( ci::Vec3f color ) {}
     
     ci::Matrix44f getTransform() const { return mParentTransform; /* copy OK */ }
     
-    void registerAttribute(string attrName, AttributeType attrType);
+    void registerAttribute(std::string attrName, AttributeType attrType);
         
     EffectAttrMap getAttributes() { return mAttributes; }
-    EffectAttribute getAttribute(string attrName);
+    EffectAttribute getAttribute(std::string attrName);
     
     void setAttributes(EffectAttrMap attributes) {  mAttributes = attributes; }
-    void setAttribute(string name, boost::any value) { mAttributes[name].mValue = value; }
+    void setAttribute(std::string name, boost::any value) { mAttributes[name].mValue = value; }
     
     void setEnabled(bool enabled) { mEnabled = enabled; }
     void setStartTime(float startTime) { mStartTime = startTime; }
     float getStartTime() { return mStartTime; }
     
-    void setSourcePosition(Vec3f position) 
+    void setSourcePosition(ci::Vec3f position) 
     { 
         mLocalPosition = position;
         mSourcePosition = mParentTransform.transformPoint(position);
     }
-    void setSourceOrientation(Vec3f orientation) 
+    void setSourceOrientation(ci::Vec3f orientation) 
     { 
-        mLocalOrientation.set(toRadians(orientation[0]),toRadians(orientation[1]), toRadians(orientation[2]));
-        mSourceOrientation = mLocalOrientation * Quatf(mParentTransform); 
+        mLocalOrientation.set(ci::toRadians(orientation[0]),
+                              ci::toRadians(orientation[1]), 
+                              ci::toRadians(orientation[2]));
+        mSourceOrientation = mLocalOrientation * ci::Quatf(mParentTransform); 
     }
     void setSourceScale(float scale)
     {
@@ -122,9 +121,9 @@ protected:
         mEventState(EVENT_INITIALIZED),
         mStartTime(-1.0f),
         mLifetime(0.0f),
-        mLocalPosition(Vec3f( 0.0f, 0.0f, 0.0f )),
-        mSourcePosition(Vec3f( 0.0f, 0.0f, 0.0f )),
-        mSourceOrientation(Quatf::identity()),
+        mLocalPosition(ci::Vec3f( 0.0f, 0.0f, 0.0f )),
+        mSourcePosition(ci::Vec3f( 0.0f, 0.0f, 0.0f )),
+        mSourceOrientation(ci::Quatf::identity()),
         mParentTransformChanged(false),
         mSourceScale(1.0f),
         mPreviousElapsed(0.0f),
@@ -153,15 +152,15 @@ protected:
             
     bool mEnabled;
     bool mParentTransformChanged;
-    Vec3f mLocalPosition;
-    Vec3f mSourcePosition;
+    ci::Vec3f mLocalPosition;
+    ci::Vec3f mSourcePosition;
     float mSourceScale;
     
-    Quatf mLocalOrientation;
-    Quatf mSourceOrientation;
+    ci::Quatf mLocalOrientation;
+    ci::Quatf mSourceOrientation;
     
-    string mFileExtension;
+    std::string mFileExtension;
     
-    Timer mTimer;
+    ci::Timer mTimer;
     
 };

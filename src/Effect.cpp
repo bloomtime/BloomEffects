@@ -72,7 +72,7 @@ double Effect::getEffectElapsedSeconds()
     return mActualSeconds;
 }
 
-void Effect::setup(list<EffectEventRef> events)
+void Effect::setup(list<EffectEventRef> events, Vec2f windowSize)
 {   
     mEvents = events;
     
@@ -82,7 +82,7 @@ void Effect::setup(list<EffectEventRef> events)
         {
             (*it)->setParentTransform(mTransform);
             (*it)->setCamera(mCamera);
-            (*it)->setup();
+            (*it)->setup(windowSize);
         }
     }
 }

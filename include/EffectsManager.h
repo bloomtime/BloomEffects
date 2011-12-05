@@ -45,6 +45,8 @@ public:
 	void update();
 	void draw();
     
+    void setWindowSize( Vec2f windowSize ) { mWindowSize = windowSize; }
+    
     void setBackgroundColor(Color bgColor);
     
     void setCamera(CameraRef camera) { mCamera = camera; }
@@ -69,6 +71,8 @@ protected:
     
     //cache of event attributes
     EventAttrMap mEventAttrs;
+    
+    ci::Vec2f mWindowSize;
     
 private:
 

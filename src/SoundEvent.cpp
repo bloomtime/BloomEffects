@@ -11,6 +11,7 @@
 //#include "cinder/gl/gl.h"
 
 using namespace ci;
+using namespace std;
 
 const string PATH_EXTENSION = ".sound.json";
 
@@ -59,7 +60,7 @@ void SoundEvent::processAttributes()
     mType = SOUND_TYPES.at(mAttributes.at("Type").getString());
 }
 
-void SoundEvent::setup()
+void SoundEvent::setup(ci::Vec2f windowSize)
 { 
     processAttributes();
         

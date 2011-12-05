@@ -14,14 +14,11 @@
 #include "fmod_event.hpp"
 #include <string>
 
-using namespace std;
-using namespace ci;
-
 class AudioManager;
 
 typedef std::shared_ptr<class AudioManager> AudioManagerRef;
 //typedef std::shared_ptr<FMOD::Sound> SoundRef;
-typedef std::shared_ptr<CameraPersp> CameraRef;
+typedef std::shared_ptr<ci::CameraPersp> CameraRef;
 
 const int MAX_CHANNELS = 32;
 
@@ -47,15 +44,15 @@ public:
     
     void ERRCHECK(FMOD_RESULT result);
 
-    void loadFEV(string filepath);
+    void loadFEV(std::string filepath);
        
-    FMOD::Event* createEvent(string eventPath);
-    void playEvent(FMOD::Event* event, float volume=1.0f, Vec3f pos = Vec3f(0.0f, 0.0f, 0.0f), Vec3f vel = Vec3f(0.0f, 0.0f, 0.0f));
+    FMOD::Event* createEvent(std::string eventPath);
+    void playEvent(FMOD::Event* event, float volume=1.0f, ci::Vec3f pos = ci::Vec3f(0.0f, 0.0f, 0.0f), ci::Vec3f vel = ci::Vec3f(0.0f, 0.0f, 0.0f));
     bool isEventPlaying(FMOD::Event* event);
     
     // below is fmod ex stuff
-    FMOD::Sound* createSound(string filepath, bool looping = false);
-    void playSound(FMOD::Sound* sound, float volume=1.0f, Vec3f pos = Vec3f(0.0f, 0.0f, 0.0f), Vec3f vel = Vec3f(0.0f, 0.0f, 0.0f));
+    FMOD::Sound* createSound(std::string filepath, bool looping = false);
+    void playSound(FMOD::Sound* sound, float volume=1.0f, ci::Vec3f pos = ci::Vec3f(0.0f, 0.0f, 0.0f), ci::Vec3f vel = ci::Vec3f(0.0f, 0.0f, 0.0f));
     bool isSoundPlaying(FMOD::Sound* sound);
     void stopSound(FMOD::Sound* sound);
     void setSoundVolume(FMOD::Sound* sound, float volume);

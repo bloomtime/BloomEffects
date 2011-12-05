@@ -8,6 +8,9 @@
 #include "AudioManager.h"
 #include <boost/filesystem.hpp>
 
+using namespace std;
+using namespace ci;
+
 AudioManager::AudioManager()
 {
     mSystem = NULL;
@@ -45,7 +48,7 @@ void AudioManager::ERRCHECK(FMOD_RESULT result)
 void AudioManager::loadFEV(string filepath)
 {
     FMOD_RESULT result = FMOD_OK;
-    string fullPath = ci::app::App::getResourcePath(filepath).string();
+    string fullPath = app::App::getResourcePath(filepath).string();
     result = mEventSystem->load(fullPath.c_str(), NULL, NULL);
     ERRCHECK(result);
 }

@@ -192,10 +192,10 @@ void ParticleEvent::addNewParticle()
     mParticles.push_back(newParticle);
 }
 
-void ParticleEvent::setup()
+void ParticleEvent::setup(Vec2f winSize)
 {
     //TODO may have to listen for size changes later
-    setWindowDimensions(ci::app::getWindowWidth(), ci::app::getWindowHeight());
+    setWindowDimensions(winSize.x, winSize.y);
     
     processAttributes();
 

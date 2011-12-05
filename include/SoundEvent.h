@@ -13,16 +13,13 @@
 #include <vector>
 #include <list>
 
-using namespace ci;
-using namespace std;
-
 enum SoundType {
     SOUNDTYPE_EVENT,
     SOUNDTYPE_FILE
 };
 
 // add new Emit Modes here
-const boost::unordered_map<string, SoundType> SOUND_TYPES = boost::assign::map_list_of
+const boost::unordered_map<std::string, SoundType> SOUND_TYPES = boost::assign::map_list_of
     ("Event", SOUNDTYPE_EVENT)
     ("File", SOUNDTYPE_FILE);
     
@@ -32,7 +29,7 @@ enum PlayMode {
 };
 
 // add new Emit Modes here
-const boost::unordered_map<string, PlayMode> PLAY_MODES = boost::assign::map_list_of
+const boost::unordered_map<std::string, PlayMode> PLAY_MODES = boost::assign::map_list_of
     ("Once", PLAY_ONCE)
     ("Looping", PLAY_LOOPING);
 
@@ -59,7 +56,7 @@ public:
         registerAttribute("Volume",        ATTR_FLOAT);
     }
     
-    void setup();
+    void setup(ci::Vec2f windowSize);
     void update();
     void draw();
     
@@ -69,7 +66,7 @@ protected:
     void processAttributes();
     void doFade(float elapsed, float lifetime);
 
-    string mFilePath;
+    std::string mFilePath;
     float mFadeTime;
     PlayMode mPlayMode;
     SoundType mType;

@@ -25,6 +25,7 @@ EffectsManager::~EffectsManager()
 
 void EffectsManager::setup(Vec2f windowSize)
 {
+    mWindowSize = windowSize;
     mState = EffectsState::create();
     mRenderer = EffectsRenderer::create();
     mAudioManager = AudioManager::create();
@@ -65,7 +66,7 @@ EffectRef EffectsManager::createEffect(string effectName, bool start, Matrix44f 
     EffectRef newEffect = Effect::create();
     newEffect->setCamera(mCamera);
     newEffect->setTransform(transform);
-    newEffect->setup(initializeData(data));
+    newEffect->setup(initializeData(data), mWindowSize);
     
     mEffects.push_back(newEffect);
     

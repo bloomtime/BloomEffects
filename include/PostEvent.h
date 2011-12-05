@@ -12,9 +12,6 @@
 #include <vector>
 #include <list>
 
-using namespace ci;
-using namespace std;
-
 class PostEvent;
 
 typedef std::shared_ptr<PostEvent> PostEventRef;
@@ -35,7 +32,7 @@ public:
         registerAttribute("Shader",           ATTR_STRING);
     }
     
-    void setup();
+    void setup(ci::Vec2f windowSize);
     void update();
     void draw();
     
@@ -44,9 +41,9 @@ protected:
     
     void processAttributes();
 
-    Vec2f mFadeTime;
-    string mShaderName;
-    string mPreviousShader;
+    ci::Vec2f mFadeTime;
+    std::string mShaderName;
+    std::string mPreviousShader;
     
     float mFadeStartTime; // for infinite duration soft stop
             
