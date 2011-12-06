@@ -13,6 +13,19 @@
 #include <vector>
 #include <list>
 
+enum Texture2Mode {
+    TEX2_NONE,
+    TEX2_NORMAL,
+    TEX2_DISTORT
+};
+
+// add new Texture 2 Modes here
+const boost::unordered_map<string, Texture2Mode> TEXTURE2_MODES = boost::assign::map_list_of
+    ("None", TEX2_NONE)
+    ("Normal", TEX2_NORMAL)
+    ("Distort", TEX2_DISTORT);
+    
+    
 enum FaceMode {
     FACE_BILLBOARD,
     FACE_AXIS_X,
@@ -78,12 +91,14 @@ public:
         
         registerAttribute("Shader"        ,   ATTR_SHADER);
         registerAttribute("DiffuseTexture",   ATTR_TEXTURE);
+        registerAttribute("SecondaryTexture", ATTR_TEXTURE);
         registerAttribute("DiffuseColorR",    ATTR_VECTOR3);
         registerAttribute("DiffuseColorG",    ATTR_VECTOR3);
         registerAttribute("DiffuseColorB",    ATTR_VECTOR3);
         registerAttribute("BlendMode",        ATTR_STRING);
         registerAttribute("TiledTexture",     ATTR_BOOL);
         registerAttribute("BlendTiles",       ATTR_BOOL);
+        registerAttribute("Texture2Mode",     ATTR_STRING);
 
         registerAttribute("InitialRotation",  ATTR_VECTOR2); 
         registerAttribute("InitialSpeed",     ATTR_VECTOR2);
@@ -173,7 +188,10 @@ protected:
     bool mCameraAttached;
     
     gl::Texture mDiffuseTexture;
+    gl::Texture mSecondaryTexture;
+    
     BlendMode mBlendMode;
+    Texture2Mode mTexture2Mode;
     bool mTiledTexture;
     bool mBlendTiles;
     float mNumTiles;

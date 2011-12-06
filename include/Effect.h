@@ -10,8 +10,6 @@
 #include "PostEvent.h"
 #include "SoundEvent.h"
 
-//#include "EffectsRenderer.h"
-
 #include "cinder/Camera.h"
 #include "cinder/Matrix.h"
 #include "cinder/Cinder.h"
@@ -72,7 +70,6 @@ public:
     
     void initializeData(Json::Value data);
     void setCamera(CameraRef camera);
-    //void setRenderer(EffectsRendererRef mRenderer);
     
     void setTransform( const ci::Matrix44f &transform );
     ci::Matrix44f getTransform() const { return mTransform; /* copy OK */ }
@@ -92,7 +89,6 @@ protected:
     float mStartedTime;
     
     CameraRef mCamera;
-    //EffectsRendererRef mRenderer;
     
     bool mIsStarted;
     bool mIsStopped;

@@ -32,6 +32,7 @@ ParticleEvent::ParticleEvent():
     mGlobalForce(Vec3f(0.0f, 0.0f, 0.0f)),
     mTiledTexture(true),
     mBlendTiles(false),
+    mTexture2Mode(TEX2_NONE),
     mEmitMode(EMIT_BURST),
     mEmitAngle(Vec2f(0.0f, 0.0f)),
     mNumTiles(1.0f),
@@ -89,9 +90,12 @@ void ParticleEvent::processAttributes()
     mBlendMode = BLEND_MODES.at(mAttributes.at("BlendMode").getString());
     mTiledTexture = mAttributes.at("TiledTexture").getBool();
     mBlendTiles = mAttributes.at("BlendTiles").getBool();
+    mTexture2Mode = TEXTURE2_MODES.at(mAttributes.at("Texture2Mode").getString());
     
     mDiffuseTexture = mAttributes.at("DiffuseTexture").getTexture();
     mDiffuseTexture.setWrap(GL_REPEAT, GL_REPEAT);
+    mSecondaryTexture = mAttributes.at("SecondaryTexture").getTexture();
+    mSecondaryTexture.setWrap(GL_REPEAT, GL_REPEAT);
     
     mShader = mAttributes.at("Shader").getShader();
     pos_handle = mShader.getAttribLocation("a_position");
@@ -545,13 +549,15 @@ void ParticleEvent::draw()
 
     mShader.bind();
     mDiffuseTexture.bind(0);
+    mSecondaryTexture.bind(1);
     //glBindBuffer(GL_ARRAY_BUFFER, vtx_buffer);
     
-    // not needed since there is only one texture at the moment
-    // mShader.uniform("u_diffuseTex", 1);
-    
+    mShader.uniform("u_diffuseTex", 0);
+    mShader.uniform("u_secondaryTex", 1);
     mShader.uniform("u_tileWidth", mTileWidth);
     mShader.uniform("u_tileBlend", mBlendTiles);
+    mShader.uniform("u_hasNormal", mTexture2Mode == TEX2_NORMAL);
+    mShader.uniform("u_hasDistort", mTexture2Mode == TEX2_DISTORT);
     mShader.uniform("u_tintColor", mTintColorAlpha);
     mShader.uniform("u_mvp_matrix", mCamera->getProjectionMatrix() * mCamera->getModelViewMatrix());
     
@@ -579,6 +585,7 @@ void ParticleEvent::draw()
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    mSecondaryTexture.unbind();
  	mDiffuseTexture.unbind();
     mShader.unbind();
        
