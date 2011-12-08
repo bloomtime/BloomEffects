@@ -34,6 +34,12 @@ void EffectsManager::setup(Vec2f windowSize)
     mAudioManager->setCamera(mCamera);
 }
 
+void EffectsManager::setWindowSize(Vec2f windowSize)
+{
+    mWindowSize = windowSize;
+    mRenderer->setWindowSize(windowSize);    
+}
+
 void EffectsManager::loadFEV(string filepath)
 {
     if (mAudioManager)

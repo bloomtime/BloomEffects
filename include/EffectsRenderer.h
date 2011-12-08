@@ -30,6 +30,8 @@ public:
 	void update(list<EffectRef> effects);
 	void draw();
     
+    void setWindowSize(Vec2f windowSize);
+
     void setBackgroundColor(ci::Color bgColor) { mBGColor = bgColor; }
     
     //TODO need to cache here (maybe combine this with effect attribute)

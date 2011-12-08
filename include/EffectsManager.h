@@ -45,7 +45,7 @@ public:
 	void update();
 	void draw();
     
-    void setWindowSize( Vec2f windowSize ) { mWindowSize = windowSize; }
+    void setWindowSize( Vec2f windowSize );
     
     void setBackgroundColor(Color bgColor);
     

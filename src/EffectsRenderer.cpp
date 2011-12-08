@@ -44,21 +44,28 @@ void EffectsRenderer::setup(EffectsStateRef fxState, Vec2f windowSize)
     
     setPostShader(mState->getPostShader());
     mDefaultPostShader = mCurrentPostShader;
+
+    setWindowSize(windowSize);
+}
+
+void EffectsRenderer::setWindowSize(Vec2f windowSize)
+{
+    if (fbo_size != windowSize) {
+        fbo_size = windowSize;
+        gl::Fbo::Format fbo_format;
+        fbo_format.enableDepthBuffer(false);
+        fbo_format.enableMipmapping(false);
+        fbo_format.setMinFilter(GL_NEAREST);
+        fbo_format.setMagFilter(GL_NEAREST);
+        ca_write_fbo = gl::Fbo(fbo_size.x, fbo_size.y, fbo_format);
+        ca_read_fbo  = gl::Fbo(fbo_size.x, fbo_size.y, fbo_format);
         
-    fbo_size = windowSize;
-    gl::Fbo::Format fbo_format;
-    fbo_format.enableDepthBuffer(false);
-    fbo_format.enableMipmapping(false);
-    fbo_format.setMinFilter(GL_NEAREST);
-    fbo_format.setMagFilter(GL_NEAREST);
-    ca_write_fbo = gl::Fbo(fbo_size.x, fbo_size.y, fbo_format);
-    ca_read_fbo  = gl::Fbo(fbo_size.x, fbo_size.y, fbo_format);
-
-    ca_read_fbo.bindFramebuffer();
-    gl::clear( mBGColor ); 
-    ca_read_fbo.unbindFramebuffer();
-
-    mPostCamera.setOrtho(0, windowSize.x, 0, windowSize.y, -1, 1);
+        ca_read_fbo.bindFramebuffer();
+        gl::clear( mBGColor ); 
+        ca_read_fbo.unbindFramebuffer();
+        
+        mPostCamera.setOrtho(0, windowSize.x, 0, windowSize.y, -1, 1);
+    }
 }
 
 void EffectsRenderer::update(list<EffectRef> effects)
