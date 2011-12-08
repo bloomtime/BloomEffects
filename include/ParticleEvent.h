@@ -155,6 +155,9 @@ protected:
     struct VertexData {
         ci::Vec3f vertex;
         ci::Vec4f color;
+        ci::Vec3f normal;
+        ci::Vec3f tangent;
+        ci::Vec3f bitangent;
         ci::Vec2f texture;
         float tileIndex;
     };
@@ -211,7 +214,7 @@ protected:
     
     gl::GlslProg mShader;
     GLuint vtx_buffer;
-    GLuint pos_handle, txc_handle, col_handle, tile_handle;
+    GLuint pos_handle, txc_handle, norm_handle, tan_handle, bitan_handle, col_handle, tile_handle;
     //---------------------------------
     
     // for continuous emit mode
