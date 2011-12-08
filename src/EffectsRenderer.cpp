@@ -34,7 +34,7 @@ void EffectsRenderer::setPostShader(string shaderName)
     mPostShaderName = shaderName;
 }
 
-void EffectsRenderer::setup(EffectsStateRef fxState, Vec2f windowSize)
+void EffectsRenderer::setup(EffectsStateRef fxState, Vec2i windowSize)
 {
     mState = fxState;
     
@@ -48,7 +48,7 @@ void EffectsRenderer::setup(EffectsStateRef fxState, Vec2f windowSize)
     setWindowSize(windowSize);
 }
 
-void EffectsRenderer::setWindowSize(Vec2f windowSize)
+void EffectsRenderer::setWindowSize(Vec2i windowSize)
 {
     if (fbo_size != windowSize) {
         fbo_size = windowSize;

@@ -1,6 +1,9 @@
 #include "EffectsManager.h"
 #include <boost/foreach.hpp>
 
+using namespace std;
+using namespace ci;
+
 const string FX_EXTENSION = ".effect.json";
 EffectsManagerRef EffectsManager::create()
 {
@@ -23,7 +26,7 @@ EffectsManager::~EffectsManager()
     mEventAttrs.clear();
 }
 
-void EffectsManager::setup(Vec2f windowSize)
+void EffectsManager::setup(Vec2i windowSize)
 {
     mWindowSize = windowSize;
     mState = EffectsState::create();
@@ -34,7 +37,7 @@ void EffectsManager::setup(Vec2f windowSize)
     mAudioManager->setCamera(mCamera);
 }
 
-void EffectsManager::setWindowSize(Vec2f windowSize)
+void EffectsManager::setWindowSize(Vec2i windowSize)
 {
     mWindowSize = windowSize;
     mRenderer->setWindowSize(windowSize);    

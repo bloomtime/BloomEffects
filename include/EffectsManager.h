@@ -20,20 +20,14 @@
 #include "Effect.h"
 #include <list>
 
-using namespace std;
-using namespace ci;
-
-//DEBUG
-//using namespace ci::app;
-
 class EffectsManager;
 
 typedef std::shared_ptr<EffectsManager> EffectsManagerRef;
-typedef boost::unordered_map<string, Json::Value> EffectJsonMap;
-typedef boost::unordered_map<string, EffectAttrMap> EventAttrMap;
-typedef std::shared_ptr<CameraPersp> CameraRef;
+typedef boost::unordered_map<std::string, Json::Value> EffectJsonMap;
+typedef boost::unordered_map<std::string, EffectAttrMap> EventAttrMap;
+typedef std::shared_ptr<ci::CameraPersp> CameraRef;
 
-const Vec3f KEYLIGHT_DIR = Vec3f(1.0f, 0.0f, 0.0f);
+const ci::Vec3f KEYLIGHT_DIR = ci::Vec3f(1.0f, 0.0f, 0.0f);
 
 class EffectsManager
 {
@@ -43,19 +37,19 @@ public:
     
     ~EffectsManager(); 
     
-	void setup(Vec2f windowSize);
+	void setup(ci::Vec2i windowSize);
 	void update();
 	void draw();
     
-    void setWindowSize( Vec2f windowSize );
+    void setWindowSize( ci::Vec2i windowSize );
     
-    void setBackgroundColor(Color bgColor);
+    void setBackgroundColor(ci::Color bgColor);
     
     void setCamera(CameraRef camera) { mCamera = camera; }
-    EffectRef createEffect(string effectName, bool start=true, Matrix44f transform=cinder::Matrix44<float>::identity());
+    EffectRef createEffect(std::string effectName, bool start=true, Matrix44f transform=ci::Matrix44<float>::identity());
     void destroyEffect(EffectRef effect, bool hardStop = false);
     
-    void loadFEV(string filepath);
+    void loadFEV(std::string filepath);
     
     EffectEventList initializeData(Json::Value data);
     void parseAttr(const Json::Value data, EffectAttribute &attr, EffectEventRef currentEvent);
@@ -74,7 +68,7 @@ protected:
     //cache of event attributes
     EventAttrMap mEventAttrs;
     
-    ci::Vec2f mWindowSize;
+    ci::Vec2i mWindowSize;
     
 private:
 

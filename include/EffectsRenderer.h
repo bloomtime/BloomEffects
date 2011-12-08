@@ -26,11 +26,11 @@ public:
     
     ~EffectsRenderer(); 
     
-	void setup(EffectsStateRef fxState, ci::Vec2f windowSize);
+	void setup(EffectsStateRef fxState, ci::Vec2i windowSize);
 	void update(list<EffectRef> effects);
 	void draw();
     
-    void setWindowSize(Vec2f windowSize);
+    void setWindowSize(Vec2i windowSize);
 
     void setBackgroundColor(ci::Color bgColor) { mBGColor = bgColor; }
     
