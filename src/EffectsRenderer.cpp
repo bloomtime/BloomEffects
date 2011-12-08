@@ -63,7 +63,11 @@ void EffectsRenderer::setWindowSize(Vec2f windowSize)
         ca_read_fbo.bindFramebuffer();
         gl::clear( mBGColor ); 
         ca_read_fbo.unbindFramebuffer();
-        
+
+        ca_write_fbo.bindFramebuffer();
+        gl::clear( mBGColor ); 
+        ca_write_fbo.unbindFramebuffer();
+
         mPostCamera.setOrtho(0, windowSize.x, 0, windowSize.y, -1, 1);
     }
 }
