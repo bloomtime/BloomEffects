@@ -54,6 +54,7 @@ public:
     virtual void draw() {}
     
     void setCamera(CameraRef camera) { mCamera = camera; }
+    void setKeyLightDir(ci::Vec3f dir) { mKeyLightDir = dir.normalized(); }
     void setState(EffectsStateRef state) { mState = state; }
     
     void setParentTransform( const ci::Matrix44f &transform ) 
@@ -128,6 +129,7 @@ protected:
         mSourceScale(1.0f),
         mPreviousElapsed(0.0f),
         mActualSeconds(0.0f),
+        mKeyLightDir(ci::Vec3f(0.0f, -1.0f, 0.0f)),
         mTimer(true) // true = auto-start
     {
         mParentTransform.setToIdentity();
@@ -141,6 +143,8 @@ protected:
     double mActualSeconds;
     double mPreviousElapsed;
     
+    ci::Vec3f mKeyLightDir;
+    
     //parent transform
     ci::Matrix44f mParentTransform;
     float mLifetime;
@@ -149,7 +153,7 @@ protected:
     bool mInheritTransform;
     
     EventState mEventState;
-            
+        
     bool mEnabled;
     bool mParentTransformChanged;
     ci::Vec3f mLocalPosition;

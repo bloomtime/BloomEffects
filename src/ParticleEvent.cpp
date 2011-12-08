@@ -100,6 +100,9 @@ void ParticleEvent::processAttributes()
     mShader = mAttributes.at("Shader").getShader();
     pos_handle = mShader.getAttribLocation("a_position");
     txc_handle = mShader.getAttribLocation("a_texcoord");
+    norm_handle = mShader.getAttribLocation("a_normal");
+    tan_handle = mShader.getAttribLocation("a_tangent");
+    bitan_handle = mShader.getAttribLocation("a_bitangent");
     col_handle = mShader.getAttribLocation("a_color");
     tile_handle = mShader.getAttribLocation("a_tileIndex");
     
@@ -412,13 +415,16 @@ void ParticleEvent::update()
         
 		Vec4f col = Vec4f(colorR, colorG, colorB, alpha);
         
-        Vec3f right = Quatf( bbAt, rot ) * bbRight * scale;
-        Vec3f up = Quatf( bbAt, rot ) * bbUp * scale;
+        Vec3f right = Quatf( bbAt, rot ) * bbRight;
+        Vec3f up = Quatf( bbAt, rot ) * bbUp;
         
-        Vec3f p1 = pos - right + up;
-        Vec3f p2 = pos + right + up;
-        Vec3f p3 = pos - right - up;
-        Vec3f p4 = pos + right - up;
+        Vec3f rightScale = right * scale;
+        Vec3f upScale = up * scale;
+        
+        Vec3f p1 = pos - rightScale + upScale;
+        Vec3f p2 = pos + rightScale + upScale;
+        Vec3f p3 = pos - rightScale - upScale;
+        Vec3f p4 = pos + rightScale - upScale;
         
         //camera culling and LOD'ing (screen space size)
         Vec2f screenPosA = getNormalizedScreenPos(p1);
@@ -457,40 +463,68 @@ void ParticleEvent::update()
             //realloc(mVerts, mTotalVertices * sizeof(VertexData));
             continue;
         }
+        
+        Matrix33f rotMatrix = Matrix33f(right, up, bbAt);
 
+        rotMatrix = rotMatrix.inverted().transposed();
+        //rotMatrix = rotMatrix.transposed().inverted();
+        //Vec3f lightDir = rotMatrix * mKeyLightDir;
+        
+        Vec3f newRight = rotMatrix.getRow(0);
+        Vec3f newUp = rotMatrix.getRow(1);
+        Vec3f newAt = rotMatrix.getRow(2);
+        
         mVerts[vIndex].vertex  = p1;
         mVerts[vIndex].texture = Vec2f(0.0f,0.0f);
         mVerts[vIndex].color   = col;
+        mVerts[vIndex].normal  = newAt;
+        mVerts[vIndex].tangent  = newRight;
+        mVerts[vIndex].bitangent  = newUp;
         mVerts[vIndex].tileIndex = tileIndex;
         vIndex++;
         
         mVerts[vIndex].vertex  = p2;
         mVerts[vIndex].texture = Vec2f(1.0f,0.0f);
         mVerts[vIndex].color   = col;
+        mVerts[vIndex].normal  = newAt;
+        mVerts[vIndex].tangent  = newRight;
+        mVerts[vIndex].bitangent  = newUp;
         mVerts[vIndex].tileIndex = tileIndex;
         vIndex++;
         
         mVerts[vIndex].vertex  = p3;
         mVerts[vIndex].texture = Vec2f(0.0f,1.0f);
         mVerts[vIndex].color   = col;
+        mVerts[vIndex].normal  = newAt;
+        mVerts[vIndex].tangent  = newRight;
+        mVerts[vIndex].bitangent  = newUp;
         mVerts[vIndex].tileIndex = tileIndex;
         vIndex++;
         
         mVerts[vIndex].vertex  = p2;
         mVerts[vIndex].texture = Vec2f(1.0f,0.0f);
         mVerts[vIndex].color   = col;
+        mVerts[vIndex].normal  = newAt;
+        mVerts[vIndex].tangent  = newRight;
+        mVerts[vIndex].bitangent  = newUp;
         mVerts[vIndex].tileIndex = tileIndex;
         vIndex++;
         
         mVerts[vIndex].vertex  = p3;
         mVerts[vIndex].texture = Vec2f(0.0f,1.0f);
         mVerts[vIndex].color   = col;
+        mVerts[vIndex].normal  = newAt;
+        mVerts[vIndex].tangent  = newRight;
+        mVerts[vIndex].bitangent  = newUp;
         mVerts[vIndex].tileIndex = tileIndex;
         vIndex++;
         
         mVerts[vIndex].vertex  = p4;
         mVerts[vIndex].texture = Vec2f(1.0f,1.0f);
         mVerts[vIndex].color   = col;
+        mVerts[vIndex].normal  = newAt;
+        mVerts[vIndex].tangent  = newRight;
+        mVerts[vIndex].bitangent  = newUp;
         mVerts[vIndex].tileIndex = tileIndex;
         vIndex++;        
         
@@ -559,6 +593,7 @@ void ParticleEvent::draw()
     mShader.uniform("u_hasNormal", mTexture2Mode == TEX2_NORMAL);
     mShader.uniform("u_hasDistort", mTexture2Mode == TEX2_DISTORT);
     mShader.uniform("u_tintColor", mTintColorAlpha);
+    mShader.uniform("u_keyLightDir", mKeyLightDir);
     mShader.uniform("u_mvp_matrix", mCamera->getProjectionMatrix() * mCamera->getModelViewMatrix());
     
     GLsizei stride = sizeof(VertexData);
@@ -568,12 +603,18 @@ void ParticleEvent::draw()
     
     glVertexAttribPointer(pos_handle, 3, GL_FLOAT, GL_FALSE, stride, &mVerts[0].vertex);    
     glVertexAttribPointer(col_handle, 4, GL_FLOAT, GL_FALSE, stride, &mVerts[0].color);
+    glVertexAttribPointer(norm_handle, 3, GL_FLOAT, GL_FALSE, stride, &mVerts[0].normal);
+    glVertexAttribPointer(tan_handle, 3, GL_FLOAT, GL_FALSE, stride, &mVerts[0].tangent);
+    glVertexAttribPointer(bitan_handle, 3, GL_FLOAT, GL_FALSE, stride, &mVerts[0].bitangent);
     glVertexAttribPointer(txc_handle, 2, GL_FLOAT, GL_FALSE, stride, &mVerts[0].texture);
     glVertexAttribPointer(tile_handle, 1, GL_FLOAT, GL_FALSE, stride, &mVerts[0].tileIndex);
 
     glEnableVertexAttribArray(pos_handle);
     glEnableVertexAttribArray(txc_handle);
     glEnableVertexAttribArray(col_handle);
+    glEnableVertexAttribArray(norm_handle);
+    glEnableVertexAttribArray(tan_handle);
+    glEnableVertexAttribArray(bitan_handle);
     glEnableVertexAttribArray(tile_handle);
     
     glDrawArrays(GL_TRIANGLES, 0, mTotalVertices);
@@ -581,6 +622,9 @@ void ParticleEvent::draw()
     glDisableVertexAttribArray(tile_handle);
     glDisableVertexAttribArray(col_handle);
     glDisableVertexAttribArray(txc_handle);
+    glDisableVertexAttribArray(norm_handle);
+    glDisableVertexAttribArray(tan_handle);
+    glDisableVertexAttribArray(bitan_handle);
     glDisableVertexAttribArray(pos_handle);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -144,6 +144,7 @@ EffectEventList EffectsManager::initializeData(Json::Value data)
                 // Parse global parameters
                 currentEvent->setEnabled(enabled);
                 currentEvent->setState(mState);
+                currentEvent->setKeyLightDir(KEYLIGHT_DIR);
                 currentEvent->setStartTime(currentBlock["StartTime"].asFloat());
             
                 vector<Json::Value> posValues = effects::readVector(currentBlock, "Position");
