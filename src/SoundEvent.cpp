@@ -26,7 +26,8 @@ SoundEvent::SoundEvent(AudioManagerRef audioMgr):
     mPlayMode(PLAY_ONCE),
     mVolume(1.0f),
     mEvent(NULL),
-    mSound(NULL)
+    mSound(NULL),
+    mIsInfinite(false)
 { 
     mLifetime = 0.0f;
     
@@ -58,6 +59,11 @@ void SoundEvent::processAttributes()
     mVolume = mAttributes.at("Volume").getFloat();
     mPlayMode = PLAY_MODES.at(mAttributes.at("PlayMode").getString());
     mType = SOUND_TYPES.at(mAttributes.at("Type").getString());
+    
+    mIsInfinite = false;
+    
+    if (mLifetime == 0.0f)
+        mIsInfinite = true;
 }
 
 void SoundEvent::setup(ci::Vec2f windowSize)
@@ -119,10 +125,14 @@ void SoundEvent::update()
         
         //handle the looping infinite case 
         //set the lifetime and then fade it out
-        if (mPlayMode == PLAY_LOOPING)
+        if (mPlayMode == PLAY_LOOPING && mIsInfinite)
         {
-            mLifetime = totalElapsed + mFadeTime;
-            mEventState = EVENT_RUNNING;
+            if (mLifetime == 0.0f)
+                mLifetime = totalElapsed + mFadeTime;
+                
+            doFade(totalElapsed, mLifetime);
+            //mLifetime = totalElapsed + mFadeTime;
+            //mEventState = EVENT_RUNNING;
         }
     }
     else if (isRunning())
@@ -167,9 +177,9 @@ void SoundEvent::update()
             {
                 if (totalElapsed > mLifetime)
                 {
-                    mAudioManager->stopSound(mSound);
-                    
-                    if (mEvent)
+                    if (mType == SOUNDTYPE_FILE)
+                        mAudioManager->stopSound(mSound);
+                    else if (mEvent)
                         mEvent->stop();
                         
                     mEventState = EVENT_STOPPING;
