@@ -59,14 +59,18 @@ void EffectsRenderer::setWindowSize(Vec2i windowSize)
         fbo_format.setMagFilter(GL_NEAREST);
         ca_write_fbo = gl::Fbo(fbo_size.x, fbo_size.y, fbo_format);
         ca_read_fbo  = gl::Fbo(fbo_size.x, fbo_size.y, fbo_format);
-        
-        ca_read_fbo.bindFramebuffer();
-        gl::clear( mBGColor ); 
-        ca_read_fbo.unbindFramebuffer();
 
-        ca_write_fbo.bindFramebuffer();
-        gl::clear( mBGColor ); 
-        ca_write_fbo.unbindFramebuffer();
+//        {   
+//            gl::SaveFramebufferBinding fbo_save;
+//
+//            ca_read_fbo.bindFramebuffer();
+//            gl::clear( mBGColor );
+//    //        ca_read_fbo.unbindFramebuffer();
+//
+//            ca_write_fbo.bindFramebuffer();
+//            gl::clear( mBGColor ); 
+//    //        ca_write_fbo.unbindFramebuffer();
+//        }
 
         mPostCamera.setOrtho(0, windowSize.x, 0, windowSize.y, -1, 1);
     }
