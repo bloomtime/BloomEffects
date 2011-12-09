@@ -26,10 +26,12 @@ public:
     
     ~EffectsRenderer(); 
     
-	void setup(EffectsStateRef fxState, ci::Vec2f windowSize);
+	void setup(EffectsStateRef fxState, ci::Vec2i windowSize);
 	void update(list<EffectRef> effects);
 	void draw();
     
+    void setWindowSize(Vec2i windowSize);
+
     void setBackgroundColor(ci::Color bgColor) { mBGColor = bgColor; }
     
     //TODO need to cache here (maybe combine this with effect attribute)
