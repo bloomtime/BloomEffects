@@ -209,6 +209,7 @@ protected:
     
     Vec4f mTintColorAlpha;
     Vec2f mScreenSizeLOD;
+    float mTimeElapsed;
     
     EmissionVolume mEmissionVolume;
     

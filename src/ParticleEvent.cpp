@@ -49,7 +49,8 @@ ParticleEvent::ParticleEvent():
     mDiffuseGreenLerp(Vec3f(0.0f, 0.0f, 0.0f)),
     mDiffuseBlueLerp(Vec3f(0.0f, 0.0f, 0.0f)),
     mWindowWidth(1.0f),
-    mWindowHeight(1.0f)
+    mWindowHeight(1.0f),
+    mTimeElapsed(0.0f)
 { 
     mLifetime = 1.0f;
     mEmissionVolume = EmissionVolume();
@@ -277,6 +278,7 @@ void ParticleEvent::update()
     
     float totalElapsed = getEventElapsedSeconds();
     float dt = totalElapsed - mPreviousElapsed;    
+    mTimeElapsed = totalElapsed * 1000.0f;
     
     mPreviousElapsed = totalElapsed;
     
@@ -594,6 +596,7 @@ void ParticleEvent::draw()
     mShader.uniform("u_hasDistort", mTexture2Mode == TEX2_DISTORT);
     mShader.uniform("u_tintColor", mTintColorAlpha);
     mShader.uniform("u_keyLightDir", mKeyLightDir);
+    mShader.uniform("u_worldTime", mTimeElapsed);
     mShader.uniform("u_mvp_matrix", mCamera->getProjectionMatrix() * mCamera->getModelViewMatrix());
     
     GLsizei stride = sizeof(VertexData);

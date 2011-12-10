@@ -5,6 +5,7 @@ uniform float u_tileWidth;
 uniform bool u_tileBlend;
 uniform vec4 u_tintColor;
 uniform vec3 u_keyLightDir;
+uniform float u_worldTime;
 
 attribute vec2 a_texcoord;
 attribute vec4 a_position;

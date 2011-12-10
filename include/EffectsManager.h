@@ -27,7 +27,7 @@ typedef boost::unordered_map<std::string, Json::Value> EffectJsonMap;
 typedef boost::unordered_map<std::string, EffectAttrMap> EventAttrMap;
 typedef std::shared_ptr<ci::CameraPersp> CameraRef;
 
-const ci::Vec3f KEYLIGHT_DIR = ci::Vec3f(1.0f, 0.0f, 0.0f);
+const ci::Vec3f KEYLIGHT_DIR = ci::Vec3f(1.0f, 0.0f, 0.5f);
 
 class EffectsManager
 {

@@ -16,7 +16,7 @@ EffectsRendererRef EffectsRenderer::create()
 
 EffectsRenderer::EffectsRenderer()
 {
-     mBGColor = Color(1.0f, 1.0f, 1.0f);
+     mBGColor = Color(0.5f, 0.8f, 0.7f);
      
      mPostShaderName = DEFAULT_POST_SHADER;
 }
