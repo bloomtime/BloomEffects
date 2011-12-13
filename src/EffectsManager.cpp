@@ -85,8 +85,6 @@ void EffectsManager::playEffectOnce(string effectName, Matrix44f transform)
     
     mOneOffEffects.push_back(newEffect);
     newEffect->start();
-        
-    return newEffect;
 }
 
 EffectRef EffectsManager::createEffect(string effectName, bool start, Matrix44f transform)
