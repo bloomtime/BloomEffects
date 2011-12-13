@@ -16,10 +16,16 @@ EffectsManager::EffectsManager()
 
 EffectsManager::~EffectsManager()
 {
-	for( list<EffectRef>::iterator it = mEffects.begin(); it != mEffects.end(); ++it )
+	for( list<EffectWeakRef>::iterator it = mEffects.begin(); it != mEffects.end(); ++it )
     {
         //(*it) = NULL;
         it = mEffects.erase(it);
+    }
+    
+	for( list<EffectRef>::iterator it = mOneOffEffects.begin(); it != mOneOffEffects.end(); ++it )
+    {
+        //(*it) = NULL;
+        it = mOneOffEffects.erase(it);
     }
     
     mEffectsData.clear();
@@ -55,6 +61,32 @@ void EffectsManager::setBackgroundColor(Color bgColor)
     {
         mRenderer->setBackgroundColor(bgColor);
     }
+}
+
+void EffectsManager::playEffectOnce(string effectName, Matrix44f transform)
+{
+    Json::Value data;
+    
+    //TODO store all loaded json resources.  Later should store effect resources only, not the json
+    if (mEffectsData.find(effectName) != mEffectsData.end())
+    {
+        data = mEffectsData.at(effectName);
+    }
+    else
+    {
+        data = effects::getJsonData(effectName + FX_EXTENSION);
+        mEffectsData[effectName] = data;
+    }
+    
+    EffectRef newEffect = Effect::create();
+    newEffect->setCamera(mCamera);
+    newEffect->setTransform(transform);
+    newEffect->setup(initializeData(data), mWindowSize);
+    
+    mOneOffEffects.push_back(newEffect);
+    newEffect->start();
+        
+    return newEffect;
 }
 
 EffectRef EffectsManager::createEffect(string effectName, bool start, Matrix44f transform)
@@ -276,23 +308,33 @@ void EffectsManager::parseAttr(const Json::Value data, EffectAttribute &attr, Ef
 
 void EffectsManager::destroyEffect(EffectRef effect, bool hardStop)
 {
-	for( list<EffectRef>::iterator it = mEffects.begin(); it != mEffects.end(); ++it )
+	for( list<EffectWeakRef>::iterator it = mEffects.begin(); it != mEffects.end(); ++it )
     {
-        if ((*it) == effect)
+        EffectWeakRef current = (*it);
+        
+        if ( EffectRef currentEffect = current.lock()) 
         {
-            (*it)->stop(hardStop);
-            it = mEffects.erase(it);
+            if (currentEffect == effect)
+            {
+                currentEffect->stop(hardStop);
+                it = mEffects.erase(it);
+            }
         }
     }
 }
 
 void EffectsManager::update()
 {
-	for( list<EffectRef>::iterator it = mEffects.begin(); it != mEffects.end(); ++it )
+	for( list<EffectWeakRef>::iterator it = mEffects.begin(); it != mEffects.end(); ++it )
     {
-        if (!(*it)->isStopped())
+        EffectWeakRef current = (*it);
+        
+        if ( EffectRef currentEffect = current.lock()) 
         {
-            (*it)->update();
+            if (!currentEffect->isStopped())
+            {
+                currentEffect->update();
+            }
         }
         else
         {
@@ -300,7 +342,22 @@ void EffectsManager::update()
         }
     }
     
-    mRenderer->update(mEffects);
+	for( list<EffectRef>::iterator it = mOneOffEffects.begin(); it != mOneOffEffects.end(); ++it )
+    {
+        EffectRef currentEffect = (*it);
+        
+        if (!currentEffect->isStopped())
+        {
+            currentEffect->update();
+        }
+        else
+        {
+            it = mOneOffEffects.erase(it);
+        }
+    }
+    
+    mRenderer->update(mEffects, mOneOffEffects);
+    
     mAudioManager->update();
 }
 

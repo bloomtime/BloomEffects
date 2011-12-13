@@ -27,7 +27,7 @@ public:
     ~EffectsRenderer(); 
     
 	void setup(EffectsStateRef fxState, ci::Vec2i windowSize);
-	void update(list<EffectRef> effects);
+	void update(list<EffectWeakRef> effects, list<EffectRef> oneOffEffects);
 	void draw();
     
     void setWindowSize(Vec2i windowSize);

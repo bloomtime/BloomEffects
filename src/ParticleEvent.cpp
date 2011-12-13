@@ -216,21 +216,6 @@ void ParticleEvent::setup(Vec2f winSize)
         setParentTransform(mtx);
     }
     
-    mVerts = NULL;
-    mPrevTotalVertices = -1;
-    
-    mParticles.clear();
-    mPreviousElapsed = 0.0f;
-    mCurrentRate = 0.0f;
-    
-    if (mEmitMode == EMIT_BURST)
-    {
-        for (int i=0; i<mRate; i++)
-        {
-            addNewParticle();
-        }
-    }
-    
     if (mTiledTexture)
     {
         mNumTiles = (float)mDiffuseTexture.getWidth()/(float)mDiffuseTexture.getHeight();
@@ -285,6 +270,21 @@ void ParticleEvent::update()
     // run through the state gauntlet
     if (isStarted())
     {
+        mVerts = NULL;
+        mPrevTotalVertices = -1;
+    
+        mParticles.clear();
+        mPreviousElapsed = 0.0f;
+        mCurrentRate = 0.0f;
+    
+        if (mEmitMode == EMIT_BURST)
+        {
+            for (int i=0; i<mRate; i++)
+            {
+                addNewParticle();
+            }
+        }
+        
         mEventState = EVENT_RUNNING;
     }
     

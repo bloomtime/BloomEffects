@@ -129,6 +129,15 @@ void SoundEvent::update()
         {
             if (mLifetime == 0.0f)
                 mLifetime = totalElapsed + mFadeTime;
+            else if (totalElapsed > mLifetime)
+            {
+                mAudioManager->stopSound(mSound);
+                
+                if (mEvent)
+                    mEvent->stop();
+                    
+                return;
+            }
                 
             doFade(totalElapsed, mLifetime);
             //mLifetime = totalElapsed + mFadeTime;

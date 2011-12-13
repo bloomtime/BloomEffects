@@ -38,9 +38,15 @@ Effect::~Effect()
 
 void Effect::start()
 {
+    if (isRunning())
+    {
+        return;
+    }
+    
     mIsVisible = true;
     mEffectState = EFFECT_STARTED;
     mStartedTime = mTimer.getSeconds();
+    mIsChildrenRunning = false;
     mActualSeconds = 0.0f;
     mPreviousElapsed = mStartedTime;
 }
@@ -100,7 +106,8 @@ void Effect::update()
         mIsChildrenRunning = true;
         mEffectState = EFFECT_RUNNING;
     }
-    else if (mIsVisible && isRunning()) {         
+    
+    if (mIsVisible && isRunning()) {         
     
         // if no children left, stop self
         if (!mIsChildrenRunning)

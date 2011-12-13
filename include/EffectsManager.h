@@ -46,6 +46,8 @@ public:
     void setBackgroundColor(ci::Color bgColor);
     
     void setCamera(CameraRef camera) { mCamera = camera; }
+    
+    void playEffectOnce(std::string effectName, Matrix44f transform=ci::Matrix44<float>::identity());
     EffectRef createEffect(std::string effectName, bool start=true, Matrix44f transform=ci::Matrix44<float>::identity());
     void destroyEffect(EffectRef effect, bool hardStop = false);
     
@@ -60,7 +62,8 @@ protected:
     EffectsRendererRef mRenderer;
     AudioManagerRef mAudioManager;
     
-    std::list<EffectRef> mEffects;
+    std::list<EffectWeakRef> mEffects;
+    std::list<EffectRef> mOneOffEffects;
     
     //cache of json resources
     EffectJsonMap mEffectsData;
