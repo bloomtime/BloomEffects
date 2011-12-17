@@ -97,6 +97,7 @@ public:
     }
     
     void updateSource();
+    void setInitialized() { mEventState = EVENT_INITIALIZED; }
     
     bool isEnabled() { return mEnabled; }
     

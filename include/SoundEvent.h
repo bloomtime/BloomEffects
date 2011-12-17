@@ -71,6 +71,7 @@ protected:
     PlayMode mPlayMode;
     SoundType mType;
     float mVolume;
+    bool mIsInfinite;
     
     AudioManagerRef mAudioManager;
     FMOD::Event *mEvent;

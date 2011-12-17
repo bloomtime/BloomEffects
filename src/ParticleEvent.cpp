@@ -49,7 +49,8 @@ ParticleEvent::ParticleEvent():
     mDiffuseGreenLerp(Vec3f(0.0f, 0.0f, 0.0f)),
     mDiffuseBlueLerp(Vec3f(0.0f, 0.0f, 0.0f)),
     mWindowWidth(1.0f),
-    mWindowHeight(1.0f)
+    mWindowHeight(1.0f),
+    mTimeElapsed(0.0f)
 { 
     mLifetime = 1.0f;
     mEmissionVolume = EmissionVolume();
@@ -215,21 +216,6 @@ void ParticleEvent::setup(Vec2f winSize)
         setParentTransform(mtx);
     }
     
-    mVerts = NULL;
-    mPrevTotalVertices = -1;
-    
-    mParticles.clear();
-    mPreviousElapsed = 0.0f;
-    mCurrentRate = 0.0f;
-    
-    if (mEmitMode == EMIT_BURST)
-    {
-        for (int i=0; i<mRate; i++)
-        {
-            addNewParticle();
-        }
-    }
-    
     if (mTiledTexture)
     {
         mNumTiles = (float)mDiffuseTexture.getWidth()/(float)mDiffuseTexture.getHeight();
@@ -277,12 +263,28 @@ void ParticleEvent::update()
     
     float totalElapsed = getEventElapsedSeconds();
     float dt = totalElapsed - mPreviousElapsed;    
+    mTimeElapsed = totalElapsed * 1000.0f;
     
     mPreviousElapsed = totalElapsed;
     
     // run through the state gauntlet
     if (isStarted())
     {
+        mVerts = NULL;
+        mPrevTotalVertices = -1;
+    
+        mParticles.clear();
+        mPreviousElapsed = 0.0f;
+        mCurrentRate = 0.0f;
+    
+        if (mEmitMode == EMIT_BURST)
+        {
+            for (int i=0; i<mRate; i++)
+            {
+                addNewParticle();
+            }
+        }
+        
         mEventState = EVENT_RUNNING;
     }
     
@@ -594,6 +596,7 @@ void ParticleEvent::draw()
     mShader.uniform("u_hasDistort", mTexture2Mode == TEX2_DISTORT);
     mShader.uniform("u_tintColor", mTintColorAlpha);
     mShader.uniform("u_keyLightDir", mKeyLightDir);
+    mShader.uniform("u_worldTime", mTimeElapsed);
     mShader.uniform("u_mvp_matrix", mCamera->getProjectionMatrix() * mCamera->getModelViewMatrix());
     
     GLsizei stride = sizeof(VertexData);

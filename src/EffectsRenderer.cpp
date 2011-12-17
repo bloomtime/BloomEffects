@@ -16,7 +16,7 @@ EffectsRendererRef EffectsRenderer::create()
 
 EffectsRenderer::EffectsRenderer()
 {
-     mBGColor = Color(1.0f, 1.0f, 1.0f);
+     mBGColor = Color(0.5f, 0.8f, 0.7f);
      
      mPostShaderName = DEFAULT_POST_SHADER;
 }
@@ -76,7 +76,7 @@ void EffectsRenderer::setWindowSize(Vec2i windowSize)
     }
 }
 
-void EffectsRenderer::update(list<EffectRef> effects)
+void EffectsRenderer::update(list<EffectWeakRef> effects, list<EffectRef> oneOffEffects)
 {
     string stateShader = mState->getPostShader();
     if (stateShader != mPostShaderName)
@@ -127,7 +127,20 @@ void EffectsRenderer::update(list<EffectRef> effects)
             
             gl::clear( mBGColor ); 
             
-            for( list<EffectRef>::const_iterator it = effects.begin(); it != effects.end(); ++it )
+            for( list<EffectWeakRef>::const_iterator it = effects.begin(); it != effects.end(); ++it )
+            {
+                EffectWeakRef current = (*it);
+                
+                if ( EffectRef currentEffect = current.lock()) 
+                {
+                    if (!currentEffect->isStopped())
+                    {
+                        currentEffect->draw();
+                    }
+                }
+            }
+            
+            for( list<EffectRef>::const_iterator it = oneOffEffects.begin(); it != oneOffEffects.end(); ++it )
             {
                 if (!(*it)->isStopped())
                 {

@@ -38,8 +38,15 @@ Effect::~Effect()
 
 void Effect::start()
 {
-    mIsStarted = true;
+    if (isRunning())
+    {
+        return;
+    }
+    
+    mIsVisible = true;
+    mEffectState = EFFECT_STARTED;
     mStartedTime = mTimer.getSeconds();
+    mIsChildrenRunning = false;
     mActualSeconds = 0.0f;
     mPreviousElapsed = mStartedTime;
 }
@@ -89,19 +96,26 @@ void Effect::setup(list<EffectEventRef> events, Vec2f windowSize)
 
 void Effect::update()
 {
-    if (mIsVisible && mIsStarted) {
-        // clean up any children
-        for( list<EffectEventRef>::iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+    if (isStarted())
+    {
+        for( list<EffectEventRef>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
         {
-            if ((*it)->isStopped())
-            {
-                it = mEvents.erase( it );
-            }
-        }          
+            (*it)->setInitialized();
+        }
+        
+        mIsChildrenRunning = true;
+        mEffectState = EFFECT_RUNNING;
+    }
+    
+    if (mIsVisible && isRunning()) {         
     
         // if no children left, stop self
-        if (mIsStarted && mEvents.size() == 0)
-            mIsStopped = true;
+        if (!mIsChildrenRunning)
+        {
+            mEffectState = EFFECT_STOPPED;
+        }
+        
+        mIsChildrenRunning = false;
         
         // update children
         for( list<EffectEventRef>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
@@ -114,6 +128,11 @@ void Effect::update()
             
             if ((*it)->isEnabled())
                 (*it)->update();
+                
+            if (!(*it)->isStopped())
+            {
+                mIsChildrenRunning = true;
+            }
         }
         
     }

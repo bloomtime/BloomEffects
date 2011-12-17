@@ -46,6 +46,14 @@ const boost::unordered_map<string, ChildEventType> CHILD_EVENT_TYPES = boost::as
     ("ParticleEvent", PARTICLE_EVENT)
     ("PostEvent",     POST_EVENT)
     ("SoundEvent",    SOUND_EVENT);
+    
+enum EffectState 
+{
+    EFFECT_INITIALIZED,
+    EFFECT_STARTED,
+    EFFECT_RUNNING,
+    EFFECT_STOPPED
+};
 
 class Effect {
 
@@ -74,8 +82,9 @@ public:
     void setTransform( const ci::Matrix44f &transform );
     ci::Matrix44f getTransform() const { return mTransform; /* copy OK */ }
     
-    bool isStarted() { return mIsStarted; }
-    bool isStopped() { return mIsStopped; }
+    bool isStarted() { return mEffectState == EFFECT_STARTED; }
+    bool isRunning() { return mEffectState == EFFECT_RUNNING; }
+    bool isStopped() { return mEffectState == EFFECT_STOPPED; }
 
 protected:
 
@@ -87,11 +96,11 @@ protected:
     ci::Matrix44f mTransform;
     bool mIsVisible;
     float mStartedTime;
+    bool mIsChildrenRunning;
     
     CameraRef mCamera;
     
-    bool mIsStarted;
-    bool mIsStopped;
+    EffectState mEffectState;
 
     std::list<EffectEventRef> mEvents;
     
@@ -101,9 +110,9 @@ private:
 
     Effect():
         mIsVisible(true),
-        mIsStarted(false),
-        mIsStopped(false),
+        mEffectState(EFFECT_INITIALIZED),
         mStartedTime(-1.0f),
+        mIsChildrenRunning(false),
         mTimer(true) // true = auto-start
     {
         mTransform.setToIdentity();

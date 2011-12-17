@@ -6,6 +6,7 @@ uniform float u_tileWidth;
 uniform bool u_hasNormal;
 uniform bool u_hasDistort;
 uniform bool u_tileBlend;
+uniform float u_worldTime;
 
 varying float v_tileMix;
 varying vec4 v_color;
