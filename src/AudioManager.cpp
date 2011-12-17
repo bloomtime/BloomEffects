@@ -257,7 +257,8 @@ void AudioManager::setup()
     result = mEventSystem->init(MAX_CHANNELS, FMOD_INIT_NORMAL | FMOD_INIT_ENABLE_PROFILE, NULL, FMOD_EVENT_INIT_NORMAL);
     ERRCHECK(result);
     
-    mEventSystem->getSystemObject(&mSystem);
+    result = mEventSystem->getSystemObject(&mSystem);
+    ERRCHECK(result);
     
     updateListenerPosition();
 
