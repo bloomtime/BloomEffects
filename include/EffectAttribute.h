@@ -14,7 +14,6 @@
 #include "cinder/gl/GlslProg.h"
 #include "cinder/app/App.h"
 #include "cinder/BSpline.h"
-#include "cinder/Rand.h"
 #include <boost/unordered_map.hpp>
 #include <boost/assign/list_of.hpp>
 
