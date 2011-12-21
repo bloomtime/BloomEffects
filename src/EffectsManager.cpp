@@ -354,13 +354,34 @@ void EffectsManager::update()
         }
     }
     
-    mRenderer->update(mEffects, mOneOffEffects);
+    //TODO lydia: disabled until global renderer added
+    //mRenderer->update(mEffects, mOneOffEffects);
     
     mAudioManager->update();
 }
 
 void EffectsManager::draw()
 {  
-    mRenderer->draw();
+    //mRenderer->draw();
+    
+    for( list<EffectWeakRef>::const_iterator it = mEffects.begin(); it != mEffects.end(); ++it )
+    {
+        EffectWeakRef current = (*it);
+        
+        if ( EffectRef currentEffect = current.lock()) 
+        {
+            if (!currentEffect->isStopped())
+            {
+                currentEffect->draw();
+            }
+        }
+    }
+    for( list<EffectRef>::const_iterator it = mOneOffEffects.begin(); it != mOneOffEffects.end(); ++it )
+    {
+        if (!(*it)->isStopped())
+        {
+            (*it)->draw();
+        }
+    }
 }
 

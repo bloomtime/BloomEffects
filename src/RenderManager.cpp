@@ -1,31 +1,31 @@
 //
-//  EffectsRenderer.cpp
+//  RenderManager.cpp
 //
 //  Copyright 2011 Bloom Studio, Inc. All rights reserved.
 //
 
-#include "EffectsRenderer.h"
+#include "RenderManager.h"
 
 using namespace std;
 using namespace ci;
 
-EffectsRendererRef EffectsRenderer::create()
+RenderManagerRef RenderManager::create()
 {
-    return EffectsRendererRef( new EffectsRenderer() );
+    return RenderManagerRef( new RenderManager() );
 }
 
-EffectsRenderer::EffectsRenderer()
+RenderManager::RenderManager()
 {
      mBGColor = Color(0.5f, 0.8f, 0.7f);
      
      mPostShaderName = DEFAULT_POST_SHADER;
 }
 
-EffectsRenderer::~EffectsRenderer()
+RenderManager::~RenderManager()
 {
 }
 
-void EffectsRenderer::setPostShader(string shaderName)
+void RenderManager::setPostShader(string shaderName)
 {
     //TODO need to cache here, possibly using EffectAttribute
     mCurrentPostShader = gl::GlslProg(app::App::loadResource(shaderName + "_vert.glsl"), app::App::loadResource(shaderName + "_frag.glsl"));
@@ -34,7 +34,7 @@ void EffectsRenderer::setPostShader(string shaderName)
     mPostShaderName = shaderName;
 }
 
-void EffectsRenderer::setup(EffectsStateRef fxState, Vec2i windowSize)
+void RenderManager::setup(EffectsStateRef fxState, Vec2i windowSize)
 {
     mState = fxState;
     
@@ -48,7 +48,7 @@ void EffectsRenderer::setup(EffectsStateRef fxState, Vec2i windowSize)
     setWindowSize(windowSize);
 }
 
-void EffectsRenderer::setWindowSize(Vec2i windowSize)
+void RenderManager::setWindowSize(Vec2i windowSize)
 {
     if (fbo_size != windowSize) {
         fbo_size = windowSize;
@@ -76,7 +76,7 @@ void EffectsRenderer::setWindowSize(Vec2i windowSize)
     }
 }
 
-void EffectsRenderer::update(list<EffectWeakRef> effects, list<EffectRef> oneOffEffects)
+void RenderManager::update(list<EffectWeakRef> effects, list<EffectRef> oneOffEffects)
 {
     string stateShader = mState->getPostShader();
     if (stateShader != mPostShaderName)
@@ -127,6 +127,8 @@ void EffectsRenderer::update(list<EffectWeakRef> effects, list<EffectRef> oneOff
             
             gl::clear( mBGColor ); 
             
+            //TODO HERE REGISTERED RENDERLAYER DRAW CALLS
+            /*
             for( list<EffectWeakRef>::const_iterator it = effects.begin(); it != effects.end(); ++it )
             {
                 EffectWeakRef current = (*it);
@@ -147,6 +149,7 @@ void EffectsRenderer::update(list<EffectWeakRef> effects, list<EffectRef> oneOff
                     (*it)->draw();
                 }
             }
+            */
         }
 
         mBasicShader.unbind();
@@ -159,7 +162,7 @@ void EffectsRenderer::update(list<EffectWeakRef> effects, list<EffectRef> oneOff
     ca_write_fbo = tmp;
 }
 
-void EffectsRenderer::draw()
+void RenderManager::draw()
 {  
     mCurrentPostShader.bind();
     mCurrentPostShader.uniform("u_mvp_matrix",  mPostCamera.getProjectionMatrix() * mPostCamera.getModelViewMatrix());

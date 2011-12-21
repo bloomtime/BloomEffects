@@ -8,6 +8,7 @@
 #include "EffectEvent.h"
 #include "EmitVolume.h"
 
+#include "Vbo.h"
 #include "cinder/Rand.h"
 #include "cinder/gl/GlslProg.h"
 #include <vector>
@@ -230,6 +231,8 @@ protected:
     
     std::list<Particle> mParticles;
 	VertexData *mVerts;
+    
+    gl::VboRef mTrianglesVBO;
     
 private: 
 

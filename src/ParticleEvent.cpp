@@ -99,6 +99,8 @@ void ParticleEvent::processAttributes()
     mSecondaryTexture.setWrap(GL_REPEAT, GL_REPEAT);
     
     mShader = mAttributes.at("Shader").getShader();
+    
+    /*TODO lydia: being replaced by ryan vbos
     pos_handle = mShader.getAttribLocation("a_position");
     txc_handle = mShader.getAttribLocation("a_texcoord");
     norm_handle = mShader.getAttribLocation("a_normal");
@@ -106,6 +108,7 @@ void ParticleEvent::processAttributes()
     bitan_handle = mShader.getAttribLocation("a_bitangent");
     col_handle = mShader.getAttribLocation("a_color");
     tile_handle = mShader.getAttribLocation("a_tileIndex");
+    */
     
     mInitialSpeed = mAttributes.at("InitialSpeed").getVector2();
     mInitialRotation = mAttributes.at("InitialRotation").getVector2();
@@ -222,9 +225,14 @@ void ParticleEvent::setup(Vec2f winSize)
         mTileWidth = (float)mDiffuseTexture.getHeight()/(float)mDiffuseTexture.getWidth();
     }
     
-    //TODO VBO
-    //glGenBuffers(1, &vtx_buffer); 
-    //glBindBuffer(GL_ARRAY_BUFFER, vtx_buffer);
+    mTrianglesVBO = gl::Vbo::create(GL_TRIANGLES);
+    mTrianglesVBO->set(gl::Vbo::Attribute::create("a_position", 3, GL_FLOAT, GL_STREAM_DRAW));
+    mTrianglesVBO->set(gl::Vbo::Attribute::create("a_texcoord", 2, GL_FLOAT, GL_STREAM_DRAW));
+    mTrianglesVBO->set(gl::Vbo::Attribute::create("a_color", 4, GL_FLOAT, GL_STREAM_DRAW));
+    mTrianglesVBO->set(gl::Vbo::Attribute::create("a_normal", 3, GL_FLOAT, GL_STREAM_DRAW));
+    mTrianglesVBO->set(gl::Vbo::Attribute::create("a_tangent", 3, GL_FLOAT, GL_STREAM_DRAW));
+    mTrianglesVBO->set(gl::Vbo::Attribute::create("a_bitangent", 3, GL_FLOAT, GL_STREAM_DRAW));
+    mTrianglesVBO->set(gl::Vbo::Attribute::create("a_tileIndex", 1, GL_FLOAT, GL_STREAM_DRAW));
 }
 
 void ParticleEvent::updateVelocity(Particle &currentParticle, float dt)
@@ -389,9 +397,17 @@ void ParticleEvent::update()
         
         mPrevTotalVertices = mTotalVertices;
     }
-        
+    
 	int vIndex = 0;
-	
+    
+	vector<Vec3f> positions;
+    vector<Vec2f> texcoords;
+    vector<ColorA> colors;
+    vector<Vec3f> normals;
+    vector<Vec3f> tangents;
+    vector<Vec3f> bitangents;
+    vector<float> tileIndices;
+    
 	for( list<Particle>::const_iterator it = mParticles.begin(); it != mParticles.end(); ++it )
     {
         Vec3f pos = (*it).position;
@@ -415,7 +431,7 @@ void ParticleEvent::update()
         float colorG = lerp((*it).diffuseGreenLerp.x, (*it).diffuseGreenLerp.y, time);
         float colorB = lerp((*it).diffuseBlueLerp.x, (*it).diffuseBlueLerp.y, time);
         
-		Vec4f col = Vec4f(colorR, colorG, colorB, alpha);
+		ColorA col = ColorA(colorR, colorG, colorB, alpha);
         
         Vec3f right = Quatf( bbAt, rot ) * bbRight;
         Vec3f up = Quatf( bbAt, rot ) * bbUp;
@@ -476,64 +492,68 @@ void ParticleEvent::update()
         Vec3f newUp = rotMatrix.getRow(1);
         Vec3f newAt = rotMatrix.getRow(2);
         
-        mVerts[vIndex].vertex  = p1;
-        mVerts[vIndex].texture = Vec2f(0.0f,0.0f);
-        mVerts[vIndex].color   = col;
-        mVerts[vIndex].normal  = newAt;
-        mVerts[vIndex].tangent  = newRight;
-        mVerts[vIndex].bitangent  = newUp;
-        mVerts[vIndex].tileIndex = tileIndex;
-        vIndex++;
+        //TRIANGLE 1, VERTEX 1
+        positions.push_back(p1);
+        texcoords.push_back(Vec2f(0.0f,0.0f));
+        colors.push_back(col);
+        normals.push_back(newAt);
+        tangents.push_back(newRight);
+        bitangents.push_back(newUp);
+        tileIndices.push_back(tileIndex);
         
-        mVerts[vIndex].vertex  = p2;
-        mVerts[vIndex].texture = Vec2f(1.0f,0.0f);
-        mVerts[vIndex].color   = col;
-        mVerts[vIndex].normal  = newAt;
-        mVerts[vIndex].tangent  = newRight;
-        mVerts[vIndex].bitangent  = newUp;
-        mVerts[vIndex].tileIndex = tileIndex;
-        vIndex++;
+        //TRIANGLE 1, VERTEX 2
+        positions.push_back(p2);
+        texcoords.push_back(Vec2f(1.0f,0.0f));
+        colors.push_back(col);
+        normals.push_back(newAt);
+        tangents.push_back(newRight);
+        bitangents.push_back(newUp);
+        tileIndices.push_back(tileIndex);
         
-        mVerts[vIndex].vertex  = p3;
-        mVerts[vIndex].texture = Vec2f(0.0f,1.0f);
-        mVerts[vIndex].color   = col;
-        mVerts[vIndex].normal  = newAt;
-        mVerts[vIndex].tangent  = newRight;
-        mVerts[vIndex].bitangent  = newUp;
-        mVerts[vIndex].tileIndex = tileIndex;
-        vIndex++;
+        //TRIANGLE 1, VERTEX 3
+        positions.push_back(p3);
+        texcoords.push_back(Vec2f(0.0f,1.0f));
+        colors.push_back(col);
+        normals.push_back(newAt);
+        tangents.push_back(newRight);
+        bitangents.push_back(newUp);
+        tileIndices.push_back(tileIndex);
         
-        mVerts[vIndex].vertex  = p2;
-        mVerts[vIndex].texture = Vec2f(1.0f,0.0f);
-        mVerts[vIndex].color   = col;
-        mVerts[vIndex].normal  = newAt;
-        mVerts[vIndex].tangent  = newRight;
-        mVerts[vIndex].bitangent  = newUp;
-        mVerts[vIndex].tileIndex = tileIndex;
-        vIndex++;
+        //TRIANGLE 2, VERTEX 1
+        positions.push_back(p2);
+        texcoords.push_back(Vec2f(1.0f,0.0f));
+        colors.push_back(col);
+        normals.push_back(newAt);
+        tangents.push_back(newRight);
+        bitangents.push_back(newUp);
+        tileIndices.push_back(tileIndex);
         
-        mVerts[vIndex].vertex  = p3;
-        mVerts[vIndex].texture = Vec2f(0.0f,1.0f);
-        mVerts[vIndex].color   = col;
-        mVerts[vIndex].normal  = newAt;
-        mVerts[vIndex].tangent  = newRight;
-        mVerts[vIndex].bitangent  = newUp;
-        mVerts[vIndex].tileIndex = tileIndex;
-        vIndex++;
+        //TRIANGLE 2, VERTEX 2
+        positions.push_back(p3);
+        texcoords.push_back(Vec2f(0.0f,1.0f));
+        colors.push_back(col);
+        normals.push_back(newAt);
+        tangents.push_back(newRight);
+        bitangents.push_back(newUp);
+        tileIndices.push_back(tileIndex);
         
-        mVerts[vIndex].vertex  = p4;
-        mVerts[vIndex].texture = Vec2f(1.0f,1.0f);
-        mVerts[vIndex].color   = col;
-        mVerts[vIndex].normal  = newAt;
-        mVerts[vIndex].tangent  = newRight;
-        mVerts[vIndex].bitangent  = newUp;
-        mVerts[vIndex].tileIndex = tileIndex;
-        vIndex++;        
-        
+        //TRIANGLE 2, VERTEX 3
+        positions.push_back(p4);
+        texcoords.push_back(Vec2f(1.0f,1.0f));
+        colors.push_back(col);
+        normals.push_back(newAt);
+        tangents.push_back(newRight);
+        bitangents.push_back(newUp);
+        tileIndices.push_back(tileIndex);
 	}   
-     
-    //TODO VBO
-    //glBufferData(GL_ARRAY_BUFFER, mTotalVertices * sizeof(mVerts[0]), &mVerts[0], GL_DYNAMIC_DRAW);
+    
+    mTrianglesVBO->get("a_position")->setData(positions);
+    mTrianglesVBO->get("a_texcoord")->setData(texcoords);
+    mTrianglesVBO->get("a_color")->setData(colors);
+    mTrianglesVBO->get("a_normal")->setData(normals);
+    mTrianglesVBO->get("a_tangent")->setData(tangents);
+    mTrianglesVBO->get("a_bitangent")->setData(bitangents);
+    mTrianglesVBO->get("a_tileIndex")->setData(tileIndices);
 }
 
 
@@ -587,7 +607,7 @@ void ParticleEvent::draw()
     mDiffuseTexture.bind(0);
     mSecondaryTexture.bind(1);
     //glBindBuffer(GL_ARRAY_BUFFER, vtx_buffer);
-    
+
     mShader.uniform("u_diffuseTex", 0);
     mShader.uniform("u_secondaryTex", 1);
     mShader.uniform("u_tileWidth", mTileWidth);
@@ -598,7 +618,10 @@ void ParticleEvent::draw()
     mShader.uniform("u_keyLightDir", mKeyLightDir);
     mShader.uniform("u_worldTime", mTimeElapsed);
     mShader.uniform("u_mvp_matrix", mCamera->getProjectionMatrix() * mCamera->getModelViewMatrix());
+        
+    mTrianglesVBO->draw(mShader);
     
+    /* TODO lydia: being replaced with ryan's vbo stuff
     GLsizei stride = sizeof(VertexData);
     //const GLvoid* colOffset = (GLvoid*) sizeof(vec3);
     //const GLvoid* texOffset = (GLvoid*) sizeof(vec3);
@@ -629,9 +652,10 @@ void ParticleEvent::draw()
     glDisableVertexAttribArray(tan_handle);
     glDisableVertexAttribArray(bitan_handle);
     glDisableVertexAttribArray(pos_handle);
-
+    
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+    */
+    
     mSecondaryTexture.unbind();
  	mDiffuseTexture.unbind();
     mShader.unbind();
