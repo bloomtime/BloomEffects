@@ -222,13 +222,13 @@ protected:
     float mCurrentRate;  
     
 	int mTotalVertices;
-    int mPrevTotalVertices;
     
     float mWindowWidth;
     float mWindowHeight;
     
     std::list<Particle> mParticles;
-	VertexData *mVerts;
+    
+    gl::VboRef mTrianglesVBO;
     
 private: 
 
