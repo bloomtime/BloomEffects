@@ -5,13 +5,14 @@ using namespace std;
 using namespace ci;
 
 const string FX_EXTENSION = ".effect.json";
-EffectsManagerRef EffectsManager::create()
+EffectsManagerRef EffectsManager::create(RenderManagerRef renderMgr)
 {
-    return EffectsManagerRef( new EffectsManager() );
+    return EffectsManagerRef( new EffectsManager(renderMgr) );
 }
 
-EffectsManager::EffectsManager()
+EffectsManager::EffectsManager(RenderManagerRef renderMgr)
 {
+    mRenderManager = renderMgr;
 }
 
 EffectsManager::~EffectsManager()
@@ -35,10 +36,8 @@ EffectsManager::~EffectsManager()
 void EffectsManager::setup(Vec2i windowSize)
 {
     mWindowSize = windowSize;
-    mState = EffectsState::create();
-    mRenderer = EffectsRenderer::create();
+    
     mAudioManager = AudioManager::create();
-    mRenderer->setup(mState, windowSize);
     mAudioManager->setup();
     mAudioManager->setCamera(mCamera);
 }
@@ -46,21 +45,12 @@ void EffectsManager::setup(Vec2i windowSize)
 void EffectsManager::setWindowSize(Vec2i windowSize)
 {
     mWindowSize = windowSize;
-    mRenderer->setWindowSize(windowSize);    
 }
 
 void EffectsManager::loadFEV(string filepath)
 {
     if (mAudioManager)
         mAudioManager->loadFEV(filepath);
-}
-
-void EffectsManager::setBackgroundColor(Color bgColor)
-{
-    if (mRenderer)
-    {
-        mRenderer->setBackgroundColor(bgColor);
-    }
 }
 
 void EffectsManager::playEffectOnce(string effectName, Matrix44f transform)
@@ -176,7 +166,7 @@ EffectEventList EffectsManager::initializeData(Json::Value data)
             {
                 // Parse global parameters
                 currentEvent->setEnabled(enabled);
-                currentEvent->setState(mState);
+                currentEvent->setRenderManager(mRenderManager);
                 currentEvent->setKeyLightDir(KEYLIGHT_DIR);
                 currentEvent->setStartTime(currentBlock["StartTime"].asFloat());
             
@@ -354,16 +344,11 @@ void EffectsManager::update()
         }
     }
     
-    //TODO lydia: disabled until global renderer added
-    //mRenderer->update(mEffects, mOneOffEffects);
-    
     mAudioManager->update();
 }
 
 void EffectsManager::draw()
 {  
-    //mRenderer->draw();
-    
     for( list<EffectWeakRef>::const_iterator it = mEffects.begin(); it != mEffects.end(); ++it )
     {
         EffectWeakRef current = (*it);

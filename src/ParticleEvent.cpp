@@ -366,8 +366,6 @@ void ParticleEvent::update()
     
 	mTotalVertices = mParticles.size() * 6;
     
-	int vIndex = 0;
-    
 	vector<Vec3f> positions;
     vector<Vec2f> texcoords;
     vector<ColorA> colors;

@@ -6,7 +6,7 @@
 
 #pragma once
 #include "EffectAttribute.h"
-#include "EffectsState.h"
+#include "RenderManager.h"
 
 #include "cinder/Cinder.h"
 #include "cinder/Camera.h"
@@ -53,9 +53,9 @@ public:
     virtual void update() {}
     virtual void draw() {}
     
+    void setRenderManager(RenderManagerRef renderMgr) { mRenderManager = renderMgr; }
     void setCamera(CameraRef camera) { mCamera = camera; }
     void setKeyLightDir(ci::Vec3f dir) { mKeyLightDir = dir.normalized(); }
-    void setState(EffectsStateRef state) { mState = state; }
     
     void setParentTransform( const ci::Matrix44f &transform ) 
     { 
@@ -139,7 +139,7 @@ protected:
     virtual void processAttributes() {};
     
     CameraRef mCamera;
-    EffectsStateRef mState;
+    RenderManagerRef mRenderManager;
     
     double mActualSeconds;
     double mPreviousElapsed;

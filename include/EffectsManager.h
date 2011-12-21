@@ -12,11 +12,10 @@
 #include "cinder/gl/Fbo.h"
 //#include "json/json.h"
 
-#include "EffectsRenderer.h"
+#include "RenderManager.h"
 #include "AudioManager.h"
 #include "json/json.h"
 #include "EffectJson.h"
-#include "EffectsState.h"
 #include "Effect.h"
 #include <list>
 
@@ -33,7 +32,7 @@ class EffectsManager
 {
 public:
 
-    static EffectsManagerRef create();
+    static EffectsManagerRef create(RenderManagerRef renderMgr);
     
     ~EffectsManager(); 
     
@@ -42,8 +41,6 @@ public:
 	void draw();
     
     void setWindowSize( ci::Vec2i windowSize );
-    
-    void setBackgroundColor(ci::Color bgColor);
     
     void setCamera(CameraRef camera) { mCamera = camera; }
     
@@ -58,8 +55,8 @@ public:
     
 protected:
     CameraRef mCamera;
-    EffectsStateRef mState;
-    EffectsRendererRef mRenderer;
+    
+    RenderManagerRef mRenderManager;
     AudioManagerRef mAudioManager;
     
     std::list<EffectWeakRef> mEffects;
@@ -75,5 +72,5 @@ protected:
     
 private:
 
-    EffectsManager();
+    EffectsManager(RenderManagerRef renderMgr);
 };

@@ -3,6 +3,7 @@
 //
 //  Copyright 2011 Bloom Studio, Inc. All rights reserved.
 //
+//  TODO need to move out of BloomEffects to something else
 
 #pragma once
 #include "cinder/ImageIo.h"
@@ -10,9 +11,6 @@
 #include "cinder/Camera.h"
 #include "cinder/gl/GlslProg.h"
 #include "cinder/gl/Fbo.h"
-
-#include "Effect.h"
-#include "EffectsState.h"
 
 enum RenderLayer 
 {
@@ -28,6 +26,8 @@ class RenderManager;
 
 typedef std::shared_ptr<RenderManager> RenderManagerRef;
 
+const std::string DEFAULT_POST_SHADER = "defaultPost";
+
 class RenderManager
 {
 public:
@@ -36,28 +36,30 @@ public:
     
     ~RenderManager(); 
     
-	void setup(EffectsStateRef fxState, ci::Vec2i windowSize);
-	void update(list<EffectWeakRef> effects, list<EffectRef> oneOffEffects);
+	void setup(ci::Vec2i windowSize);
+	void update();
 	void draw();
     
-    void setWindowSize(Vec2i windowSize);
+    void setWindowSize(ci::Vec2i windowSize);
     void setBackgroundColor(ci::Color bgColor) { mBGColor = bgColor; }
     
     //TODO need to cache here (maybe combine this with effect attribute)
     void setDefaultPostShader() { mCurrentPostShader = mDefaultPostShader; }
     void setPostShader(std::string shaderName);
+    void setPostShaderAlpha(float alpha) { mPostShaderAlpha = alpha; }
     
 protected:
 
     ci::CameraOrtho mPostCamera;
-    EffectsStateRef mState;
 
-    gl::Fbo ca_read_fbo, ca_write_fbo;
+    ci::gl::Fbo ca_read_fbo, ca_write_fbo;
     ci::Vec2i fbo_size;
 
     ci::Color mBGColor;
     
     std::string mPostShaderName;
+    
+    float mPostShaderAlpha;
     
     ci::gl::GlslProg mBasicShader, mCurrentPostShader;
     ci::gl::GlslProg mDefaultPostShader;

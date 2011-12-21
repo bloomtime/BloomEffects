@@ -5,6 +5,7 @@
 //
 
 #include "RenderManager.h"
+#include "cinder/app/App.h"
 
 using namespace std;
 using namespace ci;
@@ -16,9 +17,11 @@ RenderManagerRef RenderManager::create()
 
 RenderManager::RenderManager()
 {
-     mBGColor = Color(0.5f, 0.8f, 0.7f);
+     mBGColor = Color(1.0f, 1.0f, 1.0f);
+     mPostShaderAlpha = 1.0f;
      
-     mPostShaderName = DEFAULT_POST_SHADER;
+     setPostShader(DEFAULT_POST_SHADER);
+     mDefaultPostShader = mCurrentPostShader;
 }
 
 RenderManager::~RenderManager()
@@ -31,20 +34,14 @@ void RenderManager::setPostShader(string shaderName)
     mCurrentPostShader = gl::GlslProg(app::App::loadResource(shaderName + "_vert.glsl"), app::App::loadResource(shaderName + "_frag.glsl"));
     vtx_handle_post = mCurrentPostShader.getAttribLocation("a_position");
     txc_handle_post = mCurrentPostShader.getAttribLocation("a_texcoord");
-    mPostShaderName = shaderName;
 }
 
-void RenderManager::setup(EffectsStateRef fxState, Vec2i windowSize)
+void RenderManager::setup(Vec2i windowSize)
 {
-    mState = fxState;
-    
     mBasicShader = gl::GlslProg(app::App::loadResource("default_texture_vert.glsl"), app::App::loadResource("default_texture_frag.glsl"));
     vtx_handle = mBasicShader.getAttribLocation("a_position");
     txc_handle = mBasicShader.getAttribLocation("a_texcoord");
-    
-    setPostShader(mState->getPostShader());
-    mDefaultPostShader = mCurrentPostShader;
-
+ 
     setWindowSize(windowSize);
 }
 
@@ -76,14 +73,8 @@ void RenderManager::setWindowSize(Vec2i windowSize)
     }
 }
 
-void RenderManager::update(list<EffectWeakRef> effects, list<EffectRef> oneOffEffects)
+void RenderManager::update()
 {
-    string stateShader = mState->getPostShader();
-    if (stateShader != mPostShaderName)
-    {
-      setPostShader(stateShader);
-    }
-    
     // CA Calculation Pass: Draw to Write Buffer
     {
         gl::SaveFramebufferBinding fbo_save;
@@ -166,7 +157,7 @@ void RenderManager::draw()
 {  
     mCurrentPostShader.bind();
     mCurrentPostShader.uniform("u_mvp_matrix",  mPostCamera.getProjectionMatrix() * mPostCamera.getModelViewMatrix());
-    mCurrentPostShader.uniform("u_postAlpha", mState->getPostShaderAlpha());
+    mCurrentPostShader.uniform("u_postAlpha", mPostShaderAlpha);
     
     // Draw the Read Buffer
     {
