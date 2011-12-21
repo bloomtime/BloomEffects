@@ -22,7 +22,6 @@ ParticleEventRef ParticleEvent::create()
 ParticleEvent::ParticleEvent():
     mRate(1.0f),
     mTotalVertices(0),
-    mPrevTotalVertices(0),
     mBlendMode(BLEND_OPAQUE),
     mParticleLifetime(Vec2f(1.0f, 0.0f)),
     mInitialSpeed(Vec2f(0.0f, 0.0f)),
@@ -37,7 +36,6 @@ ParticleEvent::ParticleEvent():
     mEmitAngle(Vec2f(0.0f, 0.0f)),
     mNumTiles(1.0f),
     mTileWidth(1.0f),
-    mVerts(NULL),
     mRotationAngle(0.0f),
     mRotationSpeed(Vec2f(0.0f, 0.0f)),
     mCameraAttached(false),
@@ -60,11 +58,6 @@ ParticleEvent::ParticleEvent():
     
 ParticleEvent::~ParticleEvent()
 {
-    if (mVerts != NULL)	{
-        delete[] mVerts;
-        mVerts = NULL;
-    }
-    
     mParticles.clear();
 }
 
@@ -99,16 +92,6 @@ void ParticleEvent::processAttributes()
     mSecondaryTexture.setWrap(GL_REPEAT, GL_REPEAT);
     
     mShader = mAttributes.at("Shader").getShader();
-    
-    /*TODO lydia: being replaced by ryan vbos
-    pos_handle = mShader.getAttribLocation("a_position");
-    txc_handle = mShader.getAttribLocation("a_texcoord");
-    norm_handle = mShader.getAttribLocation("a_normal");
-    tan_handle = mShader.getAttribLocation("a_tangent");
-    bitan_handle = mShader.getAttribLocation("a_bitangent");
-    col_handle = mShader.getAttribLocation("a_color");
-    tile_handle = mShader.getAttribLocation("a_tileIndex");
-    */
     
     mInitialSpeed = mAttributes.at("InitialSpeed").getVector2();
     mInitialRotation = mAttributes.at("InitialRotation").getVector2();
@@ -278,9 +261,6 @@ void ParticleEvent::update()
     // run through the state gauntlet
     if (isStarted())
     {
-        mVerts = NULL;
-        mPrevTotalVertices = -1;
-    
         mParticles.clear();
         mPreviousElapsed = 0.0f;
         mCurrentRate = 0.0f;
@@ -385,18 +365,6 @@ void ParticleEvent::update()
     }
     
 	mTotalVertices = mParticles.size() * 6;
-	
-    if (mTotalVertices != mPrevTotalVertices) {
-        if (mVerts != NULL) {
-            delete[] mVerts; 
-            mVerts = NULL;
-        }
-        if (mTotalVertices > 0) {
-            mVerts = new VertexData[mTotalVertices];
-        }
-        
-        mPrevTotalVertices = mTotalVertices;
-    }
     
 	int vIndex = 0;
     
@@ -620,42 +588,7 @@ void ParticleEvent::draw()
     mShader.uniform("u_mvp_matrix", mCamera->getProjectionMatrix() * mCamera->getModelViewMatrix());
         
     mTrianglesVBO->draw(mShader);
-    
-    /* TODO lydia: being replaced with ryan's vbo stuff
-    GLsizei stride = sizeof(VertexData);
-    //const GLvoid* colOffset = (GLvoid*) sizeof(vec3);
-    //const GLvoid* texOffset = (GLvoid*) sizeof(vec3);
-    //const GLvoid* tileOffset = (GLvoid*) sizeof(vec3);
-    
-    glVertexAttribPointer(pos_handle, 3, GL_FLOAT, GL_FALSE, stride, &mVerts[0].vertex);    
-    glVertexAttribPointer(col_handle, 4, GL_FLOAT, GL_FALSE, stride, &mVerts[0].color);
-    glVertexAttribPointer(norm_handle, 3, GL_FLOAT, GL_FALSE, stride, &mVerts[0].normal);
-    glVertexAttribPointer(tan_handle, 3, GL_FLOAT, GL_FALSE, stride, &mVerts[0].tangent);
-    glVertexAttribPointer(bitan_handle, 3, GL_FLOAT, GL_FALSE, stride, &mVerts[0].bitangent);
-    glVertexAttribPointer(txc_handle, 2, GL_FLOAT, GL_FALSE, stride, &mVerts[0].texture);
-    glVertexAttribPointer(tile_handle, 1, GL_FLOAT, GL_FALSE, stride, &mVerts[0].tileIndex);
-
-    glEnableVertexAttribArray(pos_handle);
-    glEnableVertexAttribArray(txc_handle);
-    glEnableVertexAttribArray(col_handle);
-    glEnableVertexAttribArray(norm_handle);
-    glEnableVertexAttribArray(tan_handle);
-    glEnableVertexAttribArray(bitan_handle);
-    glEnableVertexAttribArray(tile_handle);
-    
-    glDrawArrays(GL_TRIANGLES, 0, mTotalVertices);
-    
-    glDisableVertexAttribArray(tile_handle);
-    glDisableVertexAttribArray(col_handle);
-    glDisableVertexAttribArray(txc_handle);
-    glDisableVertexAttribArray(norm_handle);
-    glDisableVertexAttribArray(tan_handle);
-    glDisableVertexAttribArray(bitan_handle);
-    glDisableVertexAttribArray(pos_handle);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    */
-    
+        
     mSecondaryTexture.unbind();
  	mDiffuseTexture.unbind();
     mShader.unbind();
