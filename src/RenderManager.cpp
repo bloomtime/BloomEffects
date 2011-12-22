@@ -17,11 +17,20 @@ RenderManagerRef RenderManager::create()
 
 RenderManager::RenderManager()
 {
-     mBGColor = Color(1.0f, 1.0f, 1.0f);
-     mPostShaderAlpha = 1.0f;
+    mBGColor = Color(1.0f, 1.0f, 1.0f);
+    mPostShaderAlpha = 1.0f;
+    mWindowSize = Vec2i(1024, 768);
+    
+    setPostShader(DEFAULT_POST_SHADER);
+    mDefaultPostShader = mCurrentPostShader;
      
-     setPostShader(DEFAULT_POST_SHADER);
-     mDefaultPostShader = mCurrentPostShader;
+    mVBO = gl::Vbo::create(GL_TRIANGLE_STRIP);
+    mVBO->set(gl::Vbo::Attribute::create("a_position", 2, GL_FLOAT, GL_STREAM_DRAW));
+    mVBO->set(gl::Vbo::Attribute::create("a_texcoord", 2, GL_FLOAT, GL_STREAM_DRAW));
+    
+    mPostVBO = gl::Vbo::create(GL_TRIANGLE_STRIP);
+    mPostVBO->set(gl::Vbo::Attribute::create("a_position", 2, GL_FLOAT, GL_STREAM_DRAW));
+    mPostVBO->set(gl::Vbo::Attribute::create("a_texcoord", 2, GL_FLOAT, GL_STREAM_DRAW));
 }
 
 RenderManager::~RenderManager()
@@ -30,23 +39,21 @@ RenderManager::~RenderManager()
 
 void RenderManager::setPostShader(string shaderName)
 {
-    //TODO need to cache here, possibly using EffectAttribute
+    //TODO need to cache here?
     mCurrentPostShader = gl::GlslProg(app::App::loadResource(shaderName + "_vert.glsl"), app::App::loadResource(shaderName + "_frag.glsl"));
-    vtx_handle_post = mCurrentPostShader.getAttribLocation("a_position");
-    txc_handle_post = mCurrentPostShader.getAttribLocation("a_texcoord");
 }
 
 void RenderManager::setup(Vec2i windowSize)
 {
     mBasicShader = gl::GlslProg(app::App::loadResource("default_texture_vert.glsl"), app::App::loadResource("default_texture_frag.glsl"));
-    vtx_handle = mBasicShader.getAttribLocation("a_position");
-    txc_handle = mBasicShader.getAttribLocation("a_texcoord");
- 
+    
     setWindowSize(windowSize);
 }
 
 void RenderManager::setWindowSize(Vec2i windowSize)
 {
+    mWindowSize = windowSize;
+    
     if (fbo_size != windowSize) {
         fbo_size = windowSize;
         gl::Fbo::Format fbo_format;
@@ -57,18 +64,20 @@ void RenderManager::setWindowSize(Vec2i windowSize)
         ca_write_fbo = gl::Fbo(fbo_size.x, fbo_size.y, fbo_format);
         ca_read_fbo  = gl::Fbo(fbo_size.x, fbo_size.y, fbo_format);
 
-//        {   
-//            gl::SaveFramebufferBinding fbo_save;
-//
-//            ca_read_fbo.bindFramebuffer();
-//            gl::clear( mBGColor );
-//    //        ca_read_fbo.unbindFramebuffer();
-//
-//            ca_write_fbo.bindFramebuffer();
-//            gl::clear( mBGColor ); 
-//    //        ca_write_fbo.unbindFramebuffer();
-//        }
+        /*
+        {   
+            gl::SaveFramebufferBinding fbo_save;
 
+            ca_read_fbo.bindFramebuffer();
+            gl::clear( mBGColor );
+            ca_read_fbo.unbindFramebuffer();
+
+            ca_write_fbo.bindFramebuffer();
+            gl::clear( mBGColor ); 
+            ca_write_fbo.unbindFramebuffer();
+        }
+        */
+        
         mPostCamera.setOrtho(0, windowSize.x, 0, windowSize.y, -1, 1);
     }
 }
@@ -96,51 +105,35 @@ void RenderManager::update()
             Rectf destRect = texture.getCleanBounds();
             const Area srcArea = Area( destRect );
 
-            GLfloat verts[8];
-            glVertexAttribPointer( vtx_handle, 2, GL_FLOAT, GL_FALSE, 0, verts );
-            glEnableVertexAttribArray( vtx_handle );
-            GLfloat texCoords[8];
-            glVertexAttribPointer( txc_handle, 2, GL_FLOAT, GL_FALSE, 0, texCoords );
-            glEnableVertexAttribArray( txc_handle );
+            vector<Vec2f> positions;
+    
+            positions.push_back(Vec2f(destRect.getX2(), destRect.getY1()));
+            positions.push_back(Vec2f(destRect.getX1(), destRect.getY1()));
+            positions.push_back(Vec2f(destRect.getX2(), destRect.getY2()));
+            positions.push_back(Vec2f(destRect.getX1(), destRect.getY2()));
 
-            verts[0*2+0] = destRect.getX2(); verts[0*2+1] = destRect.getY1();
-            verts[1*2+0] = destRect.getX1(); verts[1*2+1] = destRect.getY1();
-            verts[2*2+0] = destRect.getX2(); verts[2*2+1] = destRect.getY2();
-            verts[3*2+0] = destRect.getX1(); verts[3*2+1] = destRect.getY2();
-
+            mVBO->get("a_position")->setData(positions);
+            
+            vector<Vec2f> texCoords;     
+                       
             const Rectf srcCoords = texture.getAreaTexCoords( srcArea );
-            texCoords[0*2+0] = srcCoords.getX2(); texCoords[0*2+1] = srcCoords.getY1();
-            texCoords[1*2+0] = srcCoords.getX1(); texCoords[1*2+1] = srcCoords.getY1();
-            texCoords[2*2+0] = srcCoords.getX2(); texCoords[2*2+1] = srcCoords.getY2();
-            texCoords[3*2+0] = srcCoords.getX1(); texCoords[3*2+1] = srcCoords.getY2();
-
-            glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+            texCoords.push_back(Vec2f(srcCoords.getX2(), srcCoords.getY1()));
+            texCoords.push_back(Vec2f(srcCoords.getX1(), srcCoords.getY1()));
+            texCoords.push_back(Vec2f(srcCoords.getX2(), srcCoords.getY2()));
+            texCoords.push_back(Vec2f(srcCoords.getX1(), srcCoords.getY2()));
             
-            gl::clear( mBGColor ); 
+            mVBO->get("a_texcoord")->setData(texCoords);
             
-            //TODO HERE REGISTERED RENDERLAYER DRAW CALLS
-            /*
-            for( list<EffectWeakRef>::const_iterator it = effects.begin(); it != effects.end(); ++it )
+            mVBO->draw(mBasicShader);
+            
+            glViewport(0,0,mWindowSize.x,mWindowSize.y);
+            gl::clear(mBGColor);
+            
+            for(int i=0; i<LAYER_INVALID; i++)
             {
-                EffectWeakRef current = (*it);
-                
-                if ( EffectRef currentEffect = current.lock()) 
-                {
-                    if (!currentEffect->isStopped())
-                    {
-                        currentEffect->draw();
-                    }
-                }
+                RenderLayer currentLayer = (RenderLayer) i;       
+                mCallbacks[currentLayer].call(true);
             }
-            
-            for( list<EffectRef>::const_iterator it = oneOffEffects.begin(); it != oneOffEffects.end(); ++it )
-            {
-                if (!(*it)->isStopped())
-                {
-                    (*it)->draw();
-                }
-            }
-            */
         }
 
         mBasicShader.unbind();
@@ -168,25 +161,26 @@ void RenderManager::draw()
         Rectf destRect = texture.getCleanBounds();
         const Area srcArea = Area( destRect );
 
-        GLfloat verts[8];
-        glVertexAttribPointer( vtx_handle, 2, GL_FLOAT, GL_FALSE, 0, verts );
-        glEnableVertexAttribArray( vtx_handle );
-        GLfloat texCoords[8];
-        glVertexAttribPointer( txc_handle, 2, GL_FLOAT, GL_FALSE, 0, texCoords );
-        glEnableVertexAttribArray( txc_handle );
+        vector<Vec2f> positions;
+    
+        positions.push_back(Vec2f(destRect.getX2(), destRect.getY1()));
+        positions.push_back(Vec2f(destRect.getX1(), destRect.getY1()));
+        positions.push_back(Vec2f(destRect.getX2(), destRect.getY2()));
+        positions.push_back(Vec2f(destRect.getX1(), destRect.getY2()));
 
-        verts[0*2+0] = destRect.getX2(); verts[0*2+1] = destRect.getY1();
-        verts[1*2+0] = destRect.getX1(); verts[1*2+1] = destRect.getY1();
-        verts[2*2+0] = destRect.getX2(); verts[2*2+1] = destRect.getY2();
-        verts[3*2+0] = destRect.getX1(); verts[3*2+1] = destRect.getY2();
-
+        mPostVBO->get("a_position")->setData(positions);
+        
+        vector<Vec2f> texCoords;     
+                   
         const Rectf srcCoords = texture.getAreaTexCoords( srcArea );
-        texCoords[0*2+0] = srcCoords.getX2(); texCoords[0*2+1] = srcCoords.getY1();
-        texCoords[1*2+0] = srcCoords.getX1(); texCoords[1*2+1] = srcCoords.getY1();
-        texCoords[2*2+0] = srcCoords.getX2(); texCoords[2*2+1] = srcCoords.getY2();
-        texCoords[3*2+0] = srcCoords.getX1(); texCoords[3*2+1] = srcCoords.getY2();
-
-        glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+        texCoords.push_back(Vec2f(srcCoords.getX2(), srcCoords.getY1()));
+        texCoords.push_back(Vec2f(srcCoords.getX1(), srcCoords.getY1()));
+        texCoords.push_back(Vec2f(srcCoords.getX2(), srcCoords.getY2()));
+        texCoords.push_back(Vec2f(srcCoords.getX1(), srcCoords.getY2()));
+            
+        mPostVBO->get("a_texcoord")->setData(texCoords);
+        
+        mPostVBO->draw(mCurrentPostShader);
     }
     mCurrentPostShader.unbind();
 }

@@ -40,6 +40,9 @@ void EffectsManager::setup(Vec2i windowSize)
     mAudioManager = AudioManager::create();
     mAudioManager->setup();
     mAudioManager->setCamera(mCamera);
+    
+    //TODO lydia: events will need to register separately later when they want to draw in different renderlayers later
+    mRenderManager->registerDraw(this, &EffectsManager::draw);
 }
 
 void EffectsManager::setWindowSize(Vec2i windowSize)
@@ -347,7 +350,7 @@ void EffectsManager::update()
     mAudioManager->update();
 }
 
-void EffectsManager::draw()
+void EffectsManager::draw(bool enabled)
 {  
     for( list<EffectWeakRef>::const_iterator it = mEffects.begin(); it != mEffects.end(); ++it )
     {

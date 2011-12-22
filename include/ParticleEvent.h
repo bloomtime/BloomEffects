@@ -114,7 +114,7 @@ public:
     
     void setup(Vec2f windowSize);
     void update();
-    void draw();
+    void draw(bool enabled=true);
     void deepDraw(){}
     
     void setTintColor( Vec3f color ) 

@@ -51,7 +51,7 @@ public:
     
     virtual void setup(ci::Vec2f windowSize) {}
     virtual void update() {}
-    virtual void draw() {}
+    virtual void draw(bool enabled=true) {}
     
     void setRenderManager(RenderManagerRef renderMgr) { mRenderManager = renderMgr; }
     void setCamera(CameraRef camera) { mCamera = camera; }

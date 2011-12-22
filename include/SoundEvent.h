@@ -58,7 +58,7 @@ public:
     
     void setup(ci::Vec2f windowSize);
     void update();
-    void draw();
+    void draw(bool enabled=true);
     
 protected:
     //-------------------------------------

@@ -562,7 +562,7 @@ void ParticleEvent::disableBlendMode()
     }
 }
 
-void ParticleEvent::draw()
+void ParticleEvent::draw(bool enabled)
 {    
     if (isInitialized() || isStopped() || mTotalVertices == 0)
         return;
