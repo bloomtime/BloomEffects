@@ -228,7 +228,7 @@ protected:
     
     std::list<Particle> mParticles;
     
-    gl::VboRef mTrianglesVBO;
+    ci::gl::VboRef mTrianglesVBO;
     
 private: 
 
