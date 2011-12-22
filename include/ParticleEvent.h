@@ -90,6 +90,7 @@ public:
         registerAttribute("ParticleScale",    ATTR_CURVE);
         registerAttribute("TileUV",           ATTR_VECTOR3);
         
+        registerAttribute("RenderLayer",      ATTR_STRING);
         registerAttribute("Shader"        ,   ATTR_SHADER);
         registerAttribute("DiffuseTexture",   ATTR_TEXTURE);
         registerAttribute("SecondaryTexture", ATTR_TEXTURE);
@@ -215,8 +216,7 @@ protected:
     EmissionVolume mEmissionVolume;
     
     gl::GlslProg mShader;
-    GLuint vtx_buffer;
-    GLuint pos_handle, txc_handle, norm_handle, tan_handle, bitan_handle, col_handle, tile_handle;
+    RenderLayer mRenderLayer;
     //---------------------------------
     
     // for continuous emit mode

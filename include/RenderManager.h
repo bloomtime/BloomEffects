@@ -26,13 +26,13 @@ enum RenderLayer
     LAYER_UI,          // ui elements
     LAYER_INVALID      // nothing.  always last
 };
-
-
+    
 class RenderManager;
 
 typedef std::shared_ptr<RenderManager> RenderManagerRef;
 typedef ci::CallbackMgr<void(bool)> RenderCallbacks;
-typedef boost::unordered_map<RenderLayer, RenderCallbacks> RenderCallbacksMap;
+typedef boost::unordered_map<RenderLayer, RenderCallbacks> RenderCallbacksByLayer;
+typedef boost::unordered_map<ci::CallbackId, RenderLayer> RenderLayersByID;
 
 const std::string DEFAULT_POST_SHADER = "defaultPost";
 
@@ -61,8 +61,16 @@ public:
     template<typename T>
     ci::CallbackId registerDraw( T *obj, void (T::*callback)(bool), RenderLayer layer=LAYER_SCENE )
     {
-        return mCallbacks[layer].registerCb(std::bind( callback, obj, std::tr1::placeholders::_1 ));
+        ci::CallbackId cid = mCallbacks[layer].registerCb(std::bind( callback, obj, std::tr1::placeholders::_1 ));
+        mLayersByID[cid] = layer;
+        
+        return cid;
     }
+    
+    void unregisterDraw(ci::CallbackId cid)
+    {
+        mCallbacks[mLayersByID[cid]].unregisterCb(cid);
+    } 
     
 protected:
 
@@ -84,7 +92,8 @@ protected:
     ci::gl::GlslProg mBasicShader, mCurrentPostShader;
     ci::gl::GlslProg mDefaultPostShader;
     
-    RenderCallbacksMap mCallbacks;
+    RenderCallbacksByLayer mCallbacks;
+    RenderLayersByID mLayersByID;
 private:
 
     RenderManager();
