@@ -36,6 +36,7 @@ ParticleEvent::ParticleEvent():
     mEmitMode(EMIT_BURST),
     mEmitAngle(Vec2f(0.0f, 0.0f)),
     mNumTiles(1.0f),
+    mRenderLayer(LAYER_EFFECTS),
     mTileWidth(1.0f),
     mRotationAngle(0.0f),
     mRotationSpeed(Vec2f(0.0f, 0.0f)),
@@ -59,6 +60,8 @@ ParticleEvent::ParticleEvent():
     
 ParticleEvent::~ParticleEvent()
 {
+    mRenderManager->unregisterDraw(mCallbackId);
+
     mParticles.clear();
 }
 
@@ -93,6 +96,8 @@ void ParticleEvent::processAttributes()
     mSecondaryTexture.setWrap(GL_REPEAT, GL_REPEAT);
     
     mShader = mAttributes.at("Shader").getShader();
+    string blah = mAttributes.at("RenderLayer").getString();
+    mRenderLayer = RENDER_LAYERS.at(blah);
     
     mInitialSpeed = mAttributes.at("InitialSpeed").getVector2();
     mInitialRotation = mAttributes.at("InitialRotation").getVector2();
@@ -217,6 +222,8 @@ void ParticleEvent::setup(Vec2f winSize)
     mTrianglesVBO->set(gl::Vbo::Attribute::create("a_tangent", 3, GL_FLOAT, GL_STREAM_DRAW));
     mTrianglesVBO->set(gl::Vbo::Attribute::create("a_bitangent", 3, GL_FLOAT, GL_STREAM_DRAW));
     mTrianglesVBO->set(gl::Vbo::Attribute::create("a_tileIndex", 1, GL_FLOAT, GL_STREAM_DRAW));
+    
+    mCallbackId = mRenderManager->registerDraw(this, &ParticleEvent::draw, mRenderLayer);
 }
 
 void ParticleEvent::updateVelocity(Particle &currentParticle, float dt)
@@ -563,9 +570,9 @@ void ParticleEvent::disableBlendMode()
     }
 }
 
-void ParticleEvent::draw()
+void ParticleEvent::draw(bool enabled)
 {    
-    if (isInitialized() || isStopped() || mTotalVertices == 0)
+    if (!enabled || isInitialized() || isStopped() || mTotalVertices == 0)
         return;
     
     enableBlendMode();	

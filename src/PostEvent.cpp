@@ -106,7 +106,7 @@ void PostEvent::update()
     //mPreviousElapsed = totalElapsed;
 }
 
-void PostEvent::draw()
+void PostEvent::draw(bool enabled)
 {    
     // nothing
 }

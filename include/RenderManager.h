@@ -9,24 +9,34 @@
 #include "cinder/ImageIo.h"
 #include "cinder/gl/Texture.h"
 #include "cinder/Camera.h"
+#include "cinder/Function.h"
 #include "cinder/gl/GlslProg.h"
 #include "cinder/gl/Fbo.h"
+#include "Vbo.h"
+
+#include <boost/unordered_map.hpp>
 
 enum RenderLayer 
 {
-    LAYER_SCENE,    // base scene rendering
-    LAYER_EFFECTS,  // particle effects, etc
-    LAYER_PREPOST,  // distortion effects, etc
-    LAYER_POST,     // post filter 
-    LAYER_UI,       // ui elements
+    LAYER_BACKGROUND,  // background 
+    LAYER_SCENE,       // base scene rendering
+    LAYER_EFFECTS,     // particle effects, etc
+    LAYER_PREPOST,     // distortion effects, etc
+    LAYER_POST,        // post filter 
+    LAYER_UI,          // ui elements
+    LAYER_INVALID      // nothing.  always last
 };
-
-
+    
 class RenderManager;
 
 typedef std::shared_ptr<RenderManager> RenderManagerRef;
+typedef ci::CallbackMgr<void(bool)> RenderCallbacks;
+typedef boost::unordered_map<RenderLayer, RenderCallbacks> RenderCallbacksByLayer;
+typedef boost::unordered_map<ci::CallbackId, RenderLayer> RenderLayersByID;
 
 const std::string DEFAULT_POST_SHADER = "defaultPost";
+
+typedef std::function<void(void)> VoidFunc;
 
 class RenderManager
 {
@@ -48,13 +58,31 @@ public:
     void setPostShader(std::string shaderName);
     void setPostShaderAlpha(float alpha) { mPostShaderAlpha = alpha; }
     
+    template<typename T>
+    ci::CallbackId registerDraw( T *obj, void (T::*callback)(bool), RenderLayer layer=LAYER_SCENE )
+    {
+        ci::CallbackId cid = mCallbacks[layer].registerCb(std::bind( callback, obj, std::tr1::placeholders::_1 ));
+        mLayersByID[cid] = layer;
+        
+        return cid;
+    }
+    
+    void unregisterDraw(ci::CallbackId cid)
+    {
+        mCallbacks[mLayersByID[cid]].unregisterCb(cid);
+    } 
+    
 protected:
 
     ci::CameraOrtho mPostCamera;
+    ci::Vec2i mWindowSize;
 
     ci::gl::Fbo ca_read_fbo, ca_write_fbo;
     ci::Vec2i fbo_size;
 
+    ci::gl::VboRef mVBO;
+    ci::gl::VboRef mPostVBO;
+    
     ci::Color mBGColor;
     
     std::string mPostShaderName;
@@ -64,9 +92,8 @@ protected:
     ci::gl::GlslProg mBasicShader, mCurrentPostShader;
     ci::gl::GlslProg mDefaultPostShader;
     
-    GLuint vtx_handle, txc_handle;
-    GLuint vtx_handle_post, txc_handle_post;
-    
+    RenderCallbacksByLayer mCallbacks;
+    RenderLayersByID mLayersByID;
 private:
 
     RenderManager();

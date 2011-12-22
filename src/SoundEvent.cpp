@@ -211,7 +211,7 @@ void SoundEvent::update()
     }
 }
 
-void SoundEvent::draw()
+void SoundEvent::draw(bool enabled)
 {    
     // nothing
 }

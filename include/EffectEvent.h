@@ -30,6 +30,14 @@ enum EventState
 
 typedef boost::unordered_map<std::string, EffectAttribute> EffectAttrMap;
 
+const boost::unordered_map<std::string, RenderLayer> RENDER_LAYERS = boost::assign::map_list_of
+    ("BACKGROUND", LAYER_BACKGROUND)
+    ("SCENE", LAYER_SCENE)
+    ("EFFECTS", LAYER_EFFECTS)
+    ("PREPOST", LAYER_PREPOST)
+    ("POST", LAYER_POST)
+    ("UI", LAYER_UI);
+    
 class EffectEvent;
 
 //typedef std::shared_ptr<EffectsRenderer> EffectRendererRef;
@@ -51,7 +59,7 @@ public:
     
     virtual void setup(ci::Vec2f windowSize) {}
     virtual void update() {}
-    virtual void draw() {}
+    virtual void draw(bool enabled=true) {}
     
     void setRenderManager(RenderManagerRef renderMgr) { mRenderManager = renderMgr; }
     void setCamera(CameraRef camera) { mCamera = camera; }
@@ -168,4 +176,5 @@ protected:
     
     ci::Timer mTimer;
     
+    template<typename T> ci::CallbackId mCallbackId;
 };

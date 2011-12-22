@@ -38,7 +38,7 @@ public:
     
 	void setup(ci::Vec2i windowSize);
 	void update();
-	void draw();
+	void draw(bool enabled=true);
     
     void setWindowSize( ci::Vec2i windowSize );
     
