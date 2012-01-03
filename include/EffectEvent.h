@@ -92,6 +92,7 @@ public:
         mLocalPosition = position;
         mSourcePosition = mParentTransform.transformPoint(position);
     }
+    
     void setSourceOrientation(ci::Vec3f orientation) 
     { 
         mLocalOrientation.set(ci::toRadians(orientation[0]),
@@ -99,6 +100,7 @@ public:
                               ci::toRadians(orientation[2]));
         mSourceOrientation = mLocalOrientation * ci::Quatf(mParentTransform); 
     }
+    
     void setSourceScale(float scale)
     {
         mSourceScale = scale;
