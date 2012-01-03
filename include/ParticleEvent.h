@@ -8,8 +8,6 @@
 #include "EffectEvent.h"
 #include "EmitVolume.h"
 
-#include "Vbo.h"
-#include "cinder/Rand.h"
 #include "cinder/gl/GlslProg.h"
 #include <vector>
 #include <list>
@@ -21,7 +19,7 @@ enum Texture2Mode {
 };
 
 // add new Texture 2 Modes here
-const boost::unordered_map<string, Texture2Mode> TEXTURE2_MODES = boost::assign::map_list_of
+const boost::unordered_map<std::string, Texture2Mode> TEXTURE2_MODES = boost::assign::map_list_of
     ("None", TEX2_NONE)
     ("Normal", TEX2_NORMAL)
     ("Distort", TEX2_DISTORT);
@@ -35,7 +33,7 @@ enum FaceMode {
 };
 
 // add new Face Modes here
-const boost::unordered_map<string, FaceMode> FACE_MODES = boost::assign::map_list_of
+const boost::unordered_map<std::string, FaceMode> FACE_MODES = boost::assign::map_list_of
     ("Billboard", FACE_BILLBOARD)
     ("AxisX", FACE_AXIS_X)
     ("AxisY", FACE_AXIS_Y)
@@ -47,7 +45,7 @@ enum EmitMode {
 };
 
 // add new Emit Modes here
-const boost::unordered_map<string, EmitMode> EMIT_MODES = boost::assign::map_list_of
+const boost::unordered_map<std::string, EmitMode> EMIT_MODES = boost::assign::map_list_of
     ("Burst", EMIT_BURST)
     ("Continuous", EMIT_CONTINUOUS);
 
@@ -58,7 +56,7 @@ enum BlendMode {
 };
 
 // add new Blend Modes here
-const boost::unordered_map<string, BlendMode> BLEND_MODES = boost::assign::map_list_of
+const boost::unordered_map<std::string, BlendMode> BLEND_MODES = boost::assign::map_list_of
     ("AlphaBlend", BLEND_ALPHA)
     ("AdditiveBlend", BLEND_ADDITIVE)
     ("OpaqueBlend", BLEND_OPAQUE);
@@ -113,19 +111,19 @@ public:
         registerAttribute("ScreenSizeLOD",    ATTR_VECTOR2); 
     }
     
-    void setup(Vec2f windowSize);
+    void setup(ci::Vec2f windowSize);
     void update();
     void draw(bool enabled=true);
     void deepDraw(){}
     
-    void setTintColor( Vec3f color ) 
+    void setTintColor( ci::Vec3f color ) 
     { 
         //alpha will be handled elsewhere
-        mTintColorAlpha = Vec4f(color, mTintColorAlpha.w); 
+        mTintColorAlpha = ci::Vec4f(color, mTintColorAlpha.w); 
     }
     
     void setTintAlpha ( float alpha ) { mTintColorAlpha.w = alpha; }
-    Vec2f getNormalizedScreenPos(Vec3f worldPos);
+    ci::Vec2f getNormalizedScreenPos(ci::Vec3f worldPos);
     
     void setWindowDimensions ( float width, float height ) 
     {
@@ -145,13 +143,13 @@ protected:
         floatCurve alphaCurve;
         floatCurve scaleCurve;
         
-        Vec2f tileUVLerp;
-        Vec2f diffuseRedLerp;
-        Vec2f diffuseGreenLerp;
-        Vec2f diffuseBlueLerp;
+        ci::Vec2f tileUVLerp;
+        ci::Vec2f diffuseRedLerp;
+        ci::Vec2f diffuseGreenLerp;
+        ci::Vec2f diffuseBlueLerp;
                 
-        Vec3f position;  
-        Vec3f velocity;
+        ci::Vec3f position;  
+        ci::Vec3f velocity;
     };
     
     struct VertexData {
@@ -170,30 +168,30 @@ protected:
     floatCurve getNewCurve(AttributeCurvePoints &curvePoints);
     void addNewParticle();
     
-    Vec3f getEmitDirection();
+    ci::Vec3f getEmitDirection();
     void updateVelocity(Particle &currentParticle, float seconds);
     void enableBlendMode();
     void disableBlendMode();
     
     // user-defined attributes
     float mRate;
-    Vec2f mParticleLifetime;  // value, variance
+    ci::Vec2f mParticleLifetime;  // value, variance
     EmitMode mEmitMode;
     FaceMode mFaceMode;
-    Vec2f mEmitAngle;
+    ci::Vec2f mEmitAngle;
         
     AttributeCurvePoints mAlphaCurve;
     AttributeCurvePoints mParticleScaleCurve;
     
-    Vec3f mTileUVLerp;
-    Vec3f mDiffuseRedLerp;
-    Vec3f mDiffuseGreenLerp;
-    Vec3f mDiffuseBlueLerp;
+    ci::Vec3f mTileUVLerp;
+    ci::Vec3f mDiffuseRedLerp;
+    ci::Vec3f mDiffuseGreenLerp;
+    ci::Vec3f mDiffuseBlueLerp;
     
     bool mCameraAttached;
     
-    gl::Texture mDiffuseTexture;
-    gl::Texture mSecondaryTexture;
+    ci::gl::Texture mDiffuseTexture;
+    ci::gl::Texture mSecondaryTexture;
     
     BlendMode mBlendMode;
     Texture2Mode mTexture2Mode;
@@ -203,19 +201,19 @@ protected:
     float mTileWidth;
     
     float mRotationAngle;
-    Vec2f mInitialSpeed;     // value, variance
-    Vec2f mInitialRotation;  // value, variance
-    Vec2f mRotationSpeed;    // value, variance
-    Vec3f mGlobalForce;  
-    Vec3f mDragForce;
+    ci::Vec2f mInitialSpeed;     // value, variance
+    ci::Vec2f mInitialRotation;  // value, variance
+    ci::Vec2f mRotationSpeed;    // value, variance
+    ci::Vec3f mGlobalForce;  
+    ci::Vec3f mDragForce;
     
-    Vec4f mTintColorAlpha;
-    Vec2f mScreenSizeLOD;
+    ci::Vec4f mTintColorAlpha;
+    ci::Vec2f mScreenSizeLOD;
     float mTimeElapsed;
     
     EmissionVolume mEmissionVolume;
     
-    gl::GlslProg mShader;
+    ci::gl::GlslProg mShader;
     RenderLayer mRenderLayer;
     //---------------------------------
     
@@ -223,14 +221,14 @@ protected:
     float mPreviousElapsed;
     float mCurrentRate;  
     
-	int mTotalVertices;
+    int mTotalVertices;
     
     float mWindowWidth;
     float mWindowHeight;
     
     std::list<Particle> mParticles;
     
-    gl::VboRef mTrianglesVBO;
+    ci::gl::VboRef mTrianglesVBO;
     
 private: 
 

@@ -10,6 +10,7 @@
 #include "cinder/gl/Texture.h"
 #include "cinder/gl/gl.h"
 
+using namespace std;
 using namespace ci;
 
 const string PATH_EXTENSION = ".particle.json";

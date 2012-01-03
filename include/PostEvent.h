@@ -5,9 +5,8 @@
 //
 
 #pragma once
-#include "EffectEvent.h"
 
-#include "cinder/Rand.h"
+#include "EffectEvent.h"
 #include "cinder/gl/GlslProg.h"
 #include <vector>
 #include <list>
