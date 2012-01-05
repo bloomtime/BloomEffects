@@ -16,17 +16,17 @@ boost::unordered_map<string, gl::Texture> EffectAttribute::sTextureCache;
 boost::unordered_map<string, gl::GlslProg> EffectAttribute::sShaderCache;
 
 gl::Texture EffectAttribute::getTexture() 
-{ 
-    gl::Texture::Format mipFmt;
-    mipFmt.enableMipmapping( true );
-    mipFmt.setMinFilter( GL_LINEAR_MIPMAP_NEAREST );    
-    mipFmt.setMagFilter( GL_LINEAR ); // TODO: experiment with GL_NEAREST where appropriate
-    
+{     
     string val = boost::any_cast<string>(mValue);
     
     if (sTextureCache.find(val) != sTextureCache.end()) {
         return sTextureCache[val];
     }
+  
+    gl::Texture::Format mipFmt;
+    mipFmt.enableMipmapping( true );
+    mipFmt.setMinFilter( GL_LINEAR_MIPMAP_NEAREST );    
+    mipFmt.setMagFilter( GL_LINEAR ); // TODO: experiment with GL_NEAREST where appropriate
     
     gl::Texture texture = gl::Texture( loadImage( app::loadResource( val ) ), mipFmt );
     sTextureCache[val] = texture;
