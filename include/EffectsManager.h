@@ -5,19 +5,20 @@
 //
 
 #pragma once
+
+#include <list>
+#include <json/json.h>
+
 #include "cinder/ImageIo.h"
 #include "cinder/gl/Texture.h"
 #include "cinder/Camera.h"
 #include "cinder/gl/GlslProg.h"
 #include "cinder/gl/Fbo.h"
-//#include "json/json.h"
 
 #include "RenderManager.h"
 #include "AudioManager.h"
-#include "json/json.h"
 #include "EffectJson.h"
 #include "Effect.h"
-#include <list>
 
 class EffectsManager;
 
@@ -52,6 +53,25 @@ public:
     
     EffectEventList initializeData(Json::Value data);
     void parseAttr(const Json::Value data, EffectAttribute &attr, EffectEventRef currentEvent);
+    
+    void setEffectData( std::string effectFileName, Json::Value data )
+    {
+        mEffectsData[effectFileName] = data;
+    }
+    
+    Json::Value getEffectData( std::string effectFileName )
+    {
+        if (mEffectsData.find(effectFileName) != mEffectsData.end())
+        {
+            return mEffectsData.at(effectFileName);
+        }
+        else
+        {
+            Json::Value data = effects::getJsonData(effectFileName);
+            mEffectsData[effectFileName] = data;
+            return data;
+        }
+    }
     
 protected:
     CameraRef mCamera;
