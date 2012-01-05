@@ -13,7 +13,7 @@
 #include "cinder/gl/GlslProg.h"
 #include "cinder/gl/Fbo.h"
 #include "Vbo.h"
-
+#include <string>
 #include <boost/unordered_map.hpp>
 
 enum RenderLayer 
@@ -42,7 +42,7 @@ class RenderManager
 {
 public:
 
-    static RenderManagerRef create();
+    static RenderManagerRef create(std::string defaultPost = DEFAULT_POST_SHADER);
     
     ~RenderManager(); 
     
@@ -96,5 +96,5 @@ protected:
     RenderLayersByID mLayersByID;
 private:
 
-    RenderManager();
+    RenderManager(std::string defaultPost = DEFAULT_POST_SHADER);
 };

@@ -10,18 +10,18 @@
 using namespace std;
 using namespace ci;
 
-RenderManagerRef RenderManager::create()
+RenderManagerRef RenderManager::create(std::string defaultPost)
 {
-    return RenderManagerRef( new RenderManager() );
+    return RenderManagerRef( new RenderManager(defaultPost) );
 }
 
-RenderManager::RenderManager()
+RenderManager::RenderManager(std::string defaultPost)
 {
     mBGColor = Color(1.0f, 1.0f, 1.0f);
     mPostShaderAlpha = 1.0f;
     mWindowSize = Vec2i(1024, 768);
     
-    setPostShader(DEFAULT_POST_SHADER);
+    setPostShader(defaultPost);
     mDefaultPostShader = mCurrentPostShader;
      
     mVBO = gl::Vbo::create(GL_TRIANGLE_STRIP);

@@ -1,5 +1,5 @@
 //
-//  ParticleEvent.h
+//  FastParticleEvent.h
 //
 //  Copyright 2011 Bloom Studio, Inc. All rights reserved.
 //
@@ -13,17 +13,17 @@
 #include <vector>
 #include <list>
 
-class ParticleEvent;
+class FastParticleEvent;
 
-typedef std::shared_ptr<ParticleEvent> ParticleEventRef;
+typedef std::shared_ptr<FastParticleEvent> FastParticleEventRef;
 
-class ParticleEvent : public EffectEvent {
+class FastParticleEvent : public EffectEvent {
 
 public:
 
-    static ParticleEventRef create();
+    static FastParticleEventRef create();
 
-    ~ParticleEvent();
+    ~FastParticleEvent();
     
     void registerAttributes() 
     {
@@ -37,19 +37,17 @@ public:
         registerAttribute("EmitAngle",           ATTR_VECTOR2);
         
         registerAttribute("Alpha",               ATTR_CURVE);
-        registerAttribute("ParticleScale",       ATTR_CURVE);
+        registerAttribute("ParticleScale",       ATTR_VECTOR3);
         registerAttribute("TileUV",              ATTR_VECTOR3);
         
         registerAttribute("RenderLayer",         ATTR_STRING);
-        registerAttribute("Shader",              ATTR_SHADER);
+        registerAttribute("Shader"        ,      ATTR_SHADER);
         registerAttribute("DiffuseTexture",      ATTR_TEXTURE);
         registerAttribute("DiffuseTextureID",    ATTR_INT);
         registerAttribute("DiffuseSampleMode",   ATTR_STRING);
         registerAttribute("SecondaryTexture",    ATTR_TEXTURE);
         registerAttribute("Texture2SampleMode", ATTR_STRING);
-        registerAttribute("DiffuseColorR",       ATTR_VECTOR3);
-        registerAttribute("DiffuseColorG",       ATTR_VECTOR3);
-        registerAttribute("DiffuseColorB",       ATTR_VECTOR3);
+        registerAttribute("DiffuseColor",        ATTR_VECTOR3);
         registerAttribute("BlendMode",           ATTR_STRING);
         registerAttribute("TiledTexture",        ATTR_BOOL);
         registerAttribute("BlendTiles",          ATTR_BOOL);
@@ -58,12 +56,10 @@ public:
         registerAttribute("InitialRotation",     ATTR_VECTOR2); 
         registerAttribute("InitialSpeed",        ATTR_VECTOR2);
         registerAttribute("GlobalForce",         ATTR_VECTOR3);
-        registerAttribute("DragForce",           ATTR_VECTOR3); 
         registerAttribute("RotationSpeed",       ATTR_VECTOR2);  
         registerAttribute("InheritTransform",    ATTR_BOOL);
         registerAttribute("FacingMode",          ATTR_STRING);
         registerAttribute("CameraAttached",      ATTR_BOOL);
-        registerAttribute("ScreenSizeLOD",       ATTR_VECTOR2); 
     }
     
     void setup(ci::Vec2f windowSize);
@@ -98,12 +94,9 @@ protected:
         float maxLifetime;
         
         floatCurve alphaCurve;
-        floatCurve scaleCurve;
+        ci::Vec2f particleScaleLerp;
         
         ci::Vec2f tileUVLerp;
-        ci::Vec2f diffuseRedLerp;
-        ci::Vec2f diffuseGreenLerp;
-        ci::Vec2f diffuseBlueLerp;
                 
         ci::Vec3f position;  
         ci::Vec3f velocity;
@@ -138,12 +131,10 @@ protected:
     ci::Vec2f mEmitAngle;
         
     AttributeCurvePoints mAlphaCurve;
-    AttributeCurvePoints mParticleScaleCurve;
     
+    ci::Vec3f mParticleScaleLerp;
     ci::Vec3f mTileUVLerp;
-    ci::Vec3f mDiffuseRedLerp;
-    ci::Vec3f mDiffuseGreenLerp;
-    ci::Vec3f mDiffuseBlueLerp;
+    ci::Vec3f mDiffuseColor;
     
     bool mCameraAttached;
     
@@ -163,11 +154,9 @@ protected:
     ci::Vec2f mInitialSpeed;     // value, variance
     ci::Vec2f mInitialRotation;  // value, variance
     ci::Vec2f mRotationSpeed;    // value, variance
-    ci::Vec3f mGlobalForce;  
-    ci::Vec3f mDragForce;
+    ci::Vec3f mGlobalForce; 
     
     ci::Vec4f mTintColorAlpha;
-    ci::Vec2f mScreenSizeLOD;
     float mTimeElapsed;
     
     EmissionVolume mEmissionVolume;
@@ -191,5 +180,5 @@ protected:
     
 private: 
 
-    ParticleEvent();
+    FastParticleEvent();
 };

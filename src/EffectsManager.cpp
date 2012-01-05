@@ -139,6 +139,12 @@ EffectEventList EffectsManager::initializeData(Json::Value data)
             // handle the different types here
             switch (ChildType) 
             {
+                case FASTPARTICLE_EVENT:
+                {
+                    currentEvent = FastParticleEvent::create();
+                    // need to concatenate extension here
+                    break;
+                }
                 case PARTICLE_EVENT:
                 {
                     currentEvent = ParticleEvent::create();

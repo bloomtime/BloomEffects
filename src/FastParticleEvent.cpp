@@ -1,10 +1,10 @@
 //
-//  ParticleEvent.cpp
+//  FastParticleEvent.cpp
 //
 //  Copyright 2011 Bloom Studio, Inc. All rights reserved.
 //
 
-#include "ParticleEvent.h"
+#include "FastParticleEvent.h"
 
 #include "cinder/Rand.h"
 #include "cinder/gl/Texture.h"
@@ -13,14 +13,14 @@
 using namespace std;
 using namespace ci;
 
-const string PATH_EXTENSION = ".particle.json";
+const string PATH_EXTENSION = ".fastparticle.json";
 
-ParticleEventRef ParticleEvent::create()
+FastParticleEventRef FastParticleEvent::create()
 {
-    return ParticleEventRef( new ParticleEvent() );
+    return FastParticleEventRef( new FastParticleEvent() );
 }
 
-ParticleEvent::ParticleEvent():
+FastParticleEvent::FastParticleEvent():
     mRate(1.0f),
     mTotalVertices(0),
     mBlendMode(BLEND_OPAQUE),
@@ -41,13 +41,9 @@ ParticleEvent::ParticleEvent():
     mRotationAngle(0.0f),
     mRotationSpeed(Vec2f(0.0f, 0.0f)),
     mCameraAttached(false),
-    mDragForce(Vec3f(0.0f, 0.0f, 0.0f)),
-    mScreenSizeLOD(Vec2f(0.0f, 2.0f)),
     mTintColorAlpha(Vec4f(1.0f, 1.0f, 1.0f, 1.0f)),
     mTileUVLerp(Vec3f(0.0f, 0.0f, 0.0f)),
-    mDiffuseRedLerp(Vec3f(0.0f, 0.0f, 0.0f)),
-    mDiffuseGreenLerp(Vec3f(0.0f, 0.0f, 0.0f)),
-    mDiffuseBlueLerp(Vec3f(0.0f, 0.0f, 0.0f)),
+    mDiffuseColor(Vec3f(1.0f, 1.0f, 1.0f)),
     mDiffuseTextureID(0),
     mWindowWidth(1.0f),
     mWindowHeight(1.0f),
@@ -59,14 +55,14 @@ ParticleEvent::ParticleEvent():
     registerAttributes(); 
 }
     
-ParticleEvent::~ParticleEvent()
+FastParticleEvent::~FastParticleEvent()
 {
     mRenderManager->unregisterDraw(mCallbackId);
 
     mParticles.clear();
 }
 
-void ParticleEvent::processAttributes()
+void FastParticleEvent::processAttributes()
 {
     // if can associate these member vars with the attr name that would be sweet
     mRate = mAttributes.at("Rate").getFloat();
@@ -80,11 +76,9 @@ void ParticleEvent::processAttributes()
     mEmitAngle = mAttributes.at("EmitAngle").getVector2();  
       
     mAlphaCurve = mAttributes.at("Alpha").getCurvePoints();
-    mParticleScaleCurve = mAttributes.at("ParticleScale").getCurvePoints();
+    mParticleScaleLerp = mAttributes.at("ParticleScale").getVector3();
     
-    mDiffuseRedLerp = mAttributes.at("DiffuseColorR").getVector3();
-    mDiffuseGreenLerp = mAttributes.at("DiffuseColorG").getVector3();
-    mDiffuseBlueLerp = mAttributes.at("DiffuseColorB").getVector3();
+    mDiffuseColor = mAttributes.at("DiffuseColor").getVector3();
     mTileUVLerp = mAttributes.at("TileUV").getVector3();
     mBlendMode = BLEND_MODES.at(mAttributes.at("BlendMode").getString());
     mTiledTexture = mAttributes.at("TiledTexture").getBool();
@@ -110,14 +104,12 @@ void ParticleEvent::processAttributes()
     mInitialSpeed = mAttributes.at("InitialSpeed").getVector2();
     mInitialRotation = mAttributes.at("InitialRotation").getVector2();
     mGlobalForce = mAttributes.at("GlobalForce").getVector3();
-    mDragForce = mAttributes.at("DragForce").getVector3();
     mRotationSpeed = mAttributes.at("RotationSpeed").getVector2();
     mInheritTransform = mAttributes.at("InheritTransform").getBool();
     mCameraAttached = mAttributes.at("CameraAttached").getBool();
-    mScreenSizeLOD = mAttributes.at("ScreenSizeLOD").getVector2();
 }
 
-void ParticleEvent::setTexture(ci::gl::Texture texture, int ID) 
+void FastParticleEvent::setTexture(ci::gl::Texture texture, int ID) 
 {
     if (mDiffuseTextureID != ID)
         return;
@@ -125,7 +117,7 @@ void ParticleEvent::setTexture(ci::gl::Texture texture, int ID)
     mDiffuseTexture = texture;
 }
 
-Vec3f ParticleEvent::getEmitDirection()
+Vec3f FastParticleEvent::getEmitDirection()
 {
     float coneSizeX = mEmitAngle[0];
     float coneSizeY = mEmitAngle[1];
@@ -139,7 +131,7 @@ Vec3f ParticleEvent::getEmitDirection()
     return emitDir * mSourceOrientation; 
 }
 
-floatCurve ParticleEvent::getNewCurve(AttributeCurvePoints &curvePoints)
+floatCurve FastParticleEvent::getNewCurve(AttributeCurvePoints &curvePoints)
 {
     vector<Vec2f> curveInput;
  
@@ -168,7 +160,7 @@ floatCurve ParticleEvent::getNewCurve(AttributeCurvePoints &curvePoints)
     return BSpline2f( curveInput, 3, false, true );
 }
 
-void ParticleEvent::addNewParticle()
+void FastParticleEvent::addNewParticle()
 {
     Particle newParticle;
     newParticle.rotation = (mInitialRotation[0] + Rand::randFloat(-mInitialRotation[1], mInitialRotation[1]));
@@ -187,28 +179,18 @@ void ParticleEvent::addNewParticle()
     
     // store curve values that have variance baked in
     newParticle.alphaCurve = getNewCurve(mAlphaCurve);
-    newParticle.scaleCurve = getNewCurve(mParticleScaleCurve);
+    
+    float pScaleVariance = Rand::randFloat(-mParticleScaleLerp.z, mParticleScaleLerp.z);
+    newParticle.particleScaleLerp = Vec2f(mParticleScaleLerp.x + pScaleVariance, mParticleScaleLerp.y + pScaleVariance);
     
     // store lerp values with variance baked in
     float tileUVVariance = Rand::randFloat(-mTileUVLerp.z, mTileUVLerp.z);
     newParticle.tileUVLerp = Vec2f(mTileUVLerp.x + tileUVVariance, mTileUVLerp.y + tileUVVariance);
     
-    float redVariance = Rand::randFloat(-mDiffuseRedLerp.z, mDiffuseRedLerp.z);
-    newParticle.diffuseRedLerp = Vec2f(math<float>::clamp(mDiffuseRedLerp.x + redVariance, 0.0f, 1.0f), 
-                                       math<float>::clamp(mDiffuseRedLerp.y + redVariance, 0.0f, 1.0f));
-     
-    float greenVariance = Rand::randFloat(-mDiffuseGreenLerp.z, mDiffuseGreenLerp.z);
-    newParticle.diffuseGreenLerp = Vec2f(math<float>::clamp(mDiffuseGreenLerp.x + greenVariance, 0.0f, 1.0f), 
-                                         math<float>::clamp(mDiffuseGreenLerp.y + greenVariance, 0.0f, 1.0f));
-                      
-    float blueVariance = Rand::randFloat(-mDiffuseBlueLerp.z, mDiffuseBlueLerp.z);
-    newParticle.diffuseBlueLerp = Vec2f(math<float>::clamp(mDiffuseBlueLerp.x + blueVariance, 0.0f, 1.0f), 
-                                        math<float>::clamp(mDiffuseBlueLerp.y + blueVariance, 0.0f, 1.0f));
-    
     mParticles.push_back(newParticle);
 }
 
-void ParticleEvent::setup(Vec2f winSize)
+void FastParticleEvent::setup(Vec2f winSize)
 {
     //TODO may have to listen for size changes later
     setWindowDimensions(winSize.x, winSize.y);
@@ -239,31 +221,22 @@ void ParticleEvent::setup(Vec2f winSize)
     mTrianglesVBO->set(gl::Vbo::Attribute::create("a_bitangent", 3, GL_FLOAT, GL_STREAM_DRAW));
     mTrianglesVBO->set(gl::Vbo::Attribute::create("a_tileIndex", 1, GL_FLOAT, GL_STREAM_DRAW));
     
-    mCallbackId = mRenderManager->registerDraw(this, &ParticleEvent::draw, mRenderLayer);
+    mCallbackId = mRenderManager->registerDraw(this, &FastParticleEvent::draw, mRenderLayer);
 }
 
-void ParticleEvent::updateVelocity(Particle &currentParticle, float dt)
+void FastParticleEvent::updateVelocity(Particle &currentParticle, float dt)
 {
     Vec3f currentVel = currentParticle.velocity;
-    Vec3f drag = Vec3f(0.0f, 0.0f, 0.0f);
-    
-    if (mDragForce[0] != 0.0f || mDragForce[1] != 0.0f || mDragForce[2] != 0.0f)
-    {
-        float velSquared = currentVel[0] * currentVel[0] + currentVel[1] * currentVel[1] + currentVel[2] * currentVel[2];
-        float velLength = sqrt(velSquared);
-        drag = -mDragForce * velSquared / velLength;
-    }
-    
-    currentParticle.velocity += currentVel * drag + mGlobalForce * dt;
+    currentParticle.velocity += mGlobalForce * dt;
 }
 
-Vec2f ParticleEvent::getNormalizedScreenPos(Vec3f worldPos)
+Vec2f FastParticleEvent::getNormalizedScreenPos(Vec3f worldPos)
 {
     Vec2f screenPos =  mCamera->worldToScreen(worldPos, mWindowWidth, mWindowHeight);
     return Vec2f(screenPos.x / mWindowWidth, screenPos.y / mWindowHeight);
 }
 
-void ParticleEvent::update()
+void FastParticleEvent::update()
 {
     if (mCameraAttached)
     {
@@ -413,15 +386,12 @@ void ParticleEvent::update()
         
         // curve lookups
         float alpha = (*it).alphaCurve.getPosition(time)[1];
-        float scale = (*it).scaleCurve.getPosition(time)[1] * mSourceScale;
+        float scale = lerp((*it).particleScaleLerp.x, (*it).particleScaleLerp.y, time) * mSourceScale;
 
         // instead of curves, these just lerp
         float tileIndex = lerp((*it).tileUVLerp.x, (*it).tileUVLerp.y, time) * mNumTiles;
-        float colorR = lerp((*it).diffuseRedLerp.x, (*it).diffuseRedLerp.y, time);
-        float colorG = lerp((*it).diffuseGreenLerp.x, (*it).diffuseGreenLerp.y, time);
-        float colorB = lerp((*it).diffuseBlueLerp.x, (*it).diffuseBlueLerp.y, time);
-        
-		ColorA col = ColorA(colorR, colorG, colorB, alpha);
+
+		ColorA col = ColorA(mDiffuseColor.x, mDiffuseColor.y, mDiffuseColor.z, alpha);
         
         Vec3f right = Quatf( bbAt, rot ) * bbRight;
         Vec3f up = Quatf( bbAt, rot ) * bbUp;
@@ -433,36 +403,6 @@ void ParticleEvent::update()
         Vec3f p2 = pos + rightScale + upScale;
         Vec3f p3 = pos - rightScale - upScale;
         Vec3f p4 = pos + rightScale - upScale;
-        
-        //camera culling and LOD'ing (screen space size)
-        Vec2f screenPosA = getNormalizedScreenPos(p1);
-        Vec2f screenPosB = getNormalizedScreenPos(p4);
-        
-        float screenLength = (screenPosB - screenPosA).length();
-        
-        // hardcoded fading threshold for now--user probably doesn't care that much.
-        float fadeRange = .05f;
-        float minFade = mScreenSizeLOD.x + fadeRange;
-        float maxFade = mScreenSizeLOD.y - fadeRange;
-        
-        // test only two corners for now to see if that is enough
-        if ((screenPosA.x < 0.0f || screenPosA.x > 1.0f) && 
-            (screenPosA.x < 0.0f || screenPosA.x > 1.0f) &&
-            (screenPosB.x < 0.0f || screenPosB.x > 1.0f) && 
-            (screenPosB.x < 0.0f || screenPosB.x > 1.0f))
-        {
-            alpha = 0.0f;
-        }
-        else if (screenLength <= minFade)
-        {
-            float fadeAmt = math<float>::clamp(screenLength - mScreenSizeLOD.x, 0.0, 1.0f) / fadeRange;
-            alpha *= fadeAmt;
-        }
-        else if (screenLength >= maxFade)
-        {
-            float fadeAmt = (screenLength - maxFade) / fadeRange;
-            alpha *= fadeAmt;
-        }
         
         // don't draw if alpha 0
         if (alpha == 0)
@@ -547,7 +487,7 @@ void ParticleEvent::update()
 }
 
 
-void ParticleEvent::enableBlendMode()
+void FastParticleEvent::enableBlendMode()
 {
     switch (mBlendMode) 
     {
@@ -569,7 +509,7 @@ void ParticleEvent::enableBlendMode()
     }
 }
 
-void ParticleEvent::disableBlendMode()
+void FastParticleEvent::disableBlendMode()
 {
     switch (mBlendMode) 
     {
@@ -591,7 +531,7 @@ void ParticleEvent::disableBlendMode()
     }
 }
 
-void ParticleEvent::draw(bool enabled)
+void FastParticleEvent::draw(bool enabled)
 {    
     if (!enabled || isInitialized() || isStopped() || mTotalVertices == 0)
         return;
