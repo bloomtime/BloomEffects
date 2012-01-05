@@ -99,7 +99,12 @@ void PostEvent::update()
             mRenderManager->setPostShaderAlpha(fadeAmt);
             
             if (fadeAmt == 0.0f)
+            {
                 mEventState = EVENT_STOPPED;
+                
+                mRenderManager->setDefaultPostShader();
+                mRenderManager->setPostShaderAlpha(1.0f);
+            }
         }
     }
     
