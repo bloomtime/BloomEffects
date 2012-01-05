@@ -48,6 +48,7 @@ ParticleEvent::ParticleEvent():
     mDiffuseRedLerp(Vec3f(0.0f, 0.0f, 0.0f)),
     mDiffuseGreenLerp(Vec3f(0.0f, 0.0f, 0.0f)),
     mDiffuseBlueLerp(Vec3f(0.0f, 0.0f, 0.0f)),
+    mDiffuseTextureID(0),
     mWindowWidth(1.0f),
     mWindowHeight(1.0f),
     mTimeElapsed(0.0f)
@@ -107,6 +108,14 @@ void ParticleEvent::processAttributes()
     mInheritTransform = mAttributes.at("InheritTransform").getBool();
     mCameraAttached = mAttributes.at("CameraAttached").getBool();
     mScreenSizeLOD = mAttributes.at("ScreenSizeLOD").getVector2();
+}
+
+void ParticleEvent::setTexture(ci::gl::Texture texture, int ID) 
+{
+    if (mDiffuseTextureID != ID)
+        return;
+        
+    mDiffuseTexture = texture;
 }
 
 Vec3f ParticleEvent::getEmitDirection()
@@ -557,6 +566,11 @@ void ParticleEvent::disableBlendMode()
 {
     switch (mBlendMode) 
     {
+        case BLEND_ADDITIVE:
+        {
+            gl::enableAlphaBlending();
+            break;
+        }
         case BLEND_ALPHA:
         {
             gl::disableAlphaBlending();

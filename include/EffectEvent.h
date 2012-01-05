@@ -72,6 +72,7 @@ public:
     }
     
     virtual void setTintColor( ci::Vec3f color ) {}
+    virtual void setTexture( ci::gl::Texture texture, int ID) {}
     
     ci::Matrix44f getTransform() const { return mParentTransform; /* copy OK */ }
     
@@ -92,6 +93,7 @@ public:
         mLocalPosition = position;
         mSourcePosition = mParentTransform.transformPoint(position);
     }
+    
     void setSourceOrientation(ci::Vec3f orientation) 
     { 
         mLocalOrientation.set(ci::toRadians(orientation[0]),
@@ -99,6 +101,7 @@ public:
                               ci::toRadians(orientation[2]));
         mSourceOrientation = mLocalOrientation * ci::Quatf(mParentTransform); 
     }
+    
     void setSourceScale(float scale)
     {
         mSourceScale = scale;

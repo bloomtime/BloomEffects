@@ -17,6 +17,7 @@
 #include "cinder/Timer.h"
 #include <vector>
 #include <list>
+#include <string>
 
 #include "EffectJson.h"
 #include "cinder/ImageIo.h"
@@ -71,6 +72,7 @@ public:
     
     void setTintColor(ci::Vec3f color);
     void setSourceScale(float scale);
+    void setTexture(ci::gl::Texture texture, int ID=0);
     
     void start();
     void stop(bool hardStop=false);  

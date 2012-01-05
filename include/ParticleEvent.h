@@ -91,6 +91,7 @@ public:
         registerAttribute("RenderLayer",      ATTR_STRING);
         registerAttribute("Shader"        ,   ATTR_SHADER);
         registerAttribute("DiffuseTexture",   ATTR_TEXTURE);
+        registerAttribute("DiffuseTextureID", ATTR_INT);
         registerAttribute("SecondaryTexture", ATTR_TEXTURE);
         registerAttribute("DiffuseColorR",    ATTR_VECTOR3);
         registerAttribute("DiffuseColorG",    ATTR_VECTOR3);
@@ -121,6 +122,8 @@ public:
         //alpha will be handled elsewhere
         mTintColorAlpha = ci::Vec4f(color, mTintColorAlpha.w); 
     }
+    
+    void setTexture( ci::gl::Texture texture, int ID);
     
     void setTintAlpha ( float alpha ) { mTintColorAlpha.w = alpha; }
     ci::Vec2f getNormalizedScreenPos(ci::Vec3f worldPos);
@@ -192,6 +195,8 @@ protected:
     
     ci::gl::Texture mDiffuseTexture;
     ci::gl::Texture mSecondaryTexture;
+    
+    int mDiffuseTextureID;
     
     BlendMode mBlendMode;
     Texture2Mode mTexture2Mode;
