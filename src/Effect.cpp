@@ -169,6 +169,17 @@ void Effect::setSourceScale(float scale)
     }
 }
 
+void Effect::setTexture(ci::gl::Texture texture, int ID)
+{
+	for( list<EffectEventRef>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+    {
+        if ((*it)->isEnabled())
+        {
+            (*it)->setTexture(texture, ID);
+        }
+    }
+}
+
 void Effect::setCamera(CameraRef camera)
 {
     mCamera = camera;

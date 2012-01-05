@@ -72,6 +72,7 @@ public:
     }
     
     virtual void setTintColor( ci::Vec3f color ) {}
+    virtual void setTexture( ci::gl::Texture texture, int ID) {}
     
     ci::Matrix44f getTransform() const { return mParentTransform; /* copy OK */ }
     

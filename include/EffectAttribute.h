@@ -34,6 +34,7 @@ enum AttributeType
     ATTR_TEXTURE,
     ATTR_SHADER,
     ATTR_FLOAT,
+    ATTR_INT,
     ATTR_VECTOR3,
     ATTR_VECTOR2,
     ATTR_BOOL,
