@@ -272,7 +272,7 @@ void EffectsManager::parseAttr(const Json::Value data, EffectAttribute &attr, Ef
         }
         default:
         {
-            std::cout << "ERROR:  Unrecognized Attr Type" << std::endl;
+            std::cout << "ERROR:  Unrecognized Attr Type " << attr.mType << " for " << attr.mName << std::endl;
             break;               
         }
     }
