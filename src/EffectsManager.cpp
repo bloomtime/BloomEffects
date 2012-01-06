@@ -58,18 +58,7 @@ void EffectsManager::loadFEV(string filepath)
 
 void EffectsManager::playEffectOnce(string effectName, Matrix44f transform)
 {
-    Json::Value data;
-    
-    //TODO store all loaded json resources.  Later should store effect resources only, not the json
-    if (mEffectsData.find(effectName) != mEffectsData.end())
-    {
-        data = mEffectsData.at(effectName);
-    }
-    else
-    {
-        data = effects::getJsonData(effectName + FX_EXTENSION);
-        mEffectsData[effectName] = data;
-    }
+    Json::Value data = getEffectData(effectName + FX_EXTENSION); // checks cache, loads if necessary
     
     EffectRef newEffect = Effect::create();
     newEffect->setCamera(mCamera);
@@ -82,18 +71,7 @@ void EffectsManager::playEffectOnce(string effectName, Matrix44f transform)
 
 EffectRef EffectsManager::createEffect(string effectName, bool start, Matrix44f transform)
 {
-    Json::Value data;
-    
-    //TODO store all loaded json resources.  Later should store effect resources only, not the json
-    if (mEffectsData.find(effectName) != mEffectsData.end())
-    {
-        data = mEffectsData.at(effectName);
-    }
-    else
-    {
-        data = effects::getJsonData(effectName + FX_EXTENSION);
-        mEffectsData[effectName] = data;
-    }
+    Json::Value data = getEffectData(effectName + FX_EXTENSION); // checks cache, loads if necessary
     
     EffectRef newEffect = Effect::create();
     newEffect->setCamera(mCamera);
@@ -186,7 +164,7 @@ EffectEventList EffectsManager::initializeData(Json::Value data)
                 currentEvent->setSourceOrientation(Vec3f(orientValues[0].asFloat(), orientValues[1].asFloat(), orientValues[2].asFloat()));
                 
                 eventPath.append(currentEvent->getPathExtension());
-                Json::Value childData = effects::getJsonData(eventPath);
+                Json::Value childData = getEffectData( eventPath ); // checks cache, only loads if necessary
                 
                 //console() << "EventPath "<< EventPath << std::endl;
                 
@@ -294,7 +272,7 @@ void EffectsManager::parseAttr(const Json::Value data, EffectAttribute &attr, Ef
         }
         default:
         {
-            std::cout << "ERROR:  Unrecognized Attr Type" << std::endl;
+            std::cout << "ERROR:  Unrecognized Attr Type " << attr.mType << " for " << attr.mName << std::endl;
             break;               
         }
     }
