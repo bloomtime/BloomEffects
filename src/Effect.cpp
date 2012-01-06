@@ -108,12 +108,6 @@ void Effect::update()
     }
     
     if (mIsVisible && isRunning()) {         
-    
-        // if no children left, stop self
-        if (!mIsChildrenRunning)
-        {
-            mEffectState = EFFECT_STOPPED;
-        }
         
         mIsChildrenRunning = false;
         
@@ -135,6 +129,11 @@ void Effect::update()
             }
         }
         
+        // if no children left, stop self
+        if (!mIsChildrenRunning)
+        {
+            mEffectState = EFFECT_STOPPED;
+        }
     }
 }
 
