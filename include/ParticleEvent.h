@@ -46,7 +46,7 @@ public:
         registerAttribute("DiffuseTextureID",    ATTR_INT);
         registerAttribute("DiffuseSampleMode",   ATTR_STRING);
         registerAttribute("SecondaryTexture",    ATTR_TEXTURE);
-        registerAttribute("Texture2SampleMode", ATTR_STRING);
+        registerAttribute("Texture2SampleMode",  ATTR_STRING);
         registerAttribute("DiffuseColorR",       ATTR_VECTOR3);
         registerAttribute("DiffuseColorG",       ATTR_VECTOR3);
         registerAttribute("DiffuseColorB",       ATTR_VECTOR3);
