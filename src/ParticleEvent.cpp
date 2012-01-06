@@ -90,12 +90,14 @@ void ParticleEvent::processAttributes()
     mTiledTexture = mAttributes.at("TiledTexture").getBool();
     mBlendTiles = mAttributes.at("BlendTiles").getBool();
     mTexture2Mode = TEXTURE2_MODES.at(mAttributes.at("Texture2Mode").getString());
-    
+
     mDiffuseTexture = mAttributes.at("DiffuseTexture").getTexture();
     int diffuseSampleMode = TEXTUREWRAP_MODES.at(mAttributes.at("DiffuseSampleMode").getString());
     mDiffuseTexture.bind();
     mDiffuseTexture.setWrap(diffuseSampleMode, diffuseSampleMode);
     mDiffuseTexture.unbind();
+
+    mDiffuseTextureID = mAttributes.at("DiffuseTextureID").getInt();
     
     mSecondaryTexture = mAttributes.at("SecondaryTexture").getTexture();
     int secondarySampleMode = TEXTUREWRAP_MODES.at(mAttributes.at("Texture2SampleMode").getString());

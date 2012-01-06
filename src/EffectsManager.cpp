@@ -230,6 +230,11 @@ void EffectsManager::parseAttr(const Json::Value data, EffectAttribute &attr, Ef
             currentValue = data[attr.mName].asFloat();
             break;
         }
+        case ATTR_INT:
+        {
+            currentValue = data[attr.mName].asInt();
+            break;
+        }
         case ATTR_VECTOR3:
         {
             vector<Json::Value> values = effects::readVector(data, attr.mName);
