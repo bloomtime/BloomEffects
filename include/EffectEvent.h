@@ -135,6 +135,7 @@ protected:
         mEventState(EVENT_INITIALIZED),
         mStartTime(-1.0f),
         mLifetime(0.0f),
+        mHardStop(false),
         mLocalPosition(ci::Vec3f( 0.0f, 0.0f, 0.0f )),
         mSourcePosition(ci::Vec3f( 0.0f, 0.0f, 0.0f )),
         mSourceOrientation(ci::Quatf::identity()),

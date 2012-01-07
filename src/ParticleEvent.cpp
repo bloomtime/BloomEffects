@@ -304,7 +304,7 @@ void ParticleEvent::update()
     }
     
     // -1.0f lifetime is infinite lifetime
-    if (isRunning() && totalElapsed >= mLifetime && mLifetime != -1.0f)
+    if (isRunning() && totalElapsed >= mLifetime && mLifetime != -1.0f && mEmitMode != EMIT_BURST)
     {
         stop(mHardStop);
     }
@@ -371,6 +371,9 @@ void ParticleEvent::update()
         
         if ((*it).lifetime > (*it).maxLifetime)
         {
+            if (mRenderLayer == LAYER_PREPOST)
+                std::cout << "killing particle" << std::endl;
+                
             it = mParticles.erase( it );
             continue;
         }
