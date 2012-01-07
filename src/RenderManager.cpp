@@ -82,6 +82,11 @@ void RenderManager::setWindowSize(Vec2i windowSize)
     }
 }
 
+gl::Texture RenderManager::getReadBuffer()
+{
+    return ca_read_fbo.getTexture();
+}
+
 void RenderManager::update()
 {
     // CA Calculation Pass: Draw to Write Buffer

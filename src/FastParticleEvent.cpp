@@ -57,7 +57,7 @@ FastParticleEvent::FastParticleEvent():
     
 FastParticleEvent::~FastParticleEvent()
 {
-    mRenderManager->unregisterDraw(mCallbackId);
+    mRenderManager->unregisterDraw(mRenderLayer, mCallbackId);
 
     mParticles.clear();
 }

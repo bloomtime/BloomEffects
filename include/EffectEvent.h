@@ -34,6 +34,7 @@ const boost::unordered_map<std::string, RenderLayer> RENDER_LAYERS = boost::assi
     ("BACKGROUND", LAYER_BACKGROUND)
     ("SCENE", LAYER_SCENE)
     ("EFFECTS", LAYER_EFFECTS)
+    ("FOREGROUND", LAYER_FOREGROUND)
     ("PREPOST", LAYER_PREPOST)
     ("POST", LAYER_POST)
     ("UI", LAYER_UI);

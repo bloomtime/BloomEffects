@@ -21,6 +21,7 @@ enum RenderLayer
     LAYER_BACKGROUND,  // background 
     LAYER_SCENE,       // base scene rendering
     LAYER_EFFECTS,     // particle effects, etc
+    LAYER_FOREGROUND,  // foreground
     LAYER_PREPOST,     // distortion effects, etc
     LAYER_POST,        // post filter 
     LAYER_UI,          // ui elements
@@ -32,7 +33,6 @@ class RenderManager;
 typedef std::shared_ptr<RenderManager> RenderManagerRef;
 typedef ci::CallbackMgr<void(bool)> RenderCallbacks;
 typedef boost::unordered_map<RenderLayer, RenderCallbacks> RenderCallbacksByLayer;
-typedef boost::unordered_map<ci::CallbackId, RenderLayer> RenderLayersByID;
 
 const std::string DEFAULT_POST_SHADER = "defaultPost";
 
@@ -50,6 +50,8 @@ public:
 	void update();
 	void draw();
     
+    ci::gl::Texture getReadBuffer();
+    
     void setWindowSize(ci::Vec2i windowSize);
     void setBackgroundColor(ci::Color bgColor) { mBGColor = bgColor; }
     
@@ -62,14 +64,13 @@ public:
     ci::CallbackId registerDraw( T *obj, void (T::*callback)(bool), RenderLayer layer=LAYER_SCENE )
     {
         ci::CallbackId cid = mCallbacks[layer].registerCb(std::bind( callback, obj, std::tr1::placeholders::_1 ));
-        mLayersByID[cid] = layer;
         
         return cid;
     }
     
-    void unregisterDraw(ci::CallbackId cid)
+    void unregisterDraw(RenderLayer layer, ci::CallbackId cid)
     {
-        mCallbacks[mLayersByID[cid]].unregisterCb(cid);
+        mCallbacks[layer].unregisterCb(cid);
     } 
     
 protected:
@@ -93,7 +94,6 @@ protected:
     ci::gl::GlslProg mDefaultPostShader;
     
     RenderCallbacksByLayer mCallbacks;
-    RenderLayersByID mLayersByID;
 private:
 
     RenderManager(std::string defaultPost = DEFAULT_POST_SHADER);

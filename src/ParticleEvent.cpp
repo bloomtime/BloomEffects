@@ -61,7 +61,7 @@ ParticleEvent::ParticleEvent():
     
 ParticleEvent::~ParticleEvent()
 {
-    mRenderManager->unregisterDraw(mCallbackId);
+    mRenderManager->unregisterDraw(mRenderLayer, mCallbackId);
 
     mParticles.clear();
 }
@@ -90,14 +90,12 @@ void ParticleEvent::processAttributes()
     mTiledTexture = mAttributes.at("TiledTexture").getBool();
     mBlendTiles = mAttributes.at("BlendTiles").getBool();
     mTexture2Mode = TEXTURE2_MODES.at(mAttributes.at("Texture2Mode").getString());
-
+    
     mDiffuseTexture = mAttributes.at("DiffuseTexture").getTexture();
     int diffuseSampleMode = TEXTUREWRAP_MODES.at(mAttributes.at("DiffuseSampleMode").getString());
     mDiffuseTexture.bind();
     mDiffuseTexture.setWrap(diffuseSampleMode, diffuseSampleMode);
     mDiffuseTexture.unbind();
-
-    mDiffuseTextureID = mAttributes.at("DiffuseTextureID").getInt();
     
     mSecondaryTexture = mAttributes.at("SecondaryTexture").getTexture();
     int secondarySampleMode = TEXTUREWRAP_MODES.at(mAttributes.at("Texture2SampleMode").getString());
@@ -117,6 +115,8 @@ void ParticleEvent::processAttributes()
     mInheritTransform = mAttributes.at("InheritTransform").getBool();
     mCameraAttached = mAttributes.at("CameraAttached").getBool();
     mScreenSizeLOD = mAttributes.at("ScreenSizeLOD").getVector2();
+    
+    mDiffuseTextureID = mAttributes.at("DiffuseTextureID").getInt();
 }
 
 void ParticleEvent::setTexture(ci::gl::Texture texture, int ID) 
@@ -235,6 +235,7 @@ void ParticleEvent::setup(Vec2f winSize)
     mTrianglesVBO = gl::Vbo::create(GL_TRIANGLES);
     mTrianglesVBO->set(gl::Vbo::Attribute::create("a_position", 3, GL_FLOAT, GL_STREAM_DRAW));
     mTrianglesVBO->set(gl::Vbo::Attribute::create("a_texcoord", 2, GL_FLOAT, GL_STREAM_DRAW));
+    mTrianglesVBO->set(gl::Vbo::Attribute::create("a_screenCoord", 2, GL_FLOAT, GL_STREAM_DRAW));
     mTrianglesVBO->set(gl::Vbo::Attribute::create("a_color", 4, GL_FLOAT, GL_STREAM_DRAW));
     mTrianglesVBO->set(gl::Vbo::Attribute::create("a_normal", 3, GL_FLOAT, GL_STREAM_DRAW));
     mTrianglesVBO->set(gl::Vbo::Attribute::create("a_tangent", 3, GL_FLOAT, GL_STREAM_DRAW));
@@ -394,6 +395,7 @@ void ParticleEvent::update()
     
 	vector<Vec3f> positions;
     vector<Vec2f> texcoords;
+    vector<Vec2f> screenCoords;
     vector<ColorA> colors;
     vector<Vec3f> normals;
     vector<Vec3f> tangents;
@@ -436,11 +438,13 @@ void ParticleEvent::update()
         Vec3f p3 = pos - rightScale - upScale;
         Vec3f p4 = pos + rightScale - upScale;
         
-        //camera culling and LOD'ing (screen space size)
+        //camera culling and LOD'ing (screen space size), and screenTexCoords
         Vec2f screenPosA = getNormalizedScreenPos(p1);
-        Vec2f screenPosB = getNormalizedScreenPos(p4);
+        Vec2f screenPosB = getNormalizedScreenPos(p2);
+        Vec2f screenPosC = getNormalizedScreenPos(p3);
+        Vec2f screenPosD = getNormalizedScreenPos(p4);
         
-        float screenLength = (screenPosB - screenPosA).length();
+        float screenLength = (screenPosD - screenPosA).length();
         
         // hardcoded fading threshold for now--user probably doesn't care that much.
         float fadeRange = .05f;
@@ -450,8 +454,8 @@ void ParticleEvent::update()
         // test only two corners for now to see if that is enough
         if ((screenPosA.x < 0.0f || screenPosA.x > 1.0f) && 
             (screenPosA.x < 0.0f || screenPosA.x > 1.0f) &&
-            (screenPosB.x < 0.0f || screenPosB.x > 1.0f) && 
-            (screenPosB.x < 0.0f || screenPosB.x > 1.0f))
+            (screenPosD.x < 0.0f || screenPosD.x > 1.0f) && 
+            (screenPosD.x < 0.0f || screenPosD.x > 1.0f))
         {
             alpha = 0.0f;
         }
@@ -487,6 +491,7 @@ void ParticleEvent::update()
         //TRIANGLE 1, VERTEX 1
         positions.push_back(p1);
         texcoords.push_back(Vec2f(0.0f,0.0f));
+        screenCoords.push_back(screenPosA);
         colors.push_back(col);
         normals.push_back(newAt);
         tangents.push_back(newRight);
@@ -496,6 +501,7 @@ void ParticleEvent::update()
         //TRIANGLE 1, VERTEX 2
         positions.push_back(p2);
         texcoords.push_back(Vec2f(1.0f,0.0f));
+        screenCoords.push_back(screenPosB);
         colors.push_back(col);
         normals.push_back(newAt);
         tangents.push_back(newRight);
@@ -505,6 +511,7 @@ void ParticleEvent::update()
         //TRIANGLE 1, VERTEX 3
         positions.push_back(p3);
         texcoords.push_back(Vec2f(0.0f,1.0f));
+        screenCoords.push_back(screenPosC);
         colors.push_back(col);
         normals.push_back(newAt);
         tangents.push_back(newRight);
@@ -514,6 +521,7 @@ void ParticleEvent::update()
         //TRIANGLE 2, VERTEX 1
         positions.push_back(p2);
         texcoords.push_back(Vec2f(1.0f,0.0f));
+        screenCoords.push_back(screenPosB);
         colors.push_back(col);
         normals.push_back(newAt);
         tangents.push_back(newRight);
@@ -523,6 +531,7 @@ void ParticleEvent::update()
         //TRIANGLE 2, VERTEX 2
         positions.push_back(p3);
         texcoords.push_back(Vec2f(0.0f,1.0f));
+        screenCoords.push_back(screenPosC);
         colors.push_back(col);
         normals.push_back(newAt);
         tangents.push_back(newRight);
@@ -532,6 +541,7 @@ void ParticleEvent::update()
         //TRIANGLE 2, VERTEX 3
         positions.push_back(p4);
         texcoords.push_back(Vec2f(1.0f,1.0f));
+        screenCoords.push_back(screenPosD);
         colors.push_back(col);
         normals.push_back(newAt);
         tangents.push_back(newRight);
@@ -541,6 +551,7 @@ void ParticleEvent::update()
     
     mTrianglesVBO->get("a_position")->setData(positions);
     mTrianglesVBO->get("a_texcoord")->setData(texcoords);
+    mTrianglesVBO->get("a_screenCoord")->setData(screenCoords);
     mTrianglesVBO->get("a_color")->setData(colors);
     mTrianglesVBO->get("a_normal")->setData(normals);
     mTrianglesVBO->get("a_tangent")->setData(tangents);
@@ -603,8 +614,13 @@ void ParticleEvent::draw(bool enabled)
     mShader.bind();
     mDiffuseTexture.bind(0);
     mSecondaryTexture.bind(1);
-    //glBindBuffer(GL_ARRAY_BUFFER, vtx_buffer);
-
+    
+    if (mRenderLayer == LAYER_PREPOST)
+    {
+        mRenderManager->getReadBuffer().bind(2);
+        mShader.uniform("u_screenTex", 2);
+    }
+        
     mShader.uniform("u_diffuseTex", 0);
     mShader.uniform("u_secondaryTex", 1);
     mShader.uniform("u_tileWidth", mTileWidth);
@@ -618,6 +634,9 @@ void ParticleEvent::draw(bool enabled)
         
     mTrianglesVBO->draw(mShader);
         
+    if (mRenderLayer == LAYER_PREPOST)
+        mRenderManager->getReadBuffer().unbind();
+    
     mSecondaryTexture.unbind();
  	mDiffuseTexture.unbind();
     mShader.unbind();
