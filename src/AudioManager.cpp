@@ -40,7 +40,7 @@ void AudioManager::ERRCHECK(FMOD_RESULT result)
 {
     if (result != FMOD_OK)
     {
-        //TODO lydia: disabled for now
+        //disabled for now--too vomitous
         //fprintf(stderr, "FMOD error! (%d) %s\n", result, FMOD_ErrorString(result));
         //exit(-1);
     }

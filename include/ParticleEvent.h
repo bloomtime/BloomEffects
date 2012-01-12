@@ -108,17 +108,7 @@ protected:
         ci::Vec3f position;  
         ci::Vec3f velocity;
     };
-    
-    struct VertexData {
-        ci::Vec3f vertex;
-        ci::Vec4f color;
-        ci::Vec3f normal;
-        ci::Vec3f tangent;
-        ci::Vec3f bitangent;
-        ci::Vec2f texture;
-        float tileIndex;
-    };
-    
+
     //-------------------------------------
     
     void processAttributes();

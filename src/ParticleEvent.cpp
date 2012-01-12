@@ -477,7 +477,6 @@ void ParticleEvent::update()
         if (alpha == 0)
         {
             mTotalVertices-= 6;
-            //realloc(mVerts, mTotalVertices * sizeof(VertexData));
             continue;
         }
         
