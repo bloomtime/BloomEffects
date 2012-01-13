@@ -13,6 +13,9 @@
 #include "cinder/gl/GlslProg.h"
 #include "cinder/gl/Fbo.h"
 #include "Vbo.h"
+
+#include "PreLoader.h"
+
 #include <string>
 #include <boost/unordered_map.hpp>
 
@@ -42,7 +45,7 @@ class RenderManager
 {
 public:
 
-    static RenderManagerRef create(std::string defaultPost = DEFAULT_POST_SHADER);
+    static RenderManagerRef create(std::string defaultPost = DEFAULT_POST_SHADER, PreLoaderRef preloader=PreLoaderRef());
     
     ~RenderManager(); 
     
@@ -52,12 +55,15 @@ public:
     
     ci::gl::Texture getReadBuffer();
     
+    void setPreLoader(PreLoaderRef preloader) { mPreLoader = preloader; }
     void setWindowSize(ci::Vec2i windowSize);
     void setBackgroundColor(ci::Color bgColor) { mBGColor = bgColor; }
     
-    //TODO need to cache here (maybe combine this with effect attribute)
+    ci::gl::GlslProg getShader(std::string shaderName);
+    
     void setDefaultPostShader() { mCurrentPostShader = mDefaultPostShader; }
     void setPostShader(std::string shaderName);
+    void setPostShaderTexture(std::string textureName);
     void setPostShaderAlpha(float alpha) { mPostShaderAlpha = alpha; }
     
     template<typename T>
@@ -77,6 +83,7 @@ protected:
 
     ci::CameraOrtho mPostCamera;
     ci::Vec2i mWindowSize;
+    PreLoaderRef mPreLoader;
 
     ci::gl::Fbo ca_read_fbo, ca_write_fbo;
     ci::Vec2i fbo_size;
@@ -94,7 +101,9 @@ protected:
     ci::gl::GlslProg mDefaultPostShader;
     
     RenderCallbacksByLayer mCallbacks;
+    
+    ci::gl::Texture mPostTexture;
 private:
 
-    RenderManager(std::string defaultPost = DEFAULT_POST_SHADER);
+    RenderManager(std::string defaultPost = DEFAULT_POST_SHADER, PreLoaderRef preloader=PreLoaderRef());
 };

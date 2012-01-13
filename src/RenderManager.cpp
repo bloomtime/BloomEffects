@@ -10,12 +10,12 @@
 using namespace std;
 using namespace ci;
 
-RenderManagerRef RenderManager::create(std::string defaultPost)
+RenderManagerRef RenderManager::create(std::string defaultPost, PreLoaderRef preloader)
 {
-    return RenderManagerRef( new RenderManager(defaultPost) );
+    return RenderManagerRef( new RenderManager(defaultPost, preloader) );
 }
 
-RenderManager::RenderManager(std::string defaultPost)
+RenderManager::RenderManager(std::string defaultPost, PreLoaderRef preloader)
 {
     mBGColor = Color(1.0f, 1.0f, 1.0f);
     mPostShaderAlpha = 1.0f;
@@ -31,21 +31,39 @@ RenderManager::RenderManager(std::string defaultPost)
     mPostVBO = gl::Vbo::create(GL_TRIANGLE_STRIP);
     mPostVBO->set(gl::Vbo::Attribute::create("a_position", 2, GL_FLOAT, GL_STREAM_DRAW));
     mPostVBO->set(gl::Vbo::Attribute::create("a_texcoord", 2, GL_FLOAT, GL_STREAM_DRAW));
+    
+    mPreLoader = preloader;
 }
 
 RenderManager::~RenderManager()
 {
 }
 
+ci::gl::GlslProg RenderManager::getShader(string shaderName)
+{
+    if (mPreLoader)
+    {
+        return mPreLoader->getShader(shaderName);
+    }
+    else 
+    {
+        return gl::GlslProg(app::App::loadResource(shaderName + "_vert.glsl"), app::App::loadResource(shaderName + "_frag.glsl"));
+    }
+}
+
 void RenderManager::setPostShader(string shaderName)
 {
-    //TODO need to cache here?
-    mCurrentPostShader = gl::GlslProg(app::App::loadResource(shaderName + "_vert.glsl"), app::App::loadResource(shaderName + "_frag.glsl"));
+    mCurrentPostShader = getShader(shaderName);
+}
+
+void RenderManager::setPostShaderTexture(string textureName)
+{
+    mPostTexture = mPreLoader->getTexture(textureName);
 }
 
 void RenderManager::setup(Vec2i windowSize)
 {
-    mBasicShader = gl::GlslProg(app::App::loadResource("default_texture_vert.glsl"), app::App::loadResource("default_texture_frag.glsl"));
+    mBasicShader = getShader("default_texture");
     
     setWindowSize(windowSize);
 }
