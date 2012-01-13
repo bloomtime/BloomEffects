@@ -102,7 +102,7 @@ protected:
     
     RenderCallbacksByLayer mCallbacks;
     
-    ci::gl::Texture mPostTexture;
+    ci::gl::Texture mPostShaderTexture;
 private:
 
     RenderManager(std::string defaultPost = DEFAULT_POST_SHADER, PreLoaderRef preloader=PreLoaderRef());

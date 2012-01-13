@@ -58,7 +58,7 @@ void RenderManager::setPostShader(string shaderName)
 
 void RenderManager::setPostShaderTexture(string textureName)
 {
-    mPostTexture = mPreLoader->getTexture(textureName);
+    mPostShaderTexture = mPreLoader->getTexture(textureName);
 }
 
 void RenderManager::setup(Vec2i windowSize)
@@ -172,6 +172,9 @@ void RenderManager::update()
 void RenderManager::draw()
 {  
     mCurrentPostShader.bind();
+        
+    mCurrentPostShader.uniform("u_screenTex", 0);
+    mCurrentPostShader.uniform("u_secondaryTex", 1);
     mCurrentPostShader.uniform("u_mvp_matrix",  mPostCamera.getProjectionMatrix() * mPostCamera.getModelViewMatrix());
     mCurrentPostShader.uniform("u_postAlpha", mPostShaderAlpha);
     
@@ -179,7 +182,10 @@ void RenderManager::draw()
     {
         gl::Texture texture = ca_read_fbo.getTexture();
         gl::SaveTextureBindState saveBindState( texture.getTarget() );
-        texture.bind();
+        texture.bind(0);
+        
+        if (mPostShaderTexture)
+            mPostShaderTexture.bind(1);
         
         Rectf destRect = texture.getCleanBounds();
         const Area srcArea = Area( destRect );
@@ -205,6 +211,7 @@ void RenderManager::draw()
         
         mPostVBO->draw(mCurrentPostShader);
     }
+        
     mCurrentPostShader.unbind();
 }
 
