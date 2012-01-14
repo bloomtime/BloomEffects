@@ -167,8 +167,8 @@ protected:
     bool mInheritTransform;
     
     EventState mEventState;
-        
     bool mEnabled;
+    
     bool mParentTransformChanged;
     ci::Vec3f mLocalPosition;
     ci::Vec3f mSourcePosition;

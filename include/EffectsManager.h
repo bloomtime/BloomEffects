@@ -19,6 +19,7 @@
 #include "AudioManager.h"
 #include "EffectJson.h"
 #include "Effect.h"
+#include "Device.h"
 
 class EffectsManager;
 
@@ -27,6 +28,18 @@ typedef boost::unordered_map<std::string, Json::Value> EffectJsonMap;
 typedef boost::unordered_map<std::string, EffectAttrMap> EventAttrMap;
 typedef std::shared_ptr<ci::CameraPersp> CameraRef;
 
+enum SpecEnabledMode 
+{
+    SPEC_ALL,
+    SPEC_MAX,
+    SPEC_MIN
+};
+
+const boost::unordered_map<std::string, SpecEnabledMode> SPEC_MODE = boost::assign::map_list_of
+    ("ALL", SPEC_ALL)
+    ("MAX_ONLY", SPEC_MAX)
+    ("MIN_ONLY", SPEC_MIN);
+    
 const ci::Vec3f KEYLIGHT_DIR = ci::Vec3f(1.0f, 0.0f, 0.5f);
 
 class EffectsManager
@@ -50,6 +63,7 @@ public:
     void destroyEffect(EffectRef effect, bool hardStop = false);
     
     void loadFEV(std::string filepath);
+    bool checkSpecEnabled(Json::Value currentBlock);
     
     EffectEventList initializeData(Json::Value data);
     void parseAttr(const Json::Value data, EffectAttribute &attr, EffectEventRef currentEvent);
@@ -89,6 +103,7 @@ protected:
     EventAttrMap mEventAttrs;
     
     ci::Vec2i mWindowSize;
+    bool mIsDeviceMaxSpec;
     
 private:
 

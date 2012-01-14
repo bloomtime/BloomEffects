@@ -13,6 +13,7 @@ EffectsManagerRef EffectsManager::create(RenderManagerRef renderMgr)
 EffectsManager::EffectsManager(RenderManagerRef renderMgr)
 {
     mRenderManager = renderMgr;
+    mIsDeviceMaxSpec = bloom::isIpad2();
 }
 
 EffectsManager::~EffectsManager()
@@ -86,6 +87,27 @@ EffectRef EffectsManager::createEffect(string effectName, bool start, Matrix44f 
     return newEffect;
 }
 
+bool EffectsManager::checkSpecEnabled(Json::Value currentBlock)
+{
+    SpecEnabledMode specMode = SPEC_MODE.at(currentBlock["SpecEnabled"].asString());
+    
+    switch (specMode) 
+    {
+        case SPEC_MIN:
+        {
+            return !mIsDeviceMaxSpec;
+        }
+        case SPEC_MAX:
+        {
+            return mIsDeviceMaxSpec;
+        }
+        default:
+        {
+            return true; 
+        }
+    }
+}
+
 EffectEventList EffectsManager::initializeData(Json::Value data)
 {
     list<EffectEventRef> effectEvents;
@@ -102,8 +124,9 @@ EffectEventList EffectsManager::initializeData(Json::Value data)
             string eventPath = currentBlock["EventPath"].asString();
             
             bool enabled = currentBlock["Enabled"].asBool();
+            bool specEnabled = checkSpecEnabled(currentBlock);
             
-            if (!enabled)
+            if (!enabled || !specEnabled)
                 continue;
             
             if (eventType == "" || eventPath == "")
