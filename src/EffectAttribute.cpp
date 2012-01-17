@@ -27,6 +27,7 @@ gl::Texture EffectAttribute::getTexture()
     mipFmt.enableMipmapping( true );
     mipFmt.setMinFilter( GL_LINEAR_MIPMAP_NEAREST );    
     mipFmt.setMagFilter( GL_LINEAR ); // TODO: experiment with GL_NEAREST where appropriate
+    mipFmt.setWrap(GL_REPEAT, GL_REPEAT);
     
     gl::Texture texture = gl::Texture( loadImage( app::loadResource( val ) ), mipFmt );
     sTextureCache[val] = texture;
