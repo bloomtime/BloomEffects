@@ -26,6 +26,8 @@
 #include <boost/unordered_map.hpp>
 #include <boost/assign/list_of.hpp>
 
+namespace bloom { namespace effects {
+
 class Effect;
 
 // for sharing ownership:
@@ -122,3 +124,5 @@ private:
         mTransform.setToIdentity();
     }
 };
+
+}} // namespace bloom::effects

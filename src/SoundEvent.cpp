@@ -6,9 +6,7 @@
 
 #include "SoundEvent.h"
 
-// may want texture input later
-//#include "cinder/gl/Texture.h"
-//#include "cinder/gl/gl.h"
+namespace bloom { namespace effects {
 
 using namespace ci;
 using namespace std;
@@ -215,3 +213,5 @@ void SoundEvent::draw(bool enabled)
 {    
     // nothing
 }
+
+}} // namespace bloom::effects

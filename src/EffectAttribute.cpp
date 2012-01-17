@@ -8,6 +8,8 @@
 
 #include "EffectAttribute.h"
 
+namespace bloom { namespace effects {
+
 using namespace std;
 using namespace ci;
 
@@ -82,3 +84,5 @@ AttributeCurvePoints EffectAttribute::getCurvePoints()
     
     return newCurvePoints;
 }
+
+}} // namespace bloom::effects

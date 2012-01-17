@@ -8,6 +8,8 @@
 #include "AudioManager.h"
 #include <boost/filesystem.hpp>
 
+namespace bloom { namespace effects {
+
 using namespace std;
 using namespace ci;
 
@@ -314,3 +316,5 @@ void AudioManager::update()
         ERRCHECK(result);
     }
 }
+
+}} // namespace bloom::effects

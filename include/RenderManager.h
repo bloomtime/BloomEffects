@@ -19,6 +19,8 @@
 #include <string>
 #include <boost/unordered_map.hpp>
 
+namespace bloom { namespace effects {
+
 enum RenderLayer 
 {
     LAYER_BACKGROUND,  // background 
@@ -107,3 +109,5 @@ private:
 
     RenderManager(std::string defaultPost = DEFAULT_POST_SHADER, PreLoaderRef preloader=PreLoaderRef());
 };
+
+}} // namespace bloom::effects

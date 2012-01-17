@@ -12,6 +12,8 @@
 #include <vector>
 #include <list>
 
+namespace bloom { namespace effects {
+
 enum Texture2Mode {
     TEX2_NONE,
     TEX2_NORMAL,
@@ -66,3 +68,5 @@ const boost::unordered_map<std::string, BlendMode> BLEND_MODES = boost::assign::
     ("AlphaBlend", BLEND_ALPHA)
     ("AdditiveBlend", BLEND_ADDITIVE)
     ("OpaqueBlend", BLEND_OPAQUE);
+
+}} // namespace bloom::effects

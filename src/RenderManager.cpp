@@ -7,6 +7,8 @@
 #include "RenderManager.h"
 #include "cinder/app/App.h"
 
+namespace bloom { namespace effects {
+
 using namespace std;
 using namespace ci;
 
@@ -215,3 +217,4 @@ void RenderManager::draw()
     mCurrentPostShader.unbind();
 }
 
+}} // namespace bloom::effects

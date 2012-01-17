@@ -11,6 +11,8 @@
 #include <vector>
 #include <list>
 
+namespace bloom { namespace effects {
+
 enum SoundType {
     SOUNDTYPE_EVENT,
     SOUNDTYPE_FILE
@@ -79,3 +81,5 @@ private:
 
     SoundEvent(AudioManagerRef audioMgr);
 };
+
+}} // namespace bloom::effects

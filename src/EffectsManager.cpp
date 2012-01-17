@@ -1,6 +1,8 @@
 #include "EffectsManager.h"
 #include <boost/foreach.hpp>
 
+namespace bloom { namespace effects {
+
 using namespace std;
 using namespace ci;
 
@@ -384,4 +386,6 @@ void EffectsManager::draw(bool enabled)
         }
     }
 }
+
+}} // namespace bloom::effects
 

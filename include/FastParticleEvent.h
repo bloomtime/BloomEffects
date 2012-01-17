@@ -13,6 +13,8 @@
 #include <vector>
 #include <list>
 
+namespace bloom { namespace effects {
+
 class FastParticleEvent;
 
 typedef std::shared_ptr<FastParticleEvent> FastParticleEventRef;
@@ -182,3 +184,5 @@ private:
 
     FastParticleEvent();
 };
+
+}} // namespace bloom::effects

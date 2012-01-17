@@ -14,6 +14,8 @@
 #include "fmod_event.hpp"
 #include <string>
 
+namespace bloom { namespace effects {
+
 class AudioManager;
 
 typedef std::shared_ptr<class AudioManager> AudioManagerRef;
@@ -68,3 +70,5 @@ private:
     
     AudioManager();
 };
+
+}} // namespace bloom::effects

@@ -8,6 +8,8 @@
 
 #include <boost/foreach.hpp>
 
+namespace bloom { namespace effects {
+
 using namespace std;
 using namespace ci;
 
@@ -90,3 +92,5 @@ void EffectEvent::updateSource()
         mParentTransformChanged = false;
     }
 }
+
+}} // namespace bloom::effects

@@ -9,6 +9,8 @@
 #include <boost/foreach.hpp>
 #include <boost/any.hpp>
 
+namespace bloom { namespace effects {
+
 EffectRef Effect::create()
 {
     return EffectRef( new Effect() );
@@ -185,3 +187,5 @@ void Effect::setCamera(CameraRef camera)
 {
     mCamera = camera;
 }
+
+}} // namespace bloom::effects

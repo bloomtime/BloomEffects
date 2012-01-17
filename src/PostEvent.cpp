@@ -10,6 +10,8 @@
 //#include "cinder/gl/Texture.h"
 //#include "cinder/gl/gl.h"
 
+namespace bloom { namespace effects {
+
 using namespace ci;
 using namespace std;
 
@@ -115,3 +117,5 @@ void PostEvent::draw(bool enabled)
 {    
     // nothing
 }
+
+}} // namespace bloom::effects

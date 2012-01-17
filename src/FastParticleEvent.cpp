@@ -10,6 +10,8 @@
 #include "cinder/gl/Texture.h"
 #include "cinder/gl/gl.h"
 
+namespace bloom { namespace effects {
+
 using namespace std;
 using namespace ci;
 
@@ -562,3 +564,5 @@ void FastParticleEvent::draw(bool enabled)
        
     disableBlendMode();
 }
+
+}} // namespace bloom::effects

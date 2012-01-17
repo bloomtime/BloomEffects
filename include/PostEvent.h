@@ -11,6 +11,8 @@
 #include <vector>
 #include <list>
 
+namespace bloom { namespace effects {
+
 class PostEvent;
 
 typedef std::shared_ptr<PostEvent> PostEventRef;
@@ -50,3 +52,5 @@ private:
 
     PostEvent();
 };
+
+}} // namespace bloom::effects

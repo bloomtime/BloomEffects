@@ -9,6 +9,8 @@
 #include "EmitVolume.h"
 #include "cinder/Rand.h"
 
+namespace bloom { namespace effects {
+
 using namespace ci;
 using namespace std;
 
@@ -52,3 +54,5 @@ Vec3f EmissionVolume::getRandomPoint(float scale)
     }
     return randomPoint;
 }
+
+}} // namespace bloom::effects

@@ -21,6 +21,8 @@
 #include "Effect.h"
 #include "Device.h"
 
+namespace bloom { namespace effects {
+
 class EffectsManager;
 
 typedef std::shared_ptr<EffectsManager> EffectsManagerRef;
@@ -109,3 +111,5 @@ private:
 
     EffectsManager(RenderManagerRef renderMgr);
 };
+
+}} // namespace bloom::effects

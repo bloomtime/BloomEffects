@@ -17,6 +17,8 @@
 #include <boost/unordered_map.hpp>
 #include <boost/assign/list_of.hpp>
 
+namespace bloom { namespace effects {
+
 typedef std::vector<ci::Vec3f> floatCurvePoints;
 typedef ci::BSpline2f floatCurve;
 
@@ -91,3 +93,5 @@ public:
     }
     
 };
+
+}} // namespace bloom::effects

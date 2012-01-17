@@ -16,7 +16,7 @@
 using namespace ci;
 using namespace std;
 
-namespace effects {
+namespace bloom { namespace effects {
 
 static Json::Value getJsonData(string effectPath)
 {
@@ -42,4 +42,4 @@ static vector<Json::Value> readVector(Json::Value object, string key)
 	return members;
 }
 
-}
+}} // namespace bloom::effects

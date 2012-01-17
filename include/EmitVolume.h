@@ -12,6 +12,8 @@
 #include <boost/assign/list_of.hpp>
 #include "cinder/Vector.h"
 
+namespace bloom { namespace effects {
+
 enum EmitVolume {
     VOLUME_POINT,
     VOLUME_SPHERE,
@@ -44,3 +46,5 @@ protected:
     EmitVolume mVolumeType;
     ci::Vec3f mScale;
 };
+
+}} // namespace bloom::effects

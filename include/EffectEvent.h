@@ -19,6 +19,8 @@
 
 //#include "EffectsRenderer.h"
 
+namespace bloom { namespace effects {
+
 enum EventState 
 {
     EVENT_INITIALIZED,
@@ -185,3 +187,5 @@ protected:
     
     template<typename T> ci::CallbackId mCallbackId;
 };
+
+}} // namespace bloom::effects
