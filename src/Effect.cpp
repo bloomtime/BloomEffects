@@ -58,6 +58,9 @@ void Effect::stop(bool hardStop)
         if ((*it)->isEnabled())
             (*it)->stop(hardStop);
     }
+    
+    if (hardStop)
+        mEffectState = EFFECT_STOPPED;
 }
 
 double Effect::getEffectElapsedSeconds()
