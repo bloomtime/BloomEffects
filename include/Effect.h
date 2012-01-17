@@ -53,7 +53,6 @@ const boost::unordered_map<string, ChildEventType> CHILD_EVENT_TYPES = boost::as
     
 enum EffectState 
 {
-    EFFECT_INITIALIZED,
     EFFECT_STARTED,
     EFFECT_RUNNING,
     EFFECT_STOPPED
@@ -115,7 +114,7 @@ private:
 
     Effect():
         mIsVisible(true),
-        mEffectState(EFFECT_INITIALIZED),
+        mEffectState(EFFECT_STOPPED),
         mStartedTime(-1.0f),
         mIsChildrenRunning(false),
         mTimer(true) // true = auto-start

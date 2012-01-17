@@ -86,8 +86,8 @@ public:
     void setAttribute(std::string name, boost::any value) { mAttributes[name].mValue = value; }
     
     void setEnabled(bool enabled) { mEnabled = enabled; }
-    void setStartTime(float startTime) { mStartTime = startTime; }
-    float getStartTime() { return mStartTime; }
+    void setToStartTime(float startTime) { mToStartTime = startTime; }
+    float getToStartTime() { return mToStartTime; }
     
     void setSourcePosition(ci::Vec3f position) 
     { 
@@ -133,7 +133,8 @@ protected:
         mFileExtension(""),
         mInheritTransform(false),
         mEventState(EVENT_INITIALIZED),
-        mStartTime(-1.0f),
+        mToStartTime(0.0f),
+        mActualStartTime(-1.0f),
         mLifetime(0.0f),
         mHardStop(false),
         mLocalPosition(ci::Vec3f( 0.0f, 0.0f, 0.0f )),
@@ -162,7 +163,8 @@ protected:
     //parent transform
     ci::Matrix44f mParentTransform;
     float mLifetime;
-    float mStartTime;
+    float mToStartTime;
+    float mActualStartTime;
     bool mHardStop;
     bool mInheritTransform;
     

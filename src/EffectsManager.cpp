@@ -178,7 +178,7 @@ EffectEventList EffectsManager::initializeData(Json::Value data)
                 currentEvent->setEnabled(enabled);
                 currentEvent->setRenderManager(mRenderManager);
                 currentEvent->setKeyLightDir(KEYLIGHT_DIR);
-                currentEvent->setStartTime(currentBlock["StartTime"].asFloat());
+                currentEvent->setToStartTime(currentBlock["StartTime"].asFloat());
             
                 vector<Json::Value> posValues = effects::readVector(currentBlock, "Position");
                 currentEvent->setSourcePosition(Vec3f(posValues[0].asFloat(), posValues[1].asFloat(), posValues[2].asFloat()));       

@@ -38,7 +38,7 @@ Effect::~Effect()
 
 void Effect::start()
 {
-    if (isRunning())
+    if (isRunning() || isStarted())
     {
         return;
     }
@@ -102,8 +102,7 @@ void Effect::update()
         {
             (*it)->setInitialized();
         }
-        
-        mIsChildrenRunning = true;
+    
         mEffectState = EFFECT_RUNNING;
     }
     
@@ -114,7 +113,7 @@ void Effect::update()
         // update children
         for( list<EffectEventRef>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
         {
-            if ((*it)->isInitialized() && (getEffectElapsedSeconds() >= (*it)->getStartTime()))
+            if ((*it)->isInitialized() && (getEffectElapsedSeconds() >= (*it)->getToStartTime()))
             {
                 (*it)->start();
             }

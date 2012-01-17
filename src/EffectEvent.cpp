@@ -19,7 +19,7 @@ EffectEvent::~EffectEvent()
 void EffectEvent::start()
 {
     mEventState = EVENT_STARTED;
-    mStartTime = mTimer.getSeconds();
+    mActualStartTime = mTimer.getSeconds();
     mActualSeconds = 0.0f;
     mPreviousElapsed = 0.0f;
 }
@@ -32,17 +32,17 @@ void EffectEvent::stop(bool hardStop)
     if (hardStop)
     {
         mEventState = EVENT_STOPPED;
-        mStartTime = -1.0f;
+        mActualStartTime = -1.0f;
         mActualSeconds = 0.0f;
     }
 }
 
 double EffectEvent::getEventElapsedSeconds()
 {
-    if (mStartTime == -1.0f)
+    if (mActualStartTime == -1.0f)
         return 0.0f;
         
-    double elapsed = mTimer.getSeconds() - mStartTime;
+    double elapsed = mTimer.getSeconds() - mActualStartTime;
     double deltaTime = elapsed - mPreviousElapsed;
     
     if (deltaTime > ELAPSED_MAX)
@@ -79,7 +79,7 @@ void EffectEvent::updateSource()
 {
     if (mEventState == EVENT_STOPPED)
     {
-        mStartTime = -1.0f;
+        mActualStartTime = -1.0f;
         mActualSeconds = 0.0f;
     }
         
