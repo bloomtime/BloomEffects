@@ -373,8 +373,8 @@ void ParticleEvent::update()
         
         if ((*it).lifetime > (*it).maxLifetime)
         {
-            if (mRenderLayer == LAYER_PREPOST)
-                std::cout << "killing particle" << std::endl;
+            //if (mRenderLayer == LAYER_PREPOST)
+            //    std::cout << "killing particle" << std::endl;
                 
             it = mParticles.erase( it );
             continue;
