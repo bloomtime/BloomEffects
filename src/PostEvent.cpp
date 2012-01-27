@@ -89,24 +89,34 @@ void PostEvent::update()
         float fadeAmt = 1.0f - math<float>::clamp((totalElapsed - tailFadeRange)/mFadeTime.y, 0.0f, 1.0f);
         mRenderManager->setPostShaderAlpha(fadeAmt);
     }
-    else if (isStopping() && mFadeTime.y > 0.0f)
+    else if (isStopping())
     {
-        if (mFadeStartTime == -1.0f)
+        if (mFadeTime.y > 0.0f)
         {
-            mFadeStartTime = totalElapsed;
+            if (mFadeStartTime == -1.0f)
+            {
+                mFadeStartTime = totalElapsed;
+            }
+            else
+            {
+                float fadeAmt = 1.0f - math<float>::clamp((totalElapsed - mFadeStartTime)/mFadeTime.y, 0.0f, 1.0f);
+                mRenderManager->setPostShaderAlpha(fadeAmt);
+            
+                if (fadeAmt <= 0.0f)
+                {
+                    mEventState = EVENT_STOPPED;
+                
+                    mRenderManager->setDefaultPostShader();
+                    mRenderManager->setPostShaderAlpha(1.0f);
+                }
+            }
         }
         else
         {
-            float fadeAmt = 1.0f - math<float>::clamp((totalElapsed - mFadeStartTime)/mFadeTime.y, 0.0f, 1.0f);
-            mRenderManager->setPostShaderAlpha(fadeAmt);
-            
-            if (fadeAmt == 0.0f)
-            {
-                mEventState = EVENT_STOPPED;
+            mEventState = EVENT_STOPPED;
                 
-                mRenderManager->setDefaultPostShader();
-                mRenderManager->setPostShaderAlpha(1.0f);
-            }
+            mRenderManager->setDefaultPostShader();
+            mRenderManager->setPostShaderAlpha(1.0f);
         }
     }
     
