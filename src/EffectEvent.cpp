@@ -79,7 +79,7 @@ EffectAttribute EffectEvent::getAttribute(string attrName)
 
 void EffectEvent::updateSource()
 {
-    if (mEventState == EVENT_STOPPED)
+    if (mEventState == EVENT_STOPPED || mEventState == EVENT_INITIALIZED)
     {
         mActualStartTime = -1.0f;
         mActualSeconds = 0.0f;

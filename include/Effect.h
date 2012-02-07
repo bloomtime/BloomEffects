@@ -57,6 +57,7 @@ enum EffectState
 {
     EFFECT_STARTED,
     EFFECT_RUNNING,
+    EFFECT_STOPPING,
     EFFECT_STOPPED
 };
 
@@ -90,6 +91,7 @@ public:
     
     bool isStarted() { return mEffectState == EFFECT_STARTED; }
     bool isRunning() { return mEffectState == EFFECT_RUNNING; }
+    bool isStopping() { return mEffectState == EFFECT_STOPPING; }
     bool isStopped() { return mEffectState == EFFECT_STOPPED; }
 
 protected:

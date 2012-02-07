@@ -50,44 +50,23 @@ void PostEvent::setup(ci::Vec2f windowSize)
 
 void PostEvent::update()
 {
+    updateSource();
+    
     float totalElapsed = getEventElapsedSeconds();
     //float dt = totalElapsed - mPreviousElapsed;  
     
     // run through the state gauntlet
-    if (isInitialized() || isStopped())
+    if (isInitialized() || totalElapsed == 0.0f)
     {
         return;
     }    
-    else if (isStarted())
+    else if (isStopped())
     {
-        mEventState = EVENT_RUNNING;
-
-        //TODO here need to set shader on effectsrenderer
-        if (mRenderManager)
-            mRenderManager->setPostShader(mShaderName);
-    }
-    // -1.0f lifetime is infinite lifetime
-    else if (isRunning() && totalElapsed >= mLifetime && mLifetime != -1.0f)
-    {
-        stop(true);
-        
         mRenderManager->setDefaultPostShader();
         mRenderManager->setPostShaderAlpha(1.0f);
+        
+        //mEventState = EVENT_INITIALIZED;
         return;
-    }
-    
-    float tailFadeRange = mLifetime - mFadeTime.y;
-    
-    // set the post alpha parameter, which is optionally used by the shader
-    if (totalElapsed < mFadeTime.x)
-    {
-        float fadeAmt = totalElapsed / mFadeTime.x;
-        mRenderManager->setPostShaderAlpha(fadeAmt);
-    }
-    else if (isRunning() && mLifetime != -1.0f && totalElapsed > tailFadeRange)
-    {
-        float fadeAmt = 1.0f - math<float>::clamp((totalElapsed - tailFadeRange)/mFadeTime.y, 0.0f, 1.0f);
-        mRenderManager->setPostShaderAlpha(fadeAmt);
     }
     else if (isStopping())
     {
@@ -97,28 +76,55 @@ void PostEvent::update()
             {
                 mFadeStartTime = totalElapsed;
             }
-            else
-            {
-                float fadeAmt = 1.0f - math<float>::clamp((totalElapsed - mFadeStartTime)/mFadeTime.y, 0.0f, 1.0f);
-                mRenderManager->setPostShaderAlpha(fadeAmt);
+
+
+            float fadeAmt = 1.0f - math<float>::clamp((totalElapsed - mFadeStartTime)/mFadeTime.y, 0.0f, 1.0f);
+            mRenderManager->setPostShaderAlpha(fadeAmt);
             
-                if (fadeAmt <= 0.0f)
-                {
-                    mEventState = EVENT_STOPPED;
-                
-                    mRenderManager->setDefaultPostShader();
-                    mRenderManager->setPostShaderAlpha(1.0f);
-                }
+            if (fadeAmt <= 0.0f)
+            {
+                mFadeStartTime = -1.0f;
+                mEventState = EVENT_STOPPED;
             }
         }
         else
         {
             mEventState = EVENT_STOPPED;
-                
-            mRenderManager->setDefaultPostShader();
-            mRenderManager->setPostShaderAlpha(1.0f);
         }
     }
+    else if (isStarted())
+    {
+        mEventState = EVENT_RUNNING;
+
+        //TODO here need to set shader on effectsrenderer
+        if (mRenderManager)
+            mRenderManager->setPostShader(mShaderName);
+    }
+    
+    //-------------------------------
+    
+    if (isRunning())
+    {
+        float tailFadeRange = mLifetime - mFadeTime.y;
+        
+        if (totalElapsed >= mLifetime && mLifetime != -1.0f)
+        {
+            stop(true);
+            return;
+        }
+        // set the post alpha parameter, which is optionally used by the shader
+        else if (totalElapsed < mFadeTime.x)
+        {
+            float fadeAmt = totalElapsed / mFadeTime.x;
+            mRenderManager->setPostShaderAlpha(fadeAmt);
+        }
+        else if (totalElapsed > tailFadeRange && mLifetime != -1.0f)
+        {
+            float fadeAmt = 1.0f - math<float>::clamp((totalElapsed - tailFadeRange)/mFadeTime.y, 0.0f, 1.0f);
+            mRenderManager->setPostShaderAlpha(fadeAmt);
+        }
+    }
+
     
     //mPreviousElapsed = totalElapsed;
 }

@@ -55,6 +55,8 @@ void Effect::start()
 
 void Effect::stop(bool hardStop)
 {
+    mEffectState = EFFECT_STOPPING;
+    
     for( list<EffectEventRef>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
     {
         if ((*it)->isEnabled())
@@ -134,6 +136,27 @@ void Effect::update()
         }
         
         // if no children left, stop self
+        if (!mIsChildrenRunning)
+        {
+            mEffectState = EFFECT_STOPPED;
+        }
+    }
+    else if (isStopping())
+    {
+        mIsChildrenRunning = false;
+        
+        // update children
+        for( list<EffectEventRef>::const_iterator it = mEvents.begin(); it != mEvents.end(); ++it )
+        {
+            if ((*it)->isEnabled())
+                (*it)->update();
+                
+            if (!(*it)->isStopped() && !(*it)->isInitialized())
+            {
+                mIsChildrenRunning = true;
+            }
+        }
+        
         if (!mIsChildrenRunning)
         {
             mEffectState = EFFECT_STOPPED;
