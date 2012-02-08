@@ -79,8 +79,8 @@ void RenderManager::setWindowSize(Vec2i windowSize)
         gl::Fbo::Format fbo_format;
         fbo_format.enableDepthBuffer(true);
         fbo_format.enableMipmapping(true);
-        fbo_format.setMinFilter(GL_NEAREST);
-        fbo_format.setMagFilter(GL_NEAREST);
+        fbo_format.setMinFilter(GL_LINEAR);
+        fbo_format.setMagFilter(GL_LINEAR);
         ca_write_fbo = gl::Fbo(fbo_size.x, fbo_size.y, fbo_format);
         ca_read_fbo  = gl::Fbo(fbo_size.x, fbo_size.y, fbo_format);
 
