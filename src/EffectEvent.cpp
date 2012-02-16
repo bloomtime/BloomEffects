@@ -28,7 +28,9 @@ void EffectEvent::start()
 
 void EffectEvent::stop(bool hardStop)
 {
-    mEventState = EVENT_STOPPING;
+    if (mEventState != EVENT_STOPPED)
+        mEventState = EVENT_STOPPING;
+        
     mHardStop = hardStop;
     
     if (hardStop)
@@ -42,7 +44,10 @@ void EffectEvent::stop(bool hardStop)
 double EffectEvent::getEventElapsedSeconds()
 {
     if (mActualStartTime == -1.0f)
-        return 0.0f;
+    {
+        mActualSeconds = 0.0f;
+        return mActualSeconds;
+    }
         
     double elapsed = mTimer.getSeconds() - mActualStartTime;
     double deltaTime = elapsed - mPreviousElapsed;
@@ -82,7 +87,6 @@ void EffectEvent::updateSource()
     if (mEventState == EVENT_STOPPED || mEventState == EVENT_INITIALIZED)
     {
         mActualStartTime = -1.0f;
-        mActualSeconds = 0.0f;
     }
         
     if (mParentTransformChanged)

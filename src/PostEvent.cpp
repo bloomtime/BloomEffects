@@ -56,18 +56,18 @@ void PostEvent::update()
     //float dt = totalElapsed - mPreviousElapsed;  
     
     // run through the state gauntlet
-    if (isInitialized() || totalElapsed == 0.0f)
-    {
-        return;
-    }    
-    else if (isStopped())
+    if (isStopped())
     {
         mRenderManager->setDefaultPostShader();
         mRenderManager->setPostShaderAlpha(1.0f);
         
-        //mEventState = EVENT_INITIALIZED;
+        mEventState = EVENT_INITIALIZED;
         return;
     }
+    else if (isInitialized() || totalElapsed == 0.0f)
+    {
+        return;
+    }    
     else if (isStopping())
     {
         if (mFadeTime.y > 0.0f)
