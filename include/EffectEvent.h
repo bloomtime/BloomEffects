@@ -185,7 +185,7 @@ protected:
     
     ci::Timer mTimer;
     
-    template<typename T> ci::CallbackId mCallbackId;
+    ci::CallbackId mCallbackId;
 };
 
 }} // namespace bloom::effects
