@@ -112,6 +112,9 @@ void SoundEvent::update()
            mEvent->stop(true);
         } 
         
+        if (mPlayMode == PLAY_LOOPING)
+            mLifetime = 0.0f;
+        
         return;
     }  
     else if (isStopping())
@@ -119,6 +122,10 @@ void SoundEvent::update()
         if (!mAudioManager->isSoundPlaying(mSound) && !mAudioManager->isEventPlaying(mEvent))
         {
             mEventState = EVENT_STOPPED;
+            
+            if (mPlayMode == PLAY_LOOPING)
+                mLifetime = 0.0f;
+            return;
         }  
         
         //handle the looping infinite case 
