@@ -110,6 +110,8 @@ void PostEvent::update()
         if (totalElapsed >= mLifetime && mLifetime != -1.0f)
         {
             stop(true);
+            mRenderManager->setDefaultPostShader();
+            mRenderManager->setPostShaderAlpha(1.0f);
             return;
         }
         // set the post alpha parameter, which is optionally used by the shader
