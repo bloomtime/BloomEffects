@@ -61,7 +61,9 @@ void PostEvent::update()
         mRenderManager->setDefaultPostShader();
         mRenderManager->setPostShaderAlpha(1.0f);
         
-        mEventState = EVENT_INITIALIZED;
+        if (mLifetime <= 0.0f)
+            mEventState = EVENT_INITIALIZED;
+            
         return;
     }
     else if (isInitialized() || totalElapsed == 0.0f)
