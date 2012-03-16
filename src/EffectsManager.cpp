@@ -1,5 +1,4 @@
 #include "EffectsManager.h"
-#include <boost/foreach.hpp>
 
 namespace bloom { namespace effects {
 
@@ -205,7 +204,7 @@ EffectEventList EffectsManager::initializeData(Json::Value data)
                 {
                     EffectAttrMap attrs = currentEvent->getAttributes();
                     
-                    BOOST_FOREACH(EffectAttrMap::value_type i, attrs) 
+                    for(EffectAttrMap::value_type &i : attrs) 
                     {
                         parseAttr(childData, i.second, currentEvent);
                     }         

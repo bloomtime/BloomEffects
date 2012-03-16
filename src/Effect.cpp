@@ -6,7 +6,6 @@
 
 #include "Effect.h"
 
-#include <boost/foreach.hpp>
 #include <boost/any.hpp>
 
 namespace bloom { namespace effects {

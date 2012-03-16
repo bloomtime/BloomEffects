@@ -6,8 +6,6 @@
 
 #include "EffectEvent.h"
 
-#include <boost/foreach.hpp>
-
 namespace bloom { namespace effects {
 
 using namespace std;
